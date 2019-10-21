@@ -14,7 +14,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 
-public class Homepage extends AppCompatActivity {
+public class HomepageActivity extends AppCompatActivity {
 
     Button btn_sign_out;
 
@@ -27,7 +27,7 @@ public class Homepage extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 AuthUI.getInstance()
-                        .signOut(Homepage.this)
+                        .signOut(HomepageActivity.this)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
@@ -36,7 +36,7 @@ public class Homepage extends AppCompatActivity {
                         }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(Homepage.this, ""+ e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(HomepageActivity.this, ""+ e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -46,5 +46,30 @@ public class Homepage extends AppCompatActivity {
     private void signOut() {
         startActivity(new Intent(this, MainActivity.class));
         finish();
+    }
+
+    public void createEventOnClick(View view) {
+        Intent intent = new Intent(this, CreateEventActivity.class);
+        startActivity(intent);
+    }
+
+    public void viewEventOnClick(View view) {
+        Intent intent = new Intent(this, EventActivity.class);
+        startActivity(intent);
+    }
+
+    public void viewFriendsOnClick(View view) {
+        Intent intent = new Intent(this, FriendsActivity.class);
+        startActivity(intent);
+    }
+
+    public void inviteFriendOnClick(View view) {
+        Intent intent = new Intent(this, InviteFriendsActivity.class);
+        startActivity(intent);
+    }
+
+    public void viewProfileOnClick(View view) {
+        Intent intent = new Intent(this, ProfileActivity.class);
+        startActivity(intent);
     }
 }
