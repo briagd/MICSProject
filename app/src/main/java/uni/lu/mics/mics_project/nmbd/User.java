@@ -1,11 +1,19 @@
 package uni.lu.mics.mics_project.nmbd;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class User {
 
-    String username;
-    String name;
-    int age;
-    String email;
+    // to be discussed
+    private String userId;
+    private String username;
+    private String name;
+    private int age;
+    private String email;
+
+    // List of friends of one user
+    private List<String> userFriendsList;
 
 
     public User(){
@@ -17,6 +25,7 @@ public class User {
         this.name = name;
         this.age = age;
         this.email = email;
+        this.userFriendsList = new ArrayList<>();
 
     }
 
