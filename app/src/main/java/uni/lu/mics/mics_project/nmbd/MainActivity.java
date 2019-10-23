@@ -1,5 +1,6 @@
 package uni.lu.mics.mics_project.nmbd;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -9,6 +10,8 @@ import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -17,18 +20,23 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.annotations.Nullable;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    //TAG used for Log and debugging
+    final String TAG = "Main Activity";
 
     private static final int MY_REQUEST_CODE = 123;
     List<AuthUI.IdpConfig> providers;
 
     //reference to the database
-    private DatabaseReference mDatabase;
+    private FirebaseFirestore mDatabase;
 
 
     @Override
@@ -37,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //initializing the database
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase = FirebaseFirestore.getInstance();
 
         //list of providers accepted for signing up
         providers = Arrays.asList(
@@ -67,40 +75,52 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == MY_REQUEST_CODE) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
+                //Get reference of the firebase user from Auth
                 final FirebaseUser firebaseuser = FirebaseAuth.getInstance().getCurrentUser();
 
-                //If user does not exists then add user to database
-                DatabaseReference uidRef = mDatabase.child("users").child(firebaseuser.getUid());
-                ValueEventListener eventListener = new ValueEventListener() {
+                //Instantiate a user object for the current user to be initialized from database and passed as intent to next activity
+                final User currentUser = new User();
+                //Creates a reference for the id of users
+                DocumentReference usersRef = mDatabase.collection("users").document(firebaseuser.getUid());
+
+                //Check if user already exists in the database
+                usersRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(!dataSnapshot.exists()) {
-                            //create new user object to be added to the database
-                            User u = new User();
-                            u.setName(firebaseuser.getDisplayName());
-                            u.setEmail(firebaseuser.getEmail());
-                            mDatabase.child("users").child(firebaseuser.getUid()).setValue(u);
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                Log.d(TAG, "User retrieved from database");
+                                //Updates the currentuser Object from database info
+                                //TODO: Check if all fields are correct
+                                currentUser.setName(document.get("name").toString());
+                                currentUser.setEmail(document.get("email").toString());
+                                currentUser.setAge(Integer.parseInt(document.get("age").toString()));
+
+                                if(document.get("username")!=null) {
+                                    currentUser.setUsername(document.get("username").toString());
+                                }
+
+                            } else {
+                                //If user does not exists then add user to database
+                                currentUser.setName(firebaseuser.getDisplayName());
+                                currentUser.setEmail(firebaseuser.getEmail());
+                                mDatabase.collection("users").document(firebaseuser.getUid()).set(currentUser);
+                                Log.d(TAG, "User added to database");
+                            }
+                        } else {
+                            Log.d(TAG, "Failed with: ", task.getException());
                         }
-
-                        //TODO:Retrieve user object from database
                     }
+                });
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.d("DatabaseError", databaseError.getMessage()); //Don't ignore errors!
-                    }
-                };
-                uidRef.addListenerForSingleValueEvent(eventListener);
-
-
-
-
-                //TODO: Add user object to intent
-                //See: https://stackoverflow.com/questions/2736389/how-to-pass-an-object-from-one-activity-to-another-on-android
-
+                //Creates intent
+                Intent intent = new Intent(this, HomepageActivity.class);
+                //adds the currentUser object as extra to the intent to be retrieved
+                intent.putExtra("currentUser", currentUser);
                 //go to homepage activity
-                startActivity(new Intent(this, HomepageActivity.class));
-
+                startActivity(intent);
 
                 finish();
 
