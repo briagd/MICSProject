@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //initializing the database
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         //list of providers accepted for signing up
@@ -66,20 +67,22 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == MY_REQUEST_CODE) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
-                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                final FirebaseUser firebaseuser = FirebaseAuth.getInstance().getCurrentUser();
 
                 //If user does not exists then add user to database
-                DatabaseReference uidRef = mDatabase.child("users").child(user.getUid());
+                DatabaseReference uidRef = mDatabase.child("users").child(firebaseuser.getUid());
                 ValueEventListener eventListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if(!dataSnapshot.exists()) {
                             //create new user object to be added to the database
                             User u = new User();
-                            u.setName(user.getDisplayName());
-                            u.setEmail(user.getEmail());
-                            mDatabase.child("users").child(user.getUid()).setValue(u);
+                            u.setName(firebaseuser.getDisplayName());
+                            u.setEmail(firebaseuser.getEmail());
+                            mDatabase.child("users").child(firebaseuser.getUid()).setValue(u);
                         }
+
+                        //TODO:Retrieve user object from database
                     }
 
                     @Override
@@ -90,6 +93,11 @@ public class MainActivity extends AppCompatActivity {
                 uidRef.addListenerForSingleValueEvent(eventListener);
 
 
+
+
+                //TODO: Add user object to intent
+                //See: https://stackoverflow.com/questions/2736389/how-to-pass-an-object-from-one-activity-to-another-on-android
+
                 //go to homepage activity
                 startActivity(new Intent(this, HomepageActivity.class));
 
@@ -97,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 finish();
 
                 //display toast if correctly signed in
-                Toast.makeText(this, "Welcome! " + user.getDisplayName(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Welcome! " + firebaseuser.getDisplayName(), Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(this, "" + response.getError().getMessage(), Toast.LENGTH_LONG).show();
             }
