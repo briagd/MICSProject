@@ -20,6 +20,7 @@ public class User implements Serializable {
     private String dateOfBirth;
     private int age;
     private String email;
+    private String profilePicUrl;
 
 
     // List of friends of one user
@@ -78,4 +79,14 @@ public class User implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getProfilePicUrl() {
+        return profilePicUrl;
+    }
+
+    public void setProfilePicUrl(String profilePicUrl) {
+        this.profilePicUrl = profilePicUrl;
+    }
+
+
 }

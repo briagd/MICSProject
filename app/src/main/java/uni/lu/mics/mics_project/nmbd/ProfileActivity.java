@@ -5,22 +5,27 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,6 +39,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -47,8 +56,10 @@ public class ProfileActivity extends AppCompatActivity {
     //reference to to the user signed in the database
     private FirebaseUser firebaseUser;
 
-    //reference to the database
+    //reference to the firestore database
     private FirebaseFirestore mDatabase;
+    //Reference to the storage
+    private StorageReference mStorageRef;
 
     //Name Edit Text view
     private EditText nameEdit;
@@ -62,12 +73,15 @@ public class ProfileActivity extends AppCompatActivity {
     //Profile pic
     private static final int PICK_IMAGE_REQUEST = 1;
     private Button chooseImageButton;
+    private Button uploadPicButton;
     private ImageView profileImageView;
     private Uri imageUri;
+    private ProgressBar uploadProgressBar;
 
 
     //Reference to the user logged in
-            private User currentUser;
+    private User currentUser;
+    private String currentUserID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +90,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         //initialize firebaseUser to Auth user
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        currentUserID = firebaseUser.getUid();
 
         // Initialize the different textEditViews
         nameEdit = findViewById(R.id.profile_activity_name_edit_view);
@@ -85,6 +100,12 @@ public class ProfileActivity extends AppCompatActivity {
         confirmPasswordTextView = findViewById(R.id.profile_activity_confirmpassword_label);
         chooseImageButton = findViewById(R.id.profile_activity_choose_image_button);
         profileImageView = findViewById(R.id.profile_activity_profile_picture_view);
+        uploadPicButton = findViewById(R.id.profile_activity_upload_picture_button);
+        uploadProgressBar = findViewById(R.id.profile_activity_upload_progressbar);
+        //Set Upload button and upload progress bar to invisible as no picture has been chosen
+        uploadPicButton.setVisibility(View.INVISIBLE);
+        uploadProgressBar.setVisibility(View.INVISIBLE);
+
 
         //Configures the date picker
         dobEdit.setInputType(InputType.TYPE_NULL);
@@ -100,7 +121,8 @@ public class ProfileActivity extends AppCompatActivity {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                dobEdit.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
+                                String dateOfB = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
+                                dobEdit.setText(dateOfB);
 
                             }
                         }, year, month, day);
@@ -115,7 +137,7 @@ public class ProfileActivity extends AppCompatActivity {
         //initializing the database
         mDatabase = FirebaseFirestore.getInstance();
         //get the database reference corresponding to the auth user
-        DocumentReference docRef = mDatabase.collection("users").document(firebaseUser.getUid());
+        DocumentReference docRef = mDatabase.collection("users").document(currentUserID);
 
         //Retrieves the user info from database
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -127,14 +149,16 @@ public class ProfileActivity extends AppCompatActivity {
                         Log.d(TAG, "User retrieved from database");
                         //Updates the currentuser Object from database info
                         currentUser = document.toObject(User.class);
+                        if (currentUser != null) {
+                            nameEdit.setText(currentUser.getName());
 
-                        nameEdit.setText(currentUser.getName());
-                        if(currentUser.getDateOfBirth()==null){
-                            Date c = Calendar.getInstance().getTime();
-                            SimpleDateFormat df = new SimpleDateFormat("dd/MMM/yyyy");
-                            dobEdit.setText(df.format(c));
-                        } else{
-                            dobEdit.setText(currentUser.getDateOfBirth());
+                            if (currentUser.getDateOfBirth() == null) {
+                                Date c = Calendar.getInstance().getTime();
+                                SimpleDateFormat df = new SimpleDateFormat("dd/MMM/yyyy");
+                                dobEdit.setText(df.format(c));
+                            } else {
+                                dobEdit.setText(currentUser.getDateOfBirth());
+                            }
                         }
 
                     }
@@ -144,8 +168,8 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        //updates the textviews according to user
-        //Log.d(TAG, currentUser.getName());
+        //Initialize Storage reference
+        mStorageRef = FirebaseStorage.getInstance().getReference();
 
 
     }
@@ -189,7 +213,7 @@ public class ProfileActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                Log.d("****************", "User password updated.");
+                                Log.d(TAG, "User password updated.");
                             }
                         }
                     });
@@ -204,7 +228,7 @@ public class ProfileActivity extends AppCompatActivity {
 
 
         //Updates the data base with the currentuser object
-        mDatabase.collection("users").document(firebaseUser.getUid()).set(currentUser);
+        mDatabase.collection("users").document(currentUserID).set(currentUser);
 
         //Display Toast to confirm that data was saved
         Toast.makeText(this, "Profile updated", Toast.LENGTH_LONG).show();
@@ -238,8 +262,68 @@ public class ProfileActivity extends AppCompatActivity {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode ==RESULT_OK && data!=null && data.getData()!= null){
             imageUri = data.getData();
             profileImageView.setImageURI(imageUri);
+            //Make the upload button visible
+            uploadPicButton.setVisibility(View.VISIBLE);
         }
     }
 
-    //TODO: save picture to storage and retrieve image when opening the page
+
+
+    //
+    public void uploadPictureOnClick(View view) {
+        //Hides button so no attempt to upload multiple times possible
+        uploadPicButton.setVisibility(View.INVISIBLE);
+        uploadFile();
+    }
+
+    //Method to get the file extension as string
+    private String getFileExtension(Uri uri){
+        ContentResolver cR = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cR.getType(uri));
+    }
+
+    private void uploadFile(){
+        if(imageUri!=null){
+            //TODO: if there is an existing profile pic, it should be removed from storage
+
+            //Creates a reference for the file to store
+            final StorageReference fileReference = mStorageRef.child("profilePics/" + currentUserID + "." + getFileExtension(imageUri));
+
+            //uploads file to firestore
+            fileReference.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Log.d(TAG, "Profile picture upload successful");
+                    //Hides progress bar and upload button
+                    uploadProgressBar.setVisibility(View.INVISIBLE);
+
+                    //Displays toast on success
+                    Toast.makeText(ProfileActivity.this, "Profile Picture updated", Toast.LENGTH_LONG).show();
+
+                    //Upload the file ProfilePicUrl information to the database
+                    String picUrl = fileReference.getDownloadUrl().toString();
+                    currentUser.setProfilePicUrl(picUrl);
+                    mDatabase.collection("users").document(currentUserID).set(currentUser);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(ProfileActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, e.getMessage());
+                }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                    //Shows the progress bar
+                    uploadProgressBar.setVisibility(View.VISIBLE);
+//
+                }
+            });
+        } else{
+            Toast.makeText(this, "No profile picture selected", Toast.LENGTH_SHORT ).show();
+        }
+    }
+
+
 }
