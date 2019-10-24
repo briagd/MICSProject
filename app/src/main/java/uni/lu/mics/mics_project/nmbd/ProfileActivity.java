@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -248,10 +249,11 @@ public class ProfileActivity extends AppCompatActivity {
 
 
     private void openImageChooser(){
-        Intent intent = new Intent();
-        //Opens the images saved on the phone to choose a profile picture
+        //TODO: Get photos also from camera
+        //Opens the images from Gallery saved on the phone to choose a profile picture
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
+
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
@@ -286,6 +288,8 @@ public class ProfileActivity extends AppCompatActivity {
     private void uploadFile(){
         if(imageUri!=null){
             //TODO: if there is an existing profile pic, it should be removed from storage
+            //TODO: Compress picture before uploading
+
 
             //Creates a reference for the file to store
             final StorageReference fileReference = mStorageRef.child("profilePics/" + currentUserID + "." + getFileExtension(imageUri));
