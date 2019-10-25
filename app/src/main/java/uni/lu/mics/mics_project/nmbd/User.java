@@ -24,7 +24,9 @@ public class User implements Serializable {
 
 
     // List of friends of one user
-    private List<String> userFriendsList;
+    private List<String> friendList;
+    private List<String> friendReqReceivedList;
+    private List<String> friendReqSentList;
 
 
     public User(){
@@ -36,7 +38,7 @@ public class User implements Serializable {
         this.name = name;
         this.age = age;
         this.email = email;
-        this.userFriendsList = new ArrayList<>();
+        this.friendList = new ArrayList<>();
     }
 
     public String getDateOfBirth() {
@@ -88,5 +90,27 @@ public class User implements Serializable {
         this.profilePicUrl = profilePicUrl;
     }
 
+    public List<String> getFriendList() {
+        return friendList;
+    }
 
+    public void setFriendList(List<String> friendList) {
+        this.friendList = friendList;
+    }
+
+    public List<String> getFriendReqReceivedList() {
+        return friendReqReceivedList;
+    }
+
+    public void setFriendReqReceivedList(List<String> friendReqReceivedList) {
+        this.friendReqReceivedList = friendReqReceivedList;
+    }
+
+    public List<String> getFriendReqSentList() {
+        return friendReqSentList;
+    }
+
+    public void setFriendReqSentList(List<String> friendReqSentList) {
+        this.friendReqSentList = friendReqSentList;
+    }
 }
