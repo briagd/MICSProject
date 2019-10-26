@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -16,13 +17,28 @@ import com.google.android.gms.tasks.Task;
 
 public class HomepageActivity extends AppCompatActivity {
 
+
     Button btn_sign_out;
+    //currentUser object retrieved from intent
+    User currentUser;
+
+    final String TAG = "HomepageActivity";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_homepage);btn_sign_out = findViewById(R.id.sign_out_button);
+        setContentView(R.layout.activity_homepage);
+
+        //TODO: Check how to retrieve current user from intent
+        //retrieves intent
+        //Intent intent = getIntent();
+        //currentUser = (User) intent.getSerializableExtra("currentUser");
+
+
+        btn_sign_out = findViewById(R.id.sign_out_button);
+
+        //Sets up the sign out button to take action if pressed
         btn_sign_out.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
