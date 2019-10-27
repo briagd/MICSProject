@@ -1,11 +1,10 @@
-package uni.lu.mics.mics_project.nmbd;
+package uni.lu.mics.mics_project.nmbd.domain.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Event {
 
-    // will be filled up once the UID is created
     private String eventId;
     private String eventName;
     private String eventDescription;
@@ -18,9 +17,7 @@ public class Event {
     private List<String> eventAdmins;
     private String eventCreator;
 
-    public Event(){
-
-    }
+    public Event(){}
 
     public Event(String eventName, String eventLocation, String eventCreator) {
         this.eventName = eventName;

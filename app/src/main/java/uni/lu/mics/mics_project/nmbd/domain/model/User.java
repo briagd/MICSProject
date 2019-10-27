@@ -1,4 +1,4 @@
-package uni.lu.mics.mics_project.nmbd;
+package uni.lu.mics.mics_project.nmbd.domain.model;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -28,10 +28,7 @@ public class User implements Serializable {
     private List<String> friendReqReceivedList;
     private List<String> friendReqSentList;
 
-
-    public User(){
-
-    }
+    public User(){}
 
     public User(String username, String name, int age, String email){
         this.username = username;
@@ -39,6 +36,14 @@ public class User implements Serializable {
         this.age = age;
         this.email = email;
         this.friendList = new ArrayList<>();
+    }
+
+    public  void setUserId(String userId){
+        this.userId = userId;
+    }
+
+    public String getUserId(){
+        return this.userId;
     }
 
     public String getDateOfBirth() {

@@ -1,5 +1,7 @@
 package uni.lu.mics.mics_project.nmbd;
 
+import uni.lu.mics.mics_project.nmbd.domain.model.User;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
