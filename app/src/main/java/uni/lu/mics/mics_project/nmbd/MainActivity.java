@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     final String TAG = "Main Activity";
 
     private static final int MY_REQUEST_CODE = 123;
-    List<AuthUI.IdpConfig> providers;
+    Authentification auth;
 
     //reference to the database
     private FirebaseFirestore mDatabase;
@@ -48,28 +48,13 @@ public class MainActivity extends AppCompatActivity {
 
         //initializing the database
         mDatabase = FirebaseFirestore.getInstance();
+        auth = new Authentification();
 
-        //list of providers accepted for signing up
-        providers = Arrays.asList(
-                new AuthUI.IdpConfig.EmailBuilder().build(),
-                //new AuthUI.IdpConfig.PhoneBuilder().build(),
-                //new AuthUI.IdpConfig.FacebookBuilder().build(),
-                new AuthUI.IdpConfig.GoogleBuilder().build()
-                //new AuthUI.IdpConfig.TwitterBuilder().build()
-        );
-        showSignInOptions();
-    }
-
-    private void showSignInOptions() {
-        //TODO: Customize the login page with logo etc
         startActivityForResult(
-                AuthUI.getInstance().createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .setTheme(R.style.MyTheme)
-                        //.setLogo(R.drawable.firebase)
-                        .build(), MY_REQUEST_CODE
+                auth.createSignInIntent(), MY_REQUEST_CODE
         );
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -77,13 +62,11 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == MY_REQUEST_CODE) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
-                //Get reference of the firebase user from Auth
-                final FirebaseUser firebaseuser = FirebaseAuth.getInstance().getCurrentUser();
 
                 //Instantiate a user object for the current user to be initialized from database and passed as intent to next activity
                 final User currentUser = new User();
                 //Creates a reference for the id of users
-                DocumentReference usersRef = mDatabase.collection("users").document(firebaseuser.getUid());
+                DocumentReference usersRef = mDatabase.collection("users").document(auth.getAuthUid());
 
                 //Check if user already exists in the database
                 usersRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -106,9 +89,9 @@ public class MainActivity extends AppCompatActivity {
 
                             } else {
                                 //If user does not exists then add user to database
-                                currentUser.setName(firebaseuser.getDisplayName());
-                                currentUser.setEmail(firebaseuser.getEmail());
-                                mDatabase.collection("users").document(firebaseuser.getUid()).set(currentUser);
+                                currentUser.setName(auth.getAuthDisplayName());
+                                currentUser.setEmail(auth.getAuthEmail());
+                                mDatabase.collection("users").document(auth.getAuthUid()).set(currentUser);
                                 Log.d(TAG, "User added to database");
                             }
                         } else {
@@ -127,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 finish();
 
                 //display toast if correctly signed in
-                Toast.makeText(this, "Welcome! " + firebaseuser.getDisplayName(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Welcome! " + auth.getAuthDisplayName(), Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(this, "" + response.getError().getMessage(), Toast.LENGTH_LONG).show();
             }
