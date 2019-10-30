@@ -1,15 +1,15 @@
 package uni.lu.mics.mics_project.nmbd;
 
-import uni.lu.mics.mics_project.nmbd.domain.model.User;
-import uni.lu.mics.mics_project.nmbd.service.Authentification;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
+import uni.lu.mics.mics_project.nmbd.domain.model.User;
 
 public class HomepageActivity extends AppCompatActivity {
 
