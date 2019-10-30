@@ -37,8 +37,13 @@ public class Repository<T> {
                         repoCallback.onCallback(model);
 
                     }
-                });
-
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        repoCallback.onCallback(null);
+                    }
+                });;
     }
 
     public void add(T model) {
