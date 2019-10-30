@@ -50,9 +50,19 @@ public class MainActivity extends AppCompatActivity {
         mDatabase = FirebaseFirestore.getInstance();
         auth = new Authentification();
 
-        startActivityForResult(
-                auth.createSignInIntent(), MY_REQUEST_CODE
-        );
+        //Check if a user is already signed in, if not go to sign in page
+        if (auth.isUserSignedIn()){
+            Intent intent = new Intent(MainActivity.this, HomepageActivity.class);
+            //TODO retrieve current user from database and put as extra
+            String currentUserUid = auth.getAuthUid();
+
+            //intent.putExtra("currentUser", currentUser);
+            //go to homepage activity
+            startActivity(intent);
+            Toast.makeText(this, "Welcome back " + auth.getAuthDisplayName(), Toast.LENGTH_LONG).show();
+        } else {
+            startActivityForResult(auth.createSignInIntent(), MY_REQUEST_CODE);
+        }
     }
 
 
@@ -91,29 +101,39 @@ public class MainActivity extends AppCompatActivity {
                                 //If user does not exists then add user to database
                                 currentUser.setName(auth.getAuthDisplayName());
                                 currentUser.setEmail(auth.getAuthEmail());
-                                mDatabase.collection("users").document(auth.getAuthUid()).set(currentUser);
+                                String uid = auth.getAuthUid();
+                                currentUser.setUserId(uid);
+                                mDatabase.collection("users").document(uid).set(currentUser);
                                 Log.d(TAG, "User added to database");
                             }
+                            //Creates intent
+                            Intent intent = new Intent(MainActivity.this, HomepageActivity.class);
+                            //adds the currentUser object as extra to the intent to be retrieved
+                            intent.putExtra("currentUser", currentUser);
+                            //go to homepage activity
+                            startActivity(intent);
+
+                            finish();
+
                         } else {
                             Log.d(TAG, "Failed with: ", task.getException());
                         }
                     }
                 });
 
-                //Creates intent
-                Intent intent = new Intent(this, HomepageActivity.class);
-                //adds the currentUser object as extra to the intent to be retrieved
-                intent.putExtra("currentUser", currentUser);
-                //go to homepage activity
-                startActivity(intent);
 
-                finish();
 
                 //display toast if correctly signed in
-                Toast.makeText(this, "Welcome! " + auth.getAuthDisplayName(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Welcome " + currentUser.getName(), Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(this, "" + response.getError().getMessage(), Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    private Intent getIntent(User user){
+        Intent intent = new Intent(MainActivity.this, HomepageActivity.class);
+        intent.putExtra("currentUser", user);
+        return intent;
     }
 }

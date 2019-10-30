@@ -1,8 +1,17 @@
 package uni.lu.mics.mics_project.nmbd;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -12,6 +21,7 @@ import java.util.List;
 public class Authentification {
 
     private List<AuthUI.IdpConfig> providers;
+    final private String TAG = "Authentification";
 
     public Authentification(){
         providers = Arrays.asList(
@@ -33,18 +43,59 @@ public class Authentification {
     }
 
 
+    public FirebaseUser getCurrentUser(){
+        return FirebaseAuth.getInstance().getCurrentUser();
+    }
+
 
     public String getAuthUid(){
-        return FirebaseAuth.getInstance().getCurrentUser().getUid();
+        return getCurrentUser().getUid();
     }
 
     public String getAuthDisplayName(){
-        return FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        return getCurrentUser().getDisplayName();
     }
 
     public String getAuthEmail(){
-        return FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        return getCurrentUser().getDisplayName();
     }
+
+    public Boolean isUserSignedIn(){
+        return (getCurrentUser()!=null);
+    }
+
+    public void updatePassword(String newPassword){
+        getCurrentUser().updatePassword(newPassword)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "User password updated.");
+                        }
+                    }
+                });
+    }
+
+    public void signOut(final Context context, Class targetActivity){
+        AuthUI.getInstance()
+                .signOut(context)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        context.startActivity(new Intent(context, MainActivity.class));
+                        //finish();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(context, ""+ e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+
+
+
 
 
 }

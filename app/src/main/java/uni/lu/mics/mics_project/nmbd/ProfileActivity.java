@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -57,8 +58,8 @@ public class ProfileActivity extends AppCompatActivity {
     final String TAG = "ProfileActivity";
 
     //reference to to the user signed in the database
-    private FirebaseUser firebaseUser;
-
+    //private FirebaseUser firebaseUser;
+    private Authentification auth;
     //reference to the firestore database
     private FirebaseFirestore mDatabase;
     //Reference to the storage
@@ -91,9 +92,14 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        Intent intent = getIntent();
+        currentUser = (User) intent.getSerializableExtra("currentUser");
+
         //initialize firebaseUser to Auth user
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        currentUserID = firebaseUser.getUid();
+
+        auth = new Authentification();
+        //TODO should get from user intent once uid have been set as a field
+        currentUserID = auth.getAuthUid();
 
         // Initialize the different textEditViews
         nameEdit = findViewById(R.id.profile_activity_name_edit_view);
@@ -134,8 +140,7 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
 
-        //TODO: initialize from intent rather than from database
-        currentUser = new User();
+
 
         //initializing the database
         mDatabase = FirebaseFirestore.getInstance();
@@ -143,33 +148,16 @@ public class ProfileActivity extends AppCompatActivity {
         DocumentReference docRef = mDatabase.collection("users").document(currentUserID);
 
         //Retrieves the user info from database
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "User retrieved from database");
-                        //Updates the currentuser Object from database info
-                        currentUser = document.toObject(User.class);
-                        if (currentUser != null) {
-                            nameEdit.setText(currentUser.getName());
 
-                            if (currentUser.getDateOfBirth() == null) {
-                                Date c = Calendar.getInstance().getTime();
-                                SimpleDateFormat df = new SimpleDateFormat("dd/MMM/yyyy");
-                                dobEdit.setText(df.format(c));
-                            } else {
-                                dobEdit.setText(currentUser.getDateOfBirth());
-                            }
-                        }
+        nameEdit.setText(currentUser.getName());
 
-                    }
-                } else {
-                    Log.d(TAG, "Failed with: ", task.getException());
-                }
-            }
-        });
+        if (currentUser.getDateOfBirth() == null) {
+            Date c = Calendar.getInstance().getTime();
+            SimpleDateFormat df = new SimpleDateFormat("dd/MMM/yyyy");
+            dobEdit.setText(df.format(c));
+        } else {
+            dobEdit.setText(currentUser.getDateOfBirth());
+        }
 
         //Initialize Storage reference
         mStorageRef = FirebaseStorage.getInstance().getReference();
@@ -184,19 +172,19 @@ public class ProfileActivity extends AppCompatActivity {
         //Updates the currentUser user object from the field
         String name = nameEdit.getText().toString();
         currentUser.setName(name);
-        //Name needs to also be updated to FirebaseAuth
-        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                .setDisplayName(name)
-                .build();
-        firebaseUser.updateProfile(profileUpdates)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-
-                        }
-                    }
-                });
+        //Name needs to also be updated to FirebaseAuth - Probably not necessary
+//        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+//                .setDisplayName(name)
+//                .build();
+//        firebaseUser.updateProfile(profileUpdates)
+//                .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        if (task.isSuccessful()) {
+//
+//                        }
+//                    }
+//                });
         //Updates date of birth of current User Object
         currentUser.setDateOfBirth(dobEdit.getText().toString());
 
@@ -211,17 +199,10 @@ public class ProfileActivity extends AppCompatActivity {
             //Rewerite the confirm password label in case it was changed because of not matching passwords
             confirmPasswordTextView.setText("Confirm Password:");
             confirmPasswordTextView.setTextColor(Color.BLACK);
-            firebaseUser.updatePassword(newPassword)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Log.d(TAG, "User password updated.");
-                            }
-                        }
-                    });
+            auth.updatePassword(newPassword);
 
         } else if (!newPassword.equals(newConfirmPassword)) {
+            Log.d(TAG, "Passwords do not match!");
             //Changes the confirm password label to notify user that passwords do not match
             confirmPasswordTextView.setText("Passwords must match.");
             confirmPasswordTextView.setTextColor(Color.RED);
@@ -250,12 +231,12 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint("IntentReset")
     private void openImageChooser(){
         //TODO: Get photos also from camera
         //Opens the images from Gallery saved on the phone to choose a profile picture
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
-
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
