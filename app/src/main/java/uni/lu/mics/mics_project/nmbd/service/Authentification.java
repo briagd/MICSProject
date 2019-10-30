@@ -1,4 +1,4 @@
-package uni.lu.mics.mics_project.nmbd;
+package uni.lu.mics.mics_project.nmbd.service;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,6 +17,9 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Arrays;
 import java.util.List;
+
+import uni.lu.mics.mics_project.nmbd.MainActivity;
+import uni.lu.mics.mics_project.nmbd.R;
 
 public class Authentification {
 
