@@ -1,6 +1,4 @@
-package uni.lu.mics.mics_project.nmbd.service;
-
-import com.google.android.gms.auth.api.Auth;
+package uni.lu.mics.mics_project.nmbd.app.service;
 
 public class ServiceFactory {
 

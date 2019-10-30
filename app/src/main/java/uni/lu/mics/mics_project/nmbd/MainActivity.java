@@ -16,9 +16,9 @@ import uni.lu.mics.mics_project.nmbd.infra.repository.Factory;
 import uni.lu.mics.mics_project.nmbd.infra.repository.RepoCallback;
 import uni.lu.mics.mics_project.nmbd.infra.repository.RepoFacade;
 import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
-import uni.lu.mics.mics_project.nmbd.service.Authentification;
-import uni.lu.mics.mics_project.nmbd.service.ServiceFacade;
-import uni.lu.mics.mics_project.nmbd.service.ServiceFactory;
+import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
+import uni.lu.mics.mics_project.nmbd.app.service.ServiceFacade;
+import uni.lu.mics.mics_project.nmbd.app.service.ServiceFactory;
 
 
 public class MainActivity extends AppCompatActivity {

@@ -1,4 +1,4 @@
-package uni.lu.mics.mics_project.nmbd.service;
+package uni.lu.mics.mics_project.nmbd.app.service;
 
 public class ServiceFacade {
 
