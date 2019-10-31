@@ -1,6 +1,5 @@
-package uni.lu.mics.mics_project.nmbd.service;
+package uni.lu.mics.mics_project.nmbd.app.service;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -29,9 +28,9 @@ public class Authentification {
     public Authentification(){
         providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build(),
+                new AuthUI.IdpConfig.GoogleBuilder().build()
                 //new AuthUI.IdpConfig.PhoneBuilder().build(),
                 //new AuthUI.IdpConfig.FacebookBuilder().build(),
-                new AuthUI.IdpConfig.GoogleBuilder().build()
                 //new AuthUI.IdpConfig.TwitterBuilder().build()
         );
     }

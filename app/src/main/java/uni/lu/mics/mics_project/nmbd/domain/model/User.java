@@ -1,12 +1,7 @@
 package uni.lu.mics.mics_project.nmbd.domain.model;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class User implements Serializable {
@@ -15,7 +10,7 @@ public class User implements Serializable {
     private String userId;
     private String username;
 
-
+    private String id;
     private String name;
     private String dateOfBirth;
     private int age;
@@ -28,22 +23,18 @@ public class User implements Serializable {
     private List<String> friendReqReceivedList;
     private List<String> friendReqSentList;
 
-    public User(){}
+    public User() {
+    }
 
-    public User(String username, String name, int age, String email){
-        this.username = username;
-        this.name = name;
-        this.age = age;
+    public User(String id, String email, String name) {
+        this.id = id;
         this.email = email;
+        this.name = name;
         this.friendList = new ArrayList<>();
     }
 
-    public  void setUserId(String userId){
-        this.userId = userId;
-    }
-
-    public String getUserId(){
-        return this.userId;
+    public String getId() {
+        return this.id;
     }
 
     public String getDateOfBirth() {
@@ -55,7 +46,6 @@ public class User implements Serializable {
     }
 
     public int getAge() {
-
         return age;
     }
 

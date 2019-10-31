@@ -11,10 +11,10 @@ public class RepoFacade {
 
 
 
-    public RepoFacade(Factory repoFactory, FirebaseFirestore db){ // This should take a db ref
+    public RepoFacade(Factory repoFactory, FirebaseFirestore db){
 
-        this.userRepo = repoFactory.makeUserRepository(db); // This should take a db ref
-        this.eventRepo = repoFactory.makeEventRepository(db); // This should take a db ref
+        this.userRepo = repoFactory.makeUserRepository(db);
+        this.eventRepo = repoFactory.makeEventRepository(db);
     }
 
     public UserRepository userRepo(){
