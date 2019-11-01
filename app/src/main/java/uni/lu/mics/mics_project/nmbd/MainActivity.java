@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onCallback(User model) {
                         if (model == null) {
                             model = new User(authId, authService.getAuthEmail(), authService.getAuthDisplayName());
-                            userRepo.add(model);
+                            userRepo.set(authId, model);
                             Log.d(TAG, "User added to database");
                         }
                         Intent intent = getIntent(model);

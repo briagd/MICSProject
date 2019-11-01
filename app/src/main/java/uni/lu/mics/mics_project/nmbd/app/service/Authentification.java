@@ -59,7 +59,7 @@ public class Authentification {
     }
 
     public String getAuthEmail(){
-        return getCurrentUser().getDisplayName();
+        return getCurrentUser().getEmail();
     }
 
     public Boolean isUserSignedIn(){
