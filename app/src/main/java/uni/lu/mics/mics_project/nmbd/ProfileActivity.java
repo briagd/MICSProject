@@ -8,8 +8,10 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
@@ -37,9 +39,16 @@ import com.google.firebase.storage.UploadTask;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
+import uni.lu.mics.mics_project.nmbd.app.service.ServiceFacade;
+import uni.lu.mics.mics_project.nmbd.app.service.ServiceFactory;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
+import uni.lu.mics.mics_project.nmbd.infra.DbManager;
+import uni.lu.mics.mics_project.nmbd.infra.repository.Factory;
+import uni.lu.mics.mics_project.nmbd.infra.repository.RepoFacade;
+import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -47,9 +56,15 @@ public class ProfileActivity extends AppCompatActivity {
 
     //reference to to the user signed in the database
     //private FirebaseUser firebaseUser;
-    private Authentification auth;
+
     //reference to the firestore database
-    private FirebaseFirestore mDatabase;
+    //private FirebaseFirestore mDatabase;
+
+    DbManager dbManager = new DbManager(new Factory());
+    RepoFacade repoFacade = dbManager.connect();
+    UserRepository userRepo = repoFacade.userRepo();
+    ServiceFacade serviceFacade = new ServiceFacade(new ServiceFactory());
+    Authentification authService = serviceFacade.authentificationService();
     //Reference to the storage
     private StorageReference mStorageRef;
 
@@ -62,9 +77,10 @@ public class ProfileActivity extends AppCompatActivity {
     private EditText passwordEdit;
     private EditText confirmPasswordEdit;
     private TextView confirmPasswordTextView;
+    private Button savePasswordButton;
     //Profile pic
     private static final int PICK_IMAGE_REQUEST = 1;
-    private Button chooseImageButton;
+//    private Button chooseImageButton;
     private Button uploadPicButton;
     private ImageView profileImageView;
     private Uri imageUri;
@@ -82,20 +98,13 @@ public class ProfileActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
-
-        //initialize firebaseUser to Auth user
-
-        auth = new Authentification();
-        //TODO should get from user intent once uid have been set as a field
-        currentUserID = auth.getAuthUid();
+        currentUserID = currentUser.getId();
 
         // Initialize the different textEditViews
         nameEdit = findViewById(R.id.profile_activity_name_edit_view);
         dobEdit = findViewById(R.id.profile_activity_dob_edit);
-        passwordEdit = findViewById(R.id.profile_activity_password_edit);
-        confirmPasswordEdit = findViewById(R.id.profile_activity_confirmpassword_edit);
-        confirmPasswordTextView = findViewById(R.id.profile_activity_confirmpassword_label);
-        chooseImageButton = findViewById(R.id.profile_activity_choose_image_button);
+
+        //chooseImageButton = findViewById(R.id.profile_activity_choose_image_button);
         profileImageView = findViewById(R.id.profile_activity_profile_picture_view);
         uploadPicButton = findViewById(R.id.profile_activity_upload_picture_button);
         uploadProgressBar = findViewById(R.id.profile_activity_upload_progressbar);
@@ -128,15 +137,7 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
 
-
-
-        //initializing the database
-        mDatabase = FirebaseFirestore.getInstance();
-        //get the database reference corresponding to the auth user
-        DocumentReference docRef = mDatabase.collection("users").document(currentUserID);
-
         //Retrieves the user info from database
-
         nameEdit.setText(currentUser.getName());
 
         if (currentUser.getDateOfBirth() == null) {
@@ -147,9 +148,10 @@ public class ProfileActivity extends AppCompatActivity {
             dobEdit.setText(currentUser.getDateOfBirth());
         }
 
+        setPasswordFields();
+
         //Initialize Storage reference
         mStorageRef = FirebaseStorage.getInstance().getReference();
-
 
     }
 
@@ -160,59 +162,97 @@ public class ProfileActivity extends AppCompatActivity {
         //Updates the currentUser user object from the field
         String name = nameEdit.getText().toString();
         currentUser.setName(name);
-        //Name needs to also be updated to FirebaseAuth - Probably not necessary
-//        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-//                .setDisplayName(name)
-//                .build();
-//        firebaseUser.updateProfile(profileUpdates)
-//                .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                        if (task.isSuccessful()) {
-//
-//                        }
-//                    }
-//                });
-        //Updates date of birth of current User Object
         currentUser.setDateOfBirth(dobEdit.getText().toString());
-
-
-        //Updates password if a new password has been entered
-        //Stores the two passwords entered to be able to compare them as strings
-        String newPassword = passwordEdit.getText().toString();
-        String newConfirmPassword = confirmPasswordEdit.getText().toString();
-
-
-        if(!TextUtils.isEmpty(newPassword) && newPassword.equals(newConfirmPassword)){
-            //Rewerite the confirm password label in case it was changed because of not matching passwords
-            confirmPasswordTextView.setText("Confirm Password:");
-            confirmPasswordTextView.setTextColor(Color.BLACK);
-            auth.updatePassword(newPassword);
-
-        } else if (!newPassword.equals(newConfirmPassword)) {
-            Log.d(TAG, "Passwords do not match!");
-            //Changes the confirm password label to notify user that passwords do not match
-            confirmPasswordTextView.setText("Passwords must match.");
-            confirmPasswordTextView.setTextColor(Color.RED);
-        }
-
-        //TODO:update other fields of the username object
-
-
         //Updates the data base with the currentuser object
-        mDatabase.collection("users").document(currentUserID).set(currentUser);
+        userRepo.set(currentUserID,currentUser);
 
         //Display Toast to confirm that data was saved
         Toast.makeText(this, "Profile updated", Toast.LENGTH_LONG).show();
     }
 
+
+
     //Sends back to homepage with the user as extra of intent
     public void backOnclick(View view) {
         Intent intent = new Intent(this, HomepageActivity.class);
-        intent.putExtra("currentUserObject", currentUser);
+        intent.putExtra("currentUser", currentUser);
         startActivity(intent);
     }
 
+    public void setPasswordFields(){
+        passwordEdit = findViewById(R.id.profile_activity_password_edit);
+        confirmPasswordEdit = findViewById(R.id.profile_activity_confirmpassword_edit);
+        confirmPasswordTextView = findViewById(R.id.profile_activity_confirmpassword_label);
+        savePasswordButton = findViewById(R.id.profile_activity_save_password_button);
+        savePasswordButton.setVisibility(View.INVISIBLE);
+        confirmPasswordEdit.setVisibility(View.INVISIBLE);
+        confirmPasswordTextView.setVisibility(View.INVISIBLE);
+        passwordEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                confirmPasswordTextView.setVisibility(View.VISIBLE);
+                confirmPasswordEdit.setVisibility(View.VISIBLE);
+                String newPassword = s.toString();
+                String newConfirmPassword = confirmPasswordEdit.getText().toString();
+                if (!newPassword.equals(newConfirmPassword)) {
+                    Log.d(TAG, "Passwords do not match!");
+                    //Changes the confirm password label to notify user that passwords do not match
+                    confirmPasswordTextView.setText("Passwords must match");
+                    confirmPasswordTextView.setTextColor(Color.RED);
+                    savePasswordButton.setVisibility(View.INVISIBLE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+        confirmPasswordEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String newPassword = passwordEdit.getText().toString();
+                String newConfirmPassword = s.toString();
+
+                if (!newPassword.equals(newConfirmPassword)) {
+                    Log.d(TAG, "Passwords do not match!");
+                    //Changes the confirm password label to notify user that passwords do not match
+                    confirmPasswordTextView.setText("Passwords must match");
+                    confirmPasswordTextView.setTextColor(Color.RED);
+                } else {
+                    confirmPasswordTextView.setText("Passwords match");
+                    confirmPasswordTextView.setTextColor(Color.BLACK);
+                    savePasswordButton.setVisibility(View.VISIBLE);
+                }
+                Log.d(TAG, s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+    }
+
+
+    public void savePasswordOnClick(View view) {
+
+        String newPassword = passwordEdit.getText().toString();
+        String newConfirmPassword = confirmPasswordEdit.getText().toString();
+
+        if(!newPassword.matches("") && newPassword.equals(newConfirmPassword)) {
+            authService.updatePassword(newPassword);
+            passwordEdit.getText().clear();
+            confirmPasswordEdit.getText().clear();
+            confirmPasswordTextView.setVisibility(View.INVISIBLE);
+            confirmPasswordEdit.setVisibility(View.INVISIBLE);
+            savePasswordButton.setVisibility(View.INVISIBLE);
+            Toast.makeText(this, "Password updated", Toast.LENGTH_LONG).show();
+            Log.d(TAG, "Password updated");
+        }
+    }
 
     public void chooseImageOnClick(View view) {
         openImageChooser();
@@ -258,9 +298,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void uploadFile(){
         if(imageUri!=null){
-            //TODO: if there is an existing profile pic, it should be removed from storage
             //TODO: Compress picture before uploading
-
 
             //Creates a reference for the file to store
             final StorageReference fileReference = mStorageRef.child("profilePics/" + currentUserID + "." + getFileExtension(imageUri));
@@ -279,7 +317,8 @@ public class ProfileActivity extends AppCompatActivity {
                     //Upload the file ProfilePicUrl information to the database
                     String picUrl = fileReference.getDownloadUrl().toString();
                     currentUser.setProfilePicUrl(picUrl);
-                    mDatabase.collection("users").document(currentUserID).set(currentUser);
+
+                    userRepo.update(currentUserID, "profilePicUrl", picUrl);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -299,6 +338,7 @@ public class ProfileActivity extends AppCompatActivity {
             Toast.makeText(this, "No profile picture selected", Toast.LENGTH_SHORT ).show();
         }
     }
+
 
 
 }
