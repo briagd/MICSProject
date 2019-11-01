@@ -49,13 +49,7 @@ import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
 public class ProfileActivity extends AppCompatActivity {
 
     final String TAG = "ProfileActivity";
-
-    //reference to to the user signed in the database
-    //private FirebaseUser firebaseUser;
-
-    //reference to the firestore database
-    //private FirebaseFirestore mDatabase;
-
+    
     DbManager dbManager = new DbManager(new Factory());
     RepoFacade repoFacade = dbManager.connect();
     UserRepository userRepo = repoFacade.userRepo();
@@ -63,7 +57,6 @@ public class ProfileActivity extends AppCompatActivity {
     Authentification authService = serviceFacade.authentificationService();
     //Reference to the storage
     private StorageReference mStorageRef;
-
     //Name Edit Text view
     private EditText nameEdit;
     private Button saveNameButton;
@@ -78,14 +71,10 @@ public class ProfileActivity extends AppCompatActivity {
     private Button savePasswordButton;
     //Profile pic
     private static final int PICK_IMAGE_REQUEST = 1;
-//    private Button chooseImageButton;
     private Button uploadPicButton;
     private ImageView profileImageView;
     private Uri imageUri;
-
     private ProgressBar uploadProgressBar;
-
-
     //Reference to the user logged in
     private User currentUser;
     private String currentUserID;
@@ -115,9 +104,6 @@ public class ProfileActivity extends AppCompatActivity {
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
     }
-
-
-
 
 
     public void setNameFields(){
@@ -179,9 +165,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-
-
-
         if (currentUser.getDateOfBirth() == null) {
             Date c = Calendar.getInstance().getTime();
             SimpleDateFormat df = new SimpleDateFormat("dd/MMM/yyyy");
@@ -190,7 +173,6 @@ public class ProfileActivity extends AppCompatActivity {
             dobEdit.setText(currentUser.getDateOfBirth());
         }
     }
-
 
     public void saveDobOnClick(View view) {
         String dob = dobEdit.getText().toString();
@@ -264,7 +246,6 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
-
     public void savePasswordOnClick(View view) {
 
         String newPassword = passwordEdit.getText().toString();
@@ -286,7 +267,6 @@ public class ProfileActivity extends AppCompatActivity {
         openImageChooser();
     }
 
-
     @SuppressLint("IntentReset")
     private void openImageChooser(){
         //TODO: Get photos also from camera
@@ -307,8 +287,6 @@ public class ProfileActivity extends AppCompatActivity {
             uploadPicButton.setVisibility(View.VISIBLE);
         }
     }
-
-
 
     //
     public void uploadPictureOnClick(View view) {
@@ -359,13 +337,10 @@ public class ProfileActivity extends AppCompatActivity {
                 public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
                     //Shows the progress bar
                     uploadProgressBar.setVisibility(View.VISIBLE);
-//
                 }
             });
         } else{
             Toast.makeText(this, "No profile picture selected", Toast.LENGTH_SHORT ).show();
         }
     }
-
-
 }
