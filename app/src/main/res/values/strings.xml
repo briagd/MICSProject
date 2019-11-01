@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MICS-Project</string>
+    <string name="profilePicsStrgFldr">profilePics</string>
 </resources>

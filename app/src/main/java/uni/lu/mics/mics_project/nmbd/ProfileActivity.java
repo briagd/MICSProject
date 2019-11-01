@@ -26,6 +26,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -56,6 +58,7 @@ public class ProfileActivity extends AppCompatActivity {
     ServiceFacade serviceFacade = new ServiceFacade(new ServiceFactory());
     Authentification authService = serviceFacade.authentificationService();
     //Reference to the storage
+    FirebaseStorage storage;
     private StorageReference mStorageRef;
     //Name Edit Text view
     private EditText nameEdit;
@@ -71,6 +74,7 @@ public class ProfileActivity extends AppCompatActivity {
     private Button savePasswordButton;
     //Profile pic
     private static final int PICK_IMAGE_REQUEST = 1;
+    private ImageView thmbProfileImageView;
     private Button uploadPicButton;
     private ImageView profileImageView;
     private Uri imageUri;
@@ -89,6 +93,7 @@ public class ProfileActivity extends AppCompatActivity {
         currentUserID = currentUser.getId();
 
         //chooseImageButton = findViewById(R.id.profile_activity_choose_image_button);
+        thmbProfileImageView = findViewById(R.id.profile_activity_thmb_imageView);
         profileImageView = findViewById(R.id.profile_activity_profile_picture_view);
         uploadPicButton = findViewById(R.id.profile_activity_upload_picture_button);
         uploadProgressBar = findViewById(R.id.profile_activity_upload_progressbar);
@@ -101,7 +106,49 @@ public class ProfileActivity extends AppCompatActivity {
         setPasswordFields();
 
         //Initialize Storage reference
-        mStorageRef = FirebaseStorage.getInstance().getReference();
+        storage = FirebaseStorage.getInstance();
+        mStorageRef = storage.getReference();
+        String filename = currentUser.getProfilePicUrl();
+        final String url = "gs://mics-android-project.appspot.com/"+filename;
+        final String defaultUrl = "gs://mics-android-project.appspot.com/profilePics/eventzy_user.png";
+        if (filename==null){
+            StorageReference gsReference = storage.getReferenceFromUrl(defaultUrl);
+            Glide.with(ProfileActivity.this)
+                    .load(gsReference)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .circleCrop()
+                    .into(thmbProfileImageView);
+        }else {
+
+            Log.d(TAG, url);
+            storage.getReference().child(filename).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    StorageReference gsReference = storage.getReferenceFromUrl(url);
+                    Glide.with(ProfileActivity.this)
+                            .load(gsReference)
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .skipMemoryCache(true)
+                            .circleCrop()
+                            .into(thmbProfileImageView);
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    StorageReference gsReference = storage.getReferenceFromUrl(defaultUrl);
+                    Glide.with(ProfileActivity.this)
+                            .load(gsReference)
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .skipMemoryCache(true)
+                            .circleCrop()
+                            .into(thmbProfileImageView);
+                }
+            });
+        }
+
+
 
     }
 
@@ -307,7 +354,8 @@ public class ProfileActivity extends AppCompatActivity {
             //TODO: Compress picture before uploading
 
             //Creates a reference for the file to store
-            final StorageReference fileReference = mStorageRef.child("profilePics/" + currentUserID + "." + getFileExtension(imageUri));
+            final String filename = "profilePics/" + currentUserID + "." + getFileExtension(imageUri);
+            final StorageReference fileReference = mStorageRef.child(filename);
 
             //uploads file to firestore
             fileReference.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -320,11 +368,20 @@ public class ProfileActivity extends AppCompatActivity {
                     //Displays toast on success
                     Toast.makeText(ProfileActivity.this, "Profile Picture updated", Toast.LENGTH_LONG).show();
 
-                    //Upload the file ProfilePicUrl information to the database
-                    String picUrl = fileReference.getDownloadUrl().toString();
-                    currentUser.setProfilePicUrl(picUrl);
 
-                    userRepo.update(currentUserID, "profilePicUrl", picUrl);
+                    currentUser.setProfilePicUrl(filename);
+
+                    userRepo.update(currentUserID, "profilePicUrl", filename);
+                    String url = "gs://mics-android-project.appspot.com/"+filename;
+                    StorageReference gsReference = storage.getReferenceFromUrl(url);
+                    if(gsReference!=null) {
+                        Glide.with(ProfileActivity.this)
+                                .load(gsReference)
+                                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                .skipMemoryCache(true)
+                                .circleCrop()
+                                .into(thmbProfileImageView);
+                    }
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
