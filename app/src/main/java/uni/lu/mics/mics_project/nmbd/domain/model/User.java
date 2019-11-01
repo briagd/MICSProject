@@ -30,6 +30,8 @@ public class User implements Serializable {
         this.email = email;
         this.name = name;
         this.friendList = new ArrayList<>();
+        this.friendReqReceivedList = new ArrayList<>();
+        this.friendReqSentList = new ArrayList<>();
     }
 
     public String getId() {
