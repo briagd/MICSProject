@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -29,8 +28,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -39,7 +36,6 @@ import com.google.firebase.storage.UploadTask;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
 import uni.lu.mics.mics_project.nmbd.app.service.ServiceFacade;
@@ -70,9 +66,11 @@ public class ProfileActivity extends AppCompatActivity {
 
     //Name Edit Text view
     private EditText nameEdit;
+    private Button saveNameButton;
     //Birthday calendar
     private DatePickerDialog datePickerDialog;
     private EditText dobEdit;
+    private Button saveDobButton;
     //Password text
     private EditText passwordEdit;
     private EditText confirmPasswordEdit;
@@ -84,6 +82,7 @@ public class ProfileActivity extends AppCompatActivity {
     private Button uploadPicButton;
     private ImageView profileImageView;
     private Uri imageUri;
+
     private ProgressBar uploadProgressBar;
 
 
@@ -100,10 +99,6 @@ public class ProfileActivity extends AppCompatActivity {
         currentUser = (User) intent.getSerializableExtra("currentUser");
         currentUserID = currentUser.getId();
 
-        // Initialize the different textEditViews
-        nameEdit = findViewById(R.id.profile_activity_name_edit_view);
-        dobEdit = findViewById(R.id.profile_activity_dob_edit);
-
         //chooseImageButton = findViewById(R.id.profile_activity_choose_image_button);
         profileImageView = findViewById(R.id.profile_activity_profile_picture_view);
         uploadPicButton = findViewById(R.id.profile_activity_upload_picture_button);
@@ -112,8 +107,55 @@ public class ProfileActivity extends AppCompatActivity {
         uploadPicButton.setVisibility(View.INVISIBLE);
         uploadProgressBar.setVisibility(View.INVISIBLE);
 
+        setNameFields();
+        setDobFields();
+        setPasswordFields();
 
+        //Initialize Storage reference
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+
+    }
+
+
+
+
+
+    public void setNameFields(){
+        nameEdit = findViewById(R.id.profile_activity_name_edit_view);
+        saveNameButton = findViewById(R.id.profile_activity_name_button);
+        saveNameButton.setVisibility(View.INVISIBLE);
+        nameEdit.setText(currentUser.getName());
+        nameEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                saveNameButton.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+    }
+
+    public void saveNameOnclick(View view) {
+        //Updates the currentUser user object from the field
+        String name = nameEdit.getText().toString();
+        currentUser.setName(name);
+
+        //Updates the data base with the currentuser object
+        userRepo.set(currentUserID,currentUser);
+        saveNameButton.setVisibility(View.INVISIBLE);
+        //Display Toast to confirm that data was saved
+        Toast.makeText(this, "Name updated", Toast.LENGTH_SHORT).show();
+    }
+
+    public void setDobFields(){
         //Configures the date picker
+        saveDobButton = findViewById(R.id.profile_activity_dob_button);
+        saveDobButton.setVisibility(View.INVISIBLE);
+        dobEdit = findViewById(R.id.profile_activity_dob_edit);
         dobEdit.setInputType(InputType.TYPE_NULL);
         dobEdit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,6 +171,7 @@ public class ProfileActivity extends AppCompatActivity {
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                                 String dateOfB = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
                                 dobEdit.setText(dateOfB);
+                                saveDobButton.setVisibility(View.VISIBLE);
 
                             }
                         }, year, month, day);
@@ -137,8 +180,7 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
 
-        //Retrieves the user info from database
-        nameEdit.setText(currentUser.getName());
+
 
         if (currentUser.getDateOfBirth() == null) {
             Date c = Calendar.getInstance().getTime();
@@ -147,30 +189,16 @@ public class ProfileActivity extends AppCompatActivity {
         } else {
             dobEdit.setText(currentUser.getDateOfBirth());
         }
-
-        setPasswordFields();
-
-        //Initialize Storage reference
-        mStorageRef = FirebaseStorage.getInstance().getReference();
-
     }
 
 
-
-    //Save data to database when save button pressed
-    public void saveOnClick(View view) {
-        //Updates the currentUser user object from the field
-        String name = nameEdit.getText().toString();
-        currentUser.setName(name);
-        currentUser.setDateOfBirth(dobEdit.getText().toString());
-        //Updates the data base with the currentuser object
-        userRepo.set(currentUserID,currentUser);
-
-        //Display Toast to confirm that data was saved
-        Toast.makeText(this, "Profile updated", Toast.LENGTH_LONG).show();
+    public void saveDobOnClick(View view) {
+        String dob = dobEdit.getText().toString();
+        currentUser.setDateOfBirth(dob);
+        userRepo.update(currentUserID,"dateOfBirth", dob);
+        saveDobButton.setVisibility(View.INVISIBLE);
+        Toast.makeText(this, "Brithday updated", Toast.LENGTH_SHORT).show();
     }
-
-
 
     //Sends back to homepage with the user as extra of intent
     public void backOnclick(View view) {
@@ -338,7 +366,6 @@ public class ProfileActivity extends AppCompatActivity {
             Toast.makeText(this, "No profile picture selected", Toast.LENGTH_SHORT ).show();
         }
     }
-
 
 
 }

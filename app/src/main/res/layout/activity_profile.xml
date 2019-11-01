@@ -40,15 +40,6 @@
                     android:onClick="backOnclick"
                     android:text="Back" />
 
-                <Button
-                    android:id="@+id/profile_activity_save_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:onClick="saveOnClick"
-                    android:text="Save Changes" />
-
             </LinearLayout>
 
             <TextView
@@ -59,13 +50,27 @@
                 android:layout_marginTop="16dp"
                 android:text="Name:" />
 
-            <EditText
-                android:id="@+id/profile_activity_name_edit_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:ems="10"
-                android:inputType="textPersonName" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/profile_activity_name_edit_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:ems="10"
+                    android:inputType="textPersonName" />
+
+                <Button
+                    android:id="@+id/profile_activity_name_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="saveNameOnclick"
+                    android:text="Save name" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/profile_activity_dob_label"
@@ -73,12 +78,25 @@
                 android:layout_height="wrap_content"
                 android:text="Birthday:" />
 
-            <EditText
-                android:id="@+id/profile_activity_dob_edit"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="textPersonName" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/profile_activity_dob_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="textPersonName" />
+
+                <Button
+                    android:id="@+id/profile_activity_dob_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="saveDobOnClick"
+                    android:text="Save" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/profile_activity_password_label"
