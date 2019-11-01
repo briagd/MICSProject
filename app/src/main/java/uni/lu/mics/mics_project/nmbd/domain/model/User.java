@@ -6,8 +6,7 @@ import java.util.List;
 
 public class User implements Serializable {
 
-    // TODO: Check if really needed
-    private String userId;
+
     private String username;
 
     private String id;
