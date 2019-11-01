@@ -49,7 +49,7 @@ import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
 public class ProfileActivity extends AppCompatActivity {
 
     final String TAG = "ProfileActivity";
-    
+
     DbManager dbManager = new DbManager(new Factory());
     RepoFacade repoFacade = dbManager.connect();
     UserRepository userRepo = repoFacade.userRepo();
@@ -179,7 +179,7 @@ public class ProfileActivity extends AppCompatActivity {
         currentUser.setDateOfBirth(dob);
         userRepo.update(currentUserID,"dateOfBirth", dob);
         saveDobButton.setVisibility(View.INVISIBLE);
-        Toast.makeText(this, "Brithday updated", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Birthday updated", Toast.LENGTH_SHORT).show();
     }
 
     //Sends back to homepage with the user as extra of intent
