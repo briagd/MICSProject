@@ -1,4 +1,18 @@
 <resources>
     <string name="app_name">MICS-Project</string>
-    <string name="profilePicsStrgFldr">profilePics</string>
+
+    <!-- Storage Strings-->
+    <string name="gsProfilePicsStrgFldr">profilePics/</string>
+    <string name="gsUrl">gs://mics-android-project.appspot.com/</string>
+    <string name="gsProfilePicsUrl">gs://mics-android-project.appspot.com/profilePics/</string>
+    <string name="gsTb256ProfPicUrl">gs://mics-android-project.appspot.com/profilePics/thumb@256_</string>
+    <string name="gsTb128ProfPicUrl">gs://mics-android-project.appspot.com/profilePics/thumb@128_</string>
+    <string name="gsTb64ProfPicUrl">gs://mics-android-project.appspot.com/profilePics/thumb@64_</string>
+    <string name="gsEventPicsStrgFldr">eventPics/</string>
+    <string name="gsEventsPicsUrl">gs://mics-android-project.appspot.com/eventsPics/</string>
+    <string name="gsTb256EventPicUrl">gs://mics-android-project.appspot.com/eventsPics/thumb@256_</string>
+    <string name="gsTb128EventPicUrl">gs://mics-android-project.appspot.com/eventsPics/thumb@128_</string>
+    <string name="gsTb64EventPicUrl">gs://mics-android-project.appspot.com/eventsPics/thumb@64_</string>
+    <string name="avatarPicUrl">gs://mics-android-project.appspot.com/profilePics/</string>
+    <string name="avatarPicId">eventzy_user.png</string>
 </resources>

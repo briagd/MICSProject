@@ -40,8 +40,12 @@ import java.util.Calendar;
 import java.util.Date;
 
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
+import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.ServiceFacade;
 import uni.lu.mics.mics_project.nmbd.app.service.ServiceFactory;
+import uni.lu.mics.mics_project.nmbd.app.service.Storage;
+import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
+import uni.lu.mics.mics_project.nmbd.app.service.StorageUploadCallback;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.DbManager;
 import uni.lu.mics.mics_project.nmbd.infra.repository.Factory;
@@ -57,9 +61,8 @@ public class ProfileActivity extends AppCompatActivity {
     UserRepository userRepo = repoFacade.userRepo();
     ServiceFacade serviceFacade = new ServiceFacade(new ServiceFactory());
     Authentification authService = serviceFacade.authentificationService();
-    //Reference to the storage
-    FirebaseStorage storage;
-    private StorageReference mStorageRef;
+    final Storage storageService = serviceFacade.storageService();
+
     //Name Edit Text view
     private EditText nameEdit;
     private Button saveNameButton;
@@ -92,7 +95,15 @@ public class ProfileActivity extends AppCompatActivity {
         currentUser = (User) intent.getSerializableExtra("currentUser");
         currentUserID = currentUser.getId();
 
-        //chooseImageButton = findViewById(R.id.profile_activity_choose_image_button);
+        setNameFields();
+        setDobFields();
+        setPasswordFields();
+        setPicFields();
+
+        displayProfilePic();
+    }
+
+    private void setPicFields() {
         thmbProfileImageView = findViewById(R.id.profile_activity_thmb_imageView);
         profileImageView = findViewById(R.id.profile_activity_profile_picture_view);
         uploadPicButton = findViewById(R.id.profile_activity_upload_picture_button);
@@ -100,56 +111,7 @@ public class ProfileActivity extends AppCompatActivity {
         //Set Upload button and upload progress bar to invisible as no picture has been chosen
         uploadPicButton.setVisibility(View.INVISIBLE);
         uploadProgressBar.setVisibility(View.INVISIBLE);
-
-        setNameFields();
-        setDobFields();
-        setPasswordFields();
-
-        //Initialize Storage reference
-        storage = FirebaseStorage.getInstance();
-        mStorageRef = storage.getReference();
-        String filename = currentUser.getProfilePicUrl();
-        final String url = "gs://mics-android-project.appspot.com/"+filename;
-        final String defaultUrl = "gs://mics-android-project.appspot.com/profilePics/eventzy_user.png";
-        if (filename==null){
-            StorageReference gsReference = storage.getReferenceFromUrl(defaultUrl);
-            Glide.with(ProfileActivity.this)
-                    .load(gsReference)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(true)
-                    .circleCrop()
-                    .into(thmbProfileImageView);
-        }else {
-
-            Log.d(TAG, url);
-            storage.getReference().child(filename).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    StorageReference gsReference = storage.getReferenceFromUrl(url);
-                    Glide.with(ProfileActivity.this)
-                            .load(gsReference)
-                            .diskCacheStrategy(DiskCacheStrategy.NONE)
-                            .skipMemoryCache(true)
-                            .circleCrop()
-                            .into(thmbProfileImageView);
-
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    StorageReference gsReference = storage.getReferenceFromUrl(defaultUrl);
-                    Glide.with(ProfileActivity.this)
-                            .load(gsReference)
-                            .diskCacheStrategy(DiskCacheStrategy.NONE)
-                            .skipMemoryCache(true)
-                            .circleCrop()
-                            .into(thmbProfileImageView);
-                }
-            });
-        }
-
-
-
+        profileImageView.setVisibility(View.VISIBLE);
     }
 
 
@@ -161,12 +123,11 @@ public class ProfileActivity extends AppCompatActivity {
         nameEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //If the name has been changed then the save button is made visible
                 saveNameButton.setVisibility(View.VISIBLE);
             }
-
             @Override
             public void afterTextChanged(Editable s) { }
         });
@@ -176,7 +137,6 @@ public class ProfileActivity extends AppCompatActivity {
         //Updates the currentUser user object from the field
         String name = nameEdit.getText().toString();
         currentUser.setName(name);
-
         //Updates the data base with the currentuser object
         userRepo.set(currentUserID,currentUser);
         saveNameButton.setVisibility(View.INVISIBLE);
@@ -205,7 +165,6 @@ public class ProfileActivity extends AppCompatActivity {
                                 String dateOfB = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
                                 dobEdit.setText(dateOfB);
                                 saveDobButton.setVisibility(View.VISIBLE);
-
                             }
                         }, year, month, day);
                 datePickerDialog.show();
@@ -244,10 +203,10 @@ public class ProfileActivity extends AppCompatActivity {
         savePasswordButton.setVisibility(View.INVISIBLE);
         confirmPasswordEdit.setVisibility(View.INVISIBLE);
         confirmPasswordTextView.setVisibility(View.INVISIBLE);
+        //Check if text has been entered in the password field
         passwordEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 confirmPasswordTextView.setVisibility(View.VISIBLE);
@@ -262,14 +221,12 @@ public class ProfileActivity extends AppCompatActivity {
                     savePasswordButton.setVisibility(View.INVISIBLE);
                 }
             }
-
             @Override
             public void afterTextChanged(Editable s) { }
         });
         confirmPasswordEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String newPassword = passwordEdit.getText().toString();
@@ -281,6 +238,7 @@ public class ProfileActivity extends AppCompatActivity {
                     confirmPasswordTextView.setText("Passwords must match");
                     confirmPasswordTextView.setTextColor(Color.RED);
                 } else {
+                    //If passwords match then the save button is displayed
                     confirmPasswordTextView.setText("Passwords match");
                     confirmPasswordTextView.setTextColor(Color.BLACK);
                     savePasswordButton.setVisibility(View.VISIBLE);
@@ -294,11 +252,11 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     public void savePasswordOnClick(View view) {
-
         String newPassword = passwordEdit.getText().toString();
         String newConfirmPassword = confirmPasswordEdit.getText().toString();
-
+        //check that passwords match
         if(!newPassword.matches("") && newPassword.equals(newConfirmPassword)) {
+            //updates passwords on the database
             authService.updatePassword(newPassword);
             passwordEdit.getText().clear();
             confirmPasswordEdit.getText().clear();
@@ -310,13 +268,28 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    private void displayProfilePic() {
+        String currentUserProfilePicUrl = currentUser.getProfilePicUrl();
+        final String gsUrl = this.getString(R.string.gsTb64ProfPicUrl);
+        storageService.getStorageReference(gsUrl, currentUserProfilePicUrl, new StorageCallback() {
+            @Override
+            public void onSuccess(StorageReference storageReference) {
+                ImageViewUtils.displayCirclePic(ProfileActivity.this, storageReference, thmbProfileImageView);
+                Log.d(TAG, "User profile picture correctly retrieved");
+            }
+            @Override
+            public void onFailure() {
+                ImageViewUtils.displayCircleAvatarPic(ProfileActivity.this, storageService, thmbProfileImageView);
+            }
+        });
+    }
+
     public void chooseImageOnClick(View view) {
         openImageChooser();
     }
 
     @SuppressLint("IntentReset")
     private void openImageChooser(){
-        //TODO: Get photos also from camera
         //Opens the images from Gallery saved on the phone to choose a profile picture
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
@@ -329,75 +302,48 @@ public class ProfileActivity extends AppCompatActivity {
         //Sets the image view to the image chosen when intent is received
         if (requestCode == PICK_IMAGE_REQUEST && resultCode ==RESULT_OK && data!=null && data.getData()!= null){
             imageUri = data.getData();
+            profileImageView.setVisibility(View.VISIBLE);
             profileImageView.setImageURI(imageUri);
             //Make the upload button visible
             uploadPicButton.setVisibility(View.VISIBLE);
         }
     }
 
-    //
     public void uploadPictureOnClick(View view) {
         //Hides button so no attempt to upload multiple times possible
         uploadPicButton.setVisibility(View.INVISIBLE);
         uploadFile();
     }
 
-    //Method to get the file extension as string
-    private String getFileExtension(Uri uri){
-        ContentResolver cR = getContentResolver();
-        MimeTypeMap mime = MimeTypeMap.getSingleton();
-        return mime.getExtensionFromMimeType(cR.getType(uri));
-    }
-
     private void uploadFile(){
-        if(imageUri!=null){
-            //TODO: Compress picture before uploading
-
-            //Creates a reference for the file to store
-            final String filename = "profilePics/" + currentUserID + "." + getFileExtension(imageUri);
-            final StorageReference fileReference = mStorageRef.child(filename);
-
-            //uploads file to firestore
-            fileReference.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        if(imageUri!=null) {
+            storageService.uploadPic(this, imageUri, this.getString(R.string.gsProfilePicsStrgFldr), currentUserID, new StorageUploadCallback() {
                 @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Log.d(TAG, "Profile picture upload successful");
-                    //Hides progress bar and upload button
-                    uploadProgressBar.setVisibility(View.INVISIBLE);
-
-                    //Displays toast on success
-                    Toast.makeText(ProfileActivity.this, "Profile Picture updated", Toast.LENGTH_LONG).show();
-
-
-                    currentUser.setProfilePicUrl(filename);
-
-                    userRepo.update(currentUserID, "profilePicUrl", filename);
-                    String url = "gs://mics-android-project.appspot.com/"+filename;
-                    StorageReference gsReference = storage.getReferenceFromUrl(url);
-                    if(gsReference!=null) {
-                        Glide.with(ProfileActivity.this)
-                                .load(gsReference)
-                                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                                .skipMemoryCache(true)
-                                .circleCrop()
-                                .into(thmbProfileImageView);
-                    }
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(ProfileActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, e.getMessage());
-                }
-            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                    //Shows the progress bar
+                public void onProgress() {
                     uploadProgressBar.setVisibility(View.VISIBLE);
                 }
+                @Override
+                public void onSuccess(StorageReference storageReference, String filename) {
+                    uploadProgressBar.setVisibility(View.INVISIBLE);
+                    //Displays toast on success
+                    Toast.makeText(ProfileActivity.this, "Profile Picture updated", Toast.LENGTH_LONG).show();
+                    //If the new picture has a different filename than the previous one it will not be replaced so it should be deleted
+                    if (currentUser.getProfilePicUrl()!=null && !filename.equals(currentUser.getProfilePicUrl())){
+                        storageService.deleteFile(ProfileActivity.this.getString(R.string.gsProfilePicsStrgFldr), currentUser.getProfilePicUrl());
+                    }
+                    //Hide the imageview to display the image chosen
+                    profileImageView.setVisibility(View.INVISIBLE);
+                    //updates current user and repo
+                    currentUser.setProfilePicUrl(filename);
+                    userRepo.update(currentUserID, "profilePicUrl", filename);
+                    //Updates the profile pic displayer
+                    displayProfilePic();
+                }
+                @Override
+                public void onFailure() {
+                    Log.d(TAG, "Upload failed");
+                }
             });
-        } else{
-            Toast.makeText(this, "No profile picture selected", Toast.LENGTH_SHORT ).show();
         }
     }
 }
