@@ -62,6 +62,23 @@ public class Repository<T> {
                 });
     }
 
+    /*
+
+     */
+    public void set(String uid, T model){
+        this.collectionRef.document(uid).set(model).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d("DocSetting", "Model correctly set");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w("DocAdding", "Error adding document", e);
+            }
+        });
+    }
+
     public void update(String modelUid, Map<String, Object> updates) {
         DocumentReference docRef = this.collectionRef.document(modelUid);
         docRef.update(updates)

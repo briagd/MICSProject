@@ -6,8 +6,7 @@ import java.util.List;
 
 public class User implements Serializable {
 
-    // TODO: Check if really needed
-    private String userId;
+
     private String username;
 
     private String id;
@@ -31,6 +30,8 @@ public class User implements Serializable {
         this.email = email;
         this.name = name;
         this.friendList = new ArrayList<>();
+        this.friendReqReceivedList = new ArrayList<>();
+        this.friendReqSentList = new ArrayList<>();
     }
 
     public String getId() {

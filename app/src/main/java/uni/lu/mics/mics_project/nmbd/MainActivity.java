@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.database.annotations.Nullable;
 
+import java.io.Serializable;
+
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.DbManager;
 import uni.lu.mics.mics_project.nmbd.infra.repository.Factory;
@@ -25,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int MY_REQUEST_CODE = 123;
     //TAG used for Log and debugging
-    final String TAG = "Main Activity";
+    private final String TAG = "Main Activity";
     DbManager dbManager = new DbManager(new Factory());
     RepoFacade repoFacade = dbManager.connect();
     UserRepository userRepo = repoFacade.userRepo();
@@ -40,13 +42,15 @@ public class MainActivity extends AppCompatActivity {
 
         //Check if a user is already signed in, if not go to sign in page
         if (authService.isUserSignedIn()) {
-            Intent intent = new Intent(MainActivity.this, HomepageActivity.class);
-            //TODO retrieve current user from database and put as extra
-            String currentUserUid = authService.getAuthUid();
-            //intent.putExtra("currentUser", currentUser);
-            //go to homepage activity
-            startActivity(intent);
-            Toast.makeText(this, "Welcome back " + authService.getAuthDisplayName(), Toast.LENGTH_LONG).show();
+            userRepo.findById(authService.getAuthUid(), new RepoCallback<User>() {
+                @Override
+                public void onCallback(User model) {
+                    Toast.makeText(MainActivity.this, "Welcome back " + model.getName(), Toast.LENGTH_LONG).show();
+                    Intent intent = getIntent(model);
+                    startActivity(intent);
+                    finish();
+                }
+            });
         } else {
             startActivityForResult(authService.createSignInIntent(), MY_REQUEST_CODE);
         }
@@ -59,21 +63,19 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == MY_REQUEST_CODE) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
-                final MainActivity self = this;
-                userRepo.findById(authService.getAuthUid(), new RepoCallback<User>() {
+                final String authId = authService.getAuthUid();
+                userRepo.findById(authId, new RepoCallback<User>() {
                     @Override
                     public void onCallback(User model) {
                         if (model == null) {
-                            model = new User(authService.getAuthUid(), authService.getAuthEmail(), authService.getAuthDisplayName());
-                            userRepo.add(model);
+                            model = new User(authId, authService.getAuthEmail(), authService.getAuthDisplayName());
+                            userRepo.set(authId, model);
                             Log.d(TAG, "User added to database");
                         }
-                        Intent intent = new Intent(MainActivity.this, HomepageActivity.class);
-                        //adds the currentUser object as extra to the intent to be retrieved
-                        intent.putExtra("currentUser", model);
+                        Intent intent = getIntent(model);
                         //go to homepage activity
                         startActivity(intent);
-                        Toast.makeText(self, "Welcome " + model.getName(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "Welcome " + model.getName(), Toast.LENGTH_LONG).show();
                         finish();
                     }
                 });
