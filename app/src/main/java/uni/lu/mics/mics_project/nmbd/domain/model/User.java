@@ -94,6 +94,14 @@ public class User implements Serializable {
         this.friendList = friendList;
     }
 
+    public void addFriendToFriendList(String friendId){
+        friendList.add(friendId);
+    }
+
+    public void removeFriendFromFriendList(String friendId){
+        friendList.remove(friendId);
+    }
+
     public List<String> getFriendReqReceivedList() {
         return friendReqReceivedList;
     }
@@ -102,11 +110,23 @@ public class User implements Serializable {
         this.friendReqReceivedList = friendReqReceivedList;
     }
 
+    public void addFriendToReqReceivedList(String friendId){
+        friendReqReceivedList.add(friendId);
+    }
+
+    public void removeFriendFromReqReceivedList(String friendReqID){
+        friendReqReceivedList.remove(friendReqID);
+    }
+
     public List<String> getFriendReqSentList() {
         return friendReqSentList;
     }
 
     public void setFriendReqSentList(List<String> friendReqSentList) {
         this.friendReqSentList = friendReqSentList;
+    }
+
+    public void addFriendToReqSentList(String friendId){
+        friendReqSentList.add(friendId);
     }
 }
