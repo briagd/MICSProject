@@ -11,6 +11,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.storage.StorageReference;
+
 import java.util.LinkedList;
 
 import uni.lu.mics.mics_project.nmbd.R;
@@ -20,17 +22,19 @@ public class FriendSearchListAdapter  extends RecyclerView.Adapter<FriendSearchL
 
     private final LinkedList<String> mSearchResultList;
     private final LinkedList<String> mSearchIDList;
+    private LinkedList<StorageReference> stRefList;
     private LayoutInflater mInflater;
     private MyClickListener mlistener;
     private final Context context;
 
     public FriendSearchListAdapter(Context context,
-                                   LinkedList<String> wordList, LinkedList<String> idList, MyClickListener listener) {
+                                   LinkedList<String> wordList, LinkedList<String> idList, LinkedList<StorageReference> stRefList, MyClickListener listener) {
         mInflater = LayoutInflater.from(context);
         this.mSearchResultList = wordList;
         this.mSearchIDList = idList;
         this.mlistener = listener;
         this.context =context;
+        this. stRefList = stRefList;
     }
 
 
@@ -52,7 +56,9 @@ public class FriendSearchListAdapter  extends RecyclerView.Adapter<FriendSearchL
     @Override
     public void onBindViewHolder(@NonNull FriendSearchListAdapter.FriendSearchViewHolder holder, final int position) {
         String mCurrent = mSearchResultList.get(position);
-
+        if(stRefList.size()>position) {
+            ImageViewUtils.displayCirclePic(context, stRefList.get(position), holder.searchPicImageView);
+        }
         holder.friendSearchResultItemView.setText(mCurrent);
         holder.myClickListener = mlistener;
     }
@@ -67,13 +73,13 @@ public class FriendSearchListAdapter  extends RecyclerView.Adapter<FriendSearchL
 
     //Holder
     public class FriendSearchViewHolder extends RecyclerView.ViewHolder{
-        public final ImageView searchPicImageView;
-        public final TextView friendSearchResultItemView;
-        public final Button addFriendButton;
-        final FriendSearchListAdapter mAdapter;
-        public FriendSearchListAdapter.MyClickListener myClickListener;
+        private final ImageView searchPicImageView;
+        private final TextView friendSearchResultItemView;
+        private final Button addFriendButton;
+        private final FriendSearchListAdapter mAdapter;
+        private FriendSearchListAdapter.MyClickListener myClickListener;
 
-        public FriendSearchViewHolder(View itemView, FriendSearchListAdapter adapter){
+        private FriendSearchViewHolder(View itemView, FriendSearchListAdapter adapter){
             super(itemView);
             friendSearchResultItemView = itemView.findViewById(R.id.friend_search_result_name);
             searchPicImageView = itemView.findViewById(R.id.friend_search_pic_imageView);

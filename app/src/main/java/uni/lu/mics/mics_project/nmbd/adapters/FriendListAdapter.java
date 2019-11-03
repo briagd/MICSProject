@@ -22,7 +22,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
 
     private final LinkedList<String> mFriendNameList;
     private final LinkedList<String> mFriendIDList;
-    LinkedList<StorageReference> stRefList;
+    private LinkedList<StorageReference> stRefList;
     private LayoutInflater mInflater;
     private MyClickListener mlistener;
     private final Context context;
@@ -68,13 +68,13 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
     }
 
     public class FriendListViewHolder extends RecyclerView.ViewHolder{
-        public final TextView friendItemView;
-        public final Button unfriendButton;
-        public final ImageView friendPicImageView;
-        final FriendListAdapter mAdapter;
-        public FriendListAdapter.MyClickListener myClickListener;
+        private final TextView friendItemView;
+        private final Button unfriendButton;
+        private final ImageView friendPicImageView;
+        private final FriendListAdapter mAdapter;
+        private FriendListAdapter.MyClickListener myClickListener;
 
-        public FriendListViewHolder(View itemView, FriendListAdapter adapter){
+        private FriendListViewHolder(View itemView, FriendListAdapter adapter){
             super(itemView);
             friendItemView = itemView.findViewById(R.id.friend_name_label);
             friendPicImageView = itemView.findViewById(R.id.friend_item_pic_imageView);

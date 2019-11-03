@@ -184,6 +184,14 @@ public class ProfileActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    @Override
+    public void onBackPressed() {
+        Log.d(TAG, "onBackPressed Called");
+        Intent intent = new Intent(this, HomepageActivity.class);
+        intent.putExtra("currentUser", currentUser);
+        startActivity(intent);
+    }
+
     public void setPasswordFields(){
         passwordEdit = findViewById(R.id.profile_activity_password_edit);
         confirmPasswordEdit = findViewById(R.id.profile_activity_confirmpassword_edit);

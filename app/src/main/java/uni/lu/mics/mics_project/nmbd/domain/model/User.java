@@ -1,8 +1,12 @@
 package uni.lu.mics.mics_project.nmbd.domain.model;
 
+import android.content.res.Resources;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import uni.lu.mics.mics_project.nmbd.R;
 
 public class User implements Serializable {
 
@@ -32,6 +36,7 @@ public class User implements Serializable {
         this.friendList = new ArrayList<>();
         this.friendReqReceivedList = new ArrayList<>();
         this.friendReqSentList = new ArrayList<>();
+        this.profilePicUrl = "eventzy_user.png";
     }
 
     public String getId() {
