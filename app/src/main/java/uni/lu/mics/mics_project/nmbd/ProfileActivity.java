@@ -320,7 +320,7 @@ public class ProfileActivity extends AppCompatActivity {
                     currentUser.setProfilePicUrl(filename);
                     userRepo.update(currentUserID, "profilePicUrl", filename);
                     //Updates the profile pic displayer
-                    displayProfilePic();
+                    displayProfilePicAfterUpload();
                 }
                 @Override
                 public void onFailure() {
@@ -328,6 +328,10 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void displayProfilePicAfterUpload(){
+        ImageViewUtils.displayCirclePicUri(ProfileActivity.this, imageUri,thmbProfileImageView );
     }
 
     private void displayProfilePic() {
