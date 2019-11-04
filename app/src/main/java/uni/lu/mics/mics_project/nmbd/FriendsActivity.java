@@ -174,9 +174,8 @@ public class FriendsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
-        Intent intent = getIntent();
-        currentUser = (User) intent.getSerializableExtra("currentUser");
-        currentUserID = currentUser.getId();
+        Log.d(TAG,currentUser.getName() );
+
     }
 
     public void updateFriendList() {
