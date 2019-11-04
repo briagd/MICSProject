@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.storage.StorageReference;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import uni.lu.mics.mics_project.nmbd.R;
@@ -22,13 +23,14 @@ public class FriendRequestListAdapter extends RecyclerView.Adapter<FriendRequest
 
     private final LinkedList<String> mRequestNameList;
     private final LinkedList<String> mRequestIDList;
-    private final LinkedList<StorageReference> stRefList;
+    private final HashMap<String, StorageReference> stRefList;
     private LayoutInflater mInflater;
     private MyClickListener mlistener;
     private final Context context;
 
 
-    public FriendRequestListAdapter(Context context, LinkedList<String> nameList, LinkedList<String> idList, LinkedList<StorageReference> stRefList, MyClickListener listener) {
+    public FriendRequestListAdapter(Context context, LinkedList<String> nameList, LinkedList<String> idList,
+                                    HashMap<String, StorageReference> stRefList, MyClickListener listener) {
         mInflater = LayoutInflater.from(context);
         this.mRequestNameList = nameList;
         this.mRequestIDList = idList;
@@ -51,7 +53,7 @@ public class FriendRequestListAdapter extends RecyclerView.Adapter<FriendRequest
         String mCurrent = mRequestNameList.get(position);
         holder.friendRequestItemView.setText(mCurrent);
         if(stRefList.size()>position) {
-            ImageViewUtils.displayCirclePic(context, stRefList.get(position), holder.friendPicImageView);
+            ImageViewUtils.displayCirclePic(context, stRefList.get(mRequestIDList.get(position)), holder.friendPicImageView);
         }
         holder.myClickListener = mlistener;
     }

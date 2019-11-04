@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.storage.StorageReference;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import uni.lu.mics.mics_project.nmbd.R;
@@ -22,13 +23,14 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
 
     private final LinkedList<String> mFriendNameList;
     private final LinkedList<String> mFriendIDList;
-    private LinkedList<StorageReference> stRefList;
+    private HashMap<String, StorageReference> stRefList;
     private LayoutInflater mInflater;
     private MyClickListener mlistener;
     private final Context context;
 
 
-    public FriendListAdapter(Context context, LinkedList<String> nameList, LinkedList<String> idList, LinkedList<StorageReference> stRefList, MyClickListener listener) {
+    public FriendListAdapter(Context context, LinkedList<String> nameList, LinkedList<String> idList,
+                             HashMap<String, StorageReference> stRefList, MyClickListener listener) {
         mInflater = LayoutInflater.from(context);
         this.mFriendNameList = nameList;
         this.mFriendIDList = idList;
@@ -51,7 +53,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
 
         String mCurrent = mFriendNameList.get(position);
         if(stRefList.size()>position) {
-            ImageViewUtils.displayCirclePic(context, stRefList.get(position), holder.friendPicImageView);
+            ImageViewUtils.displayCirclePic(context, stRefList.get(mFriendIDList.get(position)), holder.friendPicImageView);
         }
         holder.friendItemView.setText(mCurrent);
         holder.myClickListener = mlistener;

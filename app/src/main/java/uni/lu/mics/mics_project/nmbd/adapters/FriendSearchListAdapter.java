@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.storage.StorageReference;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import uni.lu.mics.mics_project.nmbd.R;
@@ -22,13 +23,14 @@ public class FriendSearchListAdapter  extends RecyclerView.Adapter<FriendSearchL
 
     private final LinkedList<String> mSearchResultList;
     private final LinkedList<String> mSearchIDList;
-    private LinkedList<StorageReference> stRefList;
+    private HashMap<String, StorageReference> stRefList;
     private LayoutInflater mInflater;
     private MyClickListener mlistener;
     private final Context context;
 
     public FriendSearchListAdapter(Context context,
-                                   LinkedList<String> wordList, LinkedList<String> idList, LinkedList<StorageReference> stRefList, MyClickListener listener) {
+                                   LinkedList<String> wordList, LinkedList<String> idList,
+                                   HashMap<String, StorageReference> stRefList, MyClickListener listener) {
         mInflater = LayoutInflater.from(context);
         this.mSearchResultList = wordList;
         this.mSearchIDList = idList;
@@ -57,7 +59,7 @@ public class FriendSearchListAdapter  extends RecyclerView.Adapter<FriendSearchL
     public void onBindViewHolder(@NonNull FriendSearchListAdapter.FriendSearchViewHolder holder, final int position) {
         String mCurrent = mSearchResultList.get(position);
         if(stRefList.size()>position) {
-            ImageViewUtils.displayCirclePic(context, stRefList.get(position), holder.searchPicImageView);
+            ImageViewUtils.displayCirclePic(context, stRefList.get(mSearchIDList.get(position)), holder.searchPicImageView);
         }
         holder.friendSearchResultItemView.setText(mCurrent);
         holder.myClickListener = mlistener;
