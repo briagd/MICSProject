@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MICS-Project</string>
+    <string name="rationale_location">Location required to display current location on map</string>
 </resources>

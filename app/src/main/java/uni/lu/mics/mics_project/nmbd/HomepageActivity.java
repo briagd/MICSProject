@@ -63,7 +63,7 @@ public class HomepageActivity extends AppCompatActivity {
     }
 
     public void inviteFriendOnClick(View view) {
-        Intent intent = createIntent(InviteFriendsActivity.class, currentUser);
+        Intent intent = createIntent(SandboxActivity.class, currentUser);
         startActivity(intent);
     }
 
