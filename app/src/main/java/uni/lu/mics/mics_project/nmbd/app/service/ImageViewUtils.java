@@ -25,6 +25,7 @@ public class ImageViewUtils {
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .circleCrop()
+                .placeholder(R.drawable.ic_profile_icons)
                 .into(imgView);
     }
 
