@@ -1,14 +1,16 @@
 package uni.lu.mics.mics_project.nmbd;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,11 +31,11 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.OverlayItem;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
-import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
+import uni.lu.mics.mics_project.nmbd.app.service.location.FetchAddressIntentService;
+import uni.lu.mics.mics_project.nmbd.app.service.location.LocConstants;
 
 public class SandboxActivity extends AppCompatActivity {
 
@@ -65,11 +67,19 @@ public class SandboxActivity extends AppCompatActivity {
     Location userlocation;
 
 
-    TextView currentCityTextView;
+    TextView currentAddTextView;
     TextView currentGPSTextView;
     TextView clickedCityTextView;
     TextView clickedGPSTextView;
     TextView distanceTextView;
+
+    //Request address variables
+    private static final String ADDRESS_REQUESTED_KEY = "address-request-pending";
+    private static final String LOCATION_ADDRESS_KEY = "location-address";
+    //The formatted location address.
+    private AddressResultReceiver mResultReceiver;
+    private String mAddressOutput;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,10 +92,10 @@ public class SandboxActivity extends AppCompatActivity {
 
         setContentView(R.layout.sandbox_activity);
 
-        currentCityTextView = findViewById(R.id.sandbox_current_city);
+        currentAddTextView = findViewById(R.id.sandbox_current_address);
         currentGPSTextView = findViewById(R.id.sandbox_current_gps);
-        currentCityTextView.setText("City from location not implemented");
-        clickedCityTextView = findViewById(R.id.sandbox_clicked_city);
+        currentAddTextView.setText("City from location not implemented");
+        clickedCityTextView = findViewById(R.id.sandbox_clicked_address);
         clickedGPSTextView = findViewById(R.id.sandbox_clicked_gps);
         clickedCityTextView.setText("City from location not implemented");
         clickedGPSTextView.setText("Click on map");
@@ -110,6 +120,9 @@ public class SandboxActivity extends AppCompatActivity {
 
 
         getLastLocation();
+
+        //To get address
+        mResultReceiver = new AddressResultReceiver(new Handler());
 
 
         //Add a marker when map clicked and get Geopoint
@@ -196,8 +209,10 @@ public class SandboxActivity extends AppCompatActivity {
                                 userlocation.set(location);
                                 GeoPoint userGeoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
                                 mapController.animateTo(userGeoPoint);
-                                currentCityTextView.setText("Accept location permission to see current city");
+                                currentAddTextView.setText("Accept location permission to see current city");
                                 currentGPSTextView.setText("Your current GPS location is"+location.getLatitude() +" "+ location.getLongitude());
+                                //
+                                startIntentService();
                             }
                         }
                     });
@@ -215,6 +230,66 @@ public class SandboxActivity extends AppCompatActivity {
     }
 
 
+
+    //Address functions
+    /**
+     * Runs when user clicks the Fetch Address button.
+     */
+    @SuppressWarnings("unused")
+    public void fetchAddressButtonHandler(View view) {
+        if (userlocation != null) {
+            startIntentService();
+            return;
+        }
+
+    }
+
+    /**
+     * Creates an intent, adds location data to it as an extra, and starts the intent service for
+     * fetching an address.
+     */
+    private void startIntentService() {
+        // Create an intent for passing to the intent service responsible for fetching the address.
+        Intent intent = new Intent(this, FetchAddressIntentService.class);
+
+        // Pass the result receiver as an extra to the service.
+        intent.putExtra(LocConstants.RECEIVER, mResultReceiver);
+
+        // Pass the location data as an extra to the service.
+        intent.putExtra(LocConstants.LOCATION_DATA_EXTRA, userlocation);
+
+        // Start the service. If the service isn't already running, it is instantiated and started
+        // (creating a process for it if needed); if it is running then it remains running. The
+        // service kills itself automatically once all intents are processed.
+        startService(intent);
+    }
+
+    /**
+     * Receiver for data sent from FetchAddressIntentService.
+     */
+    private class AddressResultReceiver extends ResultReceiver {
+        AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        /**
+         *  Receives data sent from FetchAddressIntentService and updates the UI in MainActivity.
+         */
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            // Display the address string or an error message sent from the intent service.
+            mAddressOutput = resultData.getString(LocConstants.RESULT_DATA_KEY);
+            currentAddTextView.setText(mAddressOutput);
+
+            // Show a toast message if an address was found.
+            //if (resultCode == LocConstants.SUCCESS_RESULT) {
+                Toast.makeText(SandboxActivity.this, "Address Found", Toast.LENGTH_LONG).show();
+
+           // }
+
+        }
+    }
 
 
 
