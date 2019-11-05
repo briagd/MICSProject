@@ -7,12 +7,9 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.File;
 
-import uni.lu.mics.mics_project.nmbd.ProfileActivity;
 import uni.lu.mics.mics_project.nmbd.R;
 
 
