@@ -1,6 +1,9 @@
 package uni.lu.mics.mics_project.nmbd;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -45,6 +48,9 @@ public class HomepageActivity extends AppCompatActivity {
                 auth.signOut(HomepageActivity.this, MainActivity.class);
             }
         });
+
+        //Create the Notification channel to be able to display notification
+        createNotificationChannel();
     }
 
     public void createEventOnClick(View view) {
@@ -76,5 +82,22 @@ public class HomepageActivity extends AppCompatActivity {
         Intent intent = new Intent(this, targetActivity);
         intent.putExtra("currentUser", user);
         return intent;
+    }
+
+    //Set-up notification
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.UpldNotifName);
+            String description = getString(R.string.UpldNotifDescritption);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(getString(R.string.UpldNotifId), name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 }

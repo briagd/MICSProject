@@ -21,7 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".app.service.uploadService.UploadService" />
+        <service android:name=".app.service.uploadService.UploadIntentService" />
     </application>
 
 </manifest>

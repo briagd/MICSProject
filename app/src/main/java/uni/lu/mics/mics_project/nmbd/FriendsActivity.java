@@ -4,7 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -24,6 +27,8 @@ import uni.lu.mics.mics_project.nmbd.app.service.ServiceFacade;
 import uni.lu.mics.mics_project.nmbd.app.service.ServiceFactory;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
+import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadConstants;
+import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadIntentService;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.DbManager;
 import uni.lu.mics.mics_project.nmbd.infra.repository.Factory;
@@ -41,35 +46,29 @@ import java.util.List;
 public class FriendsActivity extends AppCompatActivity {
 
     final private String TAG = "FriendsActivity";
-
+    //Friend search results
+    private final ExtendedListHash searchResultList = new ExtendedListHash();
+    //Friend Requests received
+    private final ExtendedListHash friendReqList = new ExtendedListHash();
+    //Friend List
+    private final ExtendedListHash friendList = new ExtendedListHash();
     DbManager dbManager = new DbManager(new Factory());
     RepoFacade repoFacade = dbManager.connect();
     UserRepository userRepo = repoFacade.userRepo();
-
+    ServiceFacade serviceFacade = new ServiceFacade(new ServiceFactory());
+    final Storage storageService = serviceFacade.storageService();
     //Reference to the user logged in
     private User currentUser;
     private String currentUserID;
-
-    //Friend search results
-    private final ExtendedListHash searchResultList = new ExtendedListHash();
     private RecyclerView mSearchResultRecyclerView;
     private FriendSearchListAdapter mFriendSearchListAdapter;
     private EditText searchEdit;
-
-    //Friend Requests received
-    private final ExtendedListHash friendReqList = new ExtendedListHash();
     private RecyclerView mFriendReqListRecyclerView;
     private FriendRequestListAdapter mFriendRequestListAdapter;
     private TextView frReqPendingLabel;
-
-    //Friend List
-    private final ExtendedListHash friendList = new ExtendedListHash();
     private RecyclerView mFriendListRecyclerView;
     private FriendListAdapter mFriendListAdapter;
     private TextView friendsLabel;
-
-    ServiceFacade serviceFacade = new ServiceFacade(new ServiceFactory());
-    final Storage storageService = serviceFacade.storageService();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,38 +143,6 @@ public class FriendsActivity extends AppCompatActivity {
         Intent intent = new Intent(this, HomepageActivity.class);
         intent.putExtra("currentUser", currentUser);
         startActivity(intent);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "onDestroy");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(TAG, "onStop");
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d(TAG, "onRestart");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(TAG, "onPause");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(TAG, "onResume");
-        Log.d(TAG,currentUser.getName() );
-
     }
 
     public void updateFriendList() {
@@ -366,6 +333,9 @@ public class FriendsActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
 }
 
 

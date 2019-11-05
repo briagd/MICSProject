@@ -168,19 +168,7 @@
                     android:onClick="uploadPictureOnClick"
                     android:text="Upload Picture" />
 
-                <ProgressBar
-                    android:id="@+id/profile_activity_upload_progressbar"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
             </LinearLayout>
-
-            <ImageView
-                android:id="@+id/profile_activity_profile_picture_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true" />
 
         </LinearLayout>
     </ScrollView>

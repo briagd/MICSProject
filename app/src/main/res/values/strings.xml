@@ -3,11 +3,15 @@
 
     <!-- Storage Strings-->
     <string name="gsProfilePicsStrgFldr">profilePics/</string>
+    <string name="gsProfilePicsStrgFldrtb256">profilePics/thumb@256_</string>
+    <string name="gsProfilePicsStrgFldrtb128">profilePics/thumb@128_</string>
+    <string name="gsProfilePicsStrgFldrtb64">profilePics/thumb@64_</string>
     <string name="gsUrl">gs://mics-android-project.appspot.com/</string>
     <string name="gsProfilePicsUrl">gs://mics-android-project.appspot.com/profilePics/</string>
     <string name="gsTb256ProfPicUrl">gs://mics-android-project.appspot.com/profilePics/thumb@256_</string>
     <string name="gsTb128ProfPicUrl">gs://mics-android-project.appspot.com/profilePics/thumb@128_</string>
     <string name="gsTb64ProfPicUrl">gs://mics-android-project.appspot.com/profilePics/thumb@64_</string>
+
     <string name="gsEventPicsStrgFldr">eventPics/</string>
     <string name="gsEventsPicsUrl">gs://mics-android-project.appspot.com/eventsPics/</string>
     <string name="gsTb256EventPicUrl">gs://mics-android-project.appspot.com/eventsPics/thumb@256_</string>
@@ -15,4 +19,11 @@
     <string name="gsTb64EventPicUrl">gs://mics-android-project.appspot.com/eventsPics/thumb@64_</string>
     <string name="avatarPicUrl">gs://mics-android-project.appspot.com/profilePics/</string>
     <string name="avatarPicId">eventzy_user.png</string>
+
+    <!-- Notification Strings -->
+    <string name="UpldNotifId">upload_notification</string>
+    <string name="UpldNotifDescritption">Displays the progress of upload</string>
+    <string name="UpldNotifName">Upload notification</string>
+    <string name="UpldNotifTitle">Uploading your picture</string>
+    <string name="UpldNotifContent">Your picture is being uploaded</string>
 </resources>
