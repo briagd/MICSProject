@@ -30,9 +30,9 @@ public class HomepageActivity extends AppCompatActivity {
 
         globalState = (AppGlobalState) getApplicationContext();
         auth = globalState.getServiceFacade().authentificationService();
-        //retrieves intent
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
+
         if(currentUser!=null){
             Log.d(TAG, currentUser.getName());
         }
