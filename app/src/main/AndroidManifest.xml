@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".FriendsActivity"></activity>
-        <activity android:name=".InviteFriendsActivity" />
+        <activity android:name=".SandboxActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".EventActivity" />
         <activity android:name=".CreateEventActivity" />
@@ -23,7 +23,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".app.service.location.FetchAddressIntentService"
+            android:exported="false"/>
         <service android:name=".app.service.uploadService.UploadIntentService" />
+
     </application>
+
+
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 </manifest>
