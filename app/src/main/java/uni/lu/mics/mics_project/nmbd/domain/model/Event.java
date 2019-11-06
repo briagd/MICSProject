@@ -1,43 +1,65 @@
 package uni.lu.mics.mics_project.nmbd.domain.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Event {
+public class Event implements Serializable {
 
     private String eventId;
-    private String eventName;
-    private String eventDescription;
+    private String name;
+    private String description;
+    private String date;
+    private String category;
+    private String coverPicUrl;
 
     // To be changed to coordinates type
-    private String eventLocation;
+    private String eventAddress;
+    private float gpsLat;
+    private float gpsLong;
+
     // List of users listed by UIDs
     private List<String> eventParticipants;
+    private List<String> eventInvited;
     // List of admins by UIDs
     private List<String> eventAdmins;
-    private String eventCreator;
+    private String creator;
 
     public Event(){}
 
-    public Event(String eventName, String eventLocation, String eventCreator) {
-        this.eventName = eventName;
-        this.eventLocation = eventLocation;
+    public Event(String name, String description, String date, String creator, String category) throws DomainException {
+        if (name == null || name.isEmpty()){
+            throw new DomainException("name can't be empty");
+        }
+        this.name = name;
+        this.description = description;
+        this.date = date;
+        this.creator = creator;
         this.eventParticipants = new ArrayList<>();
+        this.eventParticipants.add(creator);
         this.eventAdmins = new ArrayList<>();
-        this.eventAdmins.add(eventCreator);
-        this.eventCreator = eventCreator;
+        this.eventAdmins.add(creator);
+        this.category = category;
     }
 
-    public String getEventName() {
-        return eventName;
+    public String getName() {
+        return name;
     }
 
-    public String getEventDescription() {
-        return eventDescription;
+    public String getDescription() {
+        return description;
     }
 
-    public String getEventLocation() {
-        return eventLocation;
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date){
+        this.date = date;
+    }
+
+    public String getEventAddress() {
+        return eventAddress;
     }
 
     public List<String> getEventParticipants() {
@@ -48,20 +70,20 @@ public class Event {
         return eventAdmins;
     }
 
-    public String getEventCreator() {
-        return eventCreator;
+    public String getCreator() {
+        return creator;
     }
 
-    public void setEventName(String eventName) {
-        this.eventName = eventName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setEventDescription(String eventDescription) {
-        this.eventDescription = eventDescription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public void setEventLocation(String eventLocation) {
-        this.eventLocation = eventLocation;
+    public void setEventAddress(String eventAddress) {
+        this.eventAddress = eventAddress;
     }
 
     public void setEventParticipants(List<String> eventParticipants) {
@@ -72,7 +94,40 @@ public class Event {
         this.eventAdmins = eventAdmins;
     }
 
-    public void setEventCreator(String eventCreator) {
-        this.eventCreator = eventCreator;
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getCoverPicUrl() {
+        return coverPicUrl;
+    }
+
+    public void setCoverPicUrl(String coverPicUrl) {
+        this.coverPicUrl = coverPicUrl;
+    }
+
+    public enum EventCategory{
+        GENERAL,
+        PARTY,
+        BIRTHDAY,
+        CONCERT,
+        TRIP
+
     }
 }
