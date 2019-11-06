@@ -31,10 +31,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
 import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
-import uni.lu.mics.mics_project.nmbd.app.service.ServiceFacade;
-import uni.lu.mics.mics_project.nmbd.app.service.ServiceFactory;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
 import uni.lu.mics.mics_project.nmbd.app.service.StorageUploadCallback;
@@ -42,21 +41,16 @@ import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadConstants;
 import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadIntentService;
 import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadStartIntentService;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
-import uni.lu.mics.mics_project.nmbd.infra.DbManager;
-import uni.lu.mics.mics_project.nmbd.infra.repository.Factory;
-import uni.lu.mics.mics_project.nmbd.infra.repository.RepoFacade;
 import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
 
 public class ProfileActivity extends AppCompatActivity {
 
     final String TAG = "ProfileActivity";
 
-    DbManager dbManager = new DbManager(new Factory());
-    RepoFacade repoFacade = dbManager.connect();
-    UserRepository userRepo = repoFacade.userRepo();
-    ServiceFacade serviceFacade = new ServiceFacade(new ServiceFactory());
-    Authentification authService = serviceFacade.authentificationService();
-    final Storage storageService = serviceFacade.storageService();
+    AppGlobalState globalState;
+    UserRepository userRepo;
+    Authentification authService;
+    Storage storageService;
 
     //Name Edit Text view
     private EditText nameEdit;
@@ -86,6 +80,12 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        globalState = (AppGlobalState) getApplicationContext();
+        userRepo = globalState.getRepoFacade().userRepo();
+        authService = globalState.getServiceFacade().authentificationService();
+        storageService = globalState.getServiceFacade().storageService();
+
 
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
