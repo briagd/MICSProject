@@ -348,7 +348,8 @@ public class ProfileActivity extends AppCompatActivity {
             displayProfilePicAfterUpload();
             String filename = resultData.getString(UploadConstants.FILE_NAME);
             //If the new picture has a different filename than the previous one it will not be replaced so it should be deleted
-            if (currentUser.getProfilePicUrl()!=null && !filename.equals(currentUser.getProfilePicUrl())){
+            if (currentUser.getProfilePicUrl()!=null && !filename.equals(currentUser.getProfilePicUrl())
+            && !filename.equals("eventzy_user.png") ){
                 storageService.deleteFile(ProfileActivity.this.getString(R.string.gsProfilePicsStrgFldr), currentUser.getProfilePicUrl());
                 storageService.deleteFile(ProfileActivity.this.getString(R.string.gsProfilePicsStrgFldrtb256), currentUser.getProfilePicUrl());
                 storageService.deleteFile(ProfileActivity.this.getString(R.string.gsProfilePicsStrgFldrtb128), currentUser.getProfilePicUrl());
