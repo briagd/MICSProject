@@ -1,5 +1,6 @@
 package uni.lu.mics.mics_project.nmbd;
 
+import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import pub.devrel.easypermissions.EasyPermissions;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
@@ -24,6 +26,11 @@ public class HomepageActivity extends AppCompatActivity {
     User currentUser;
 
     final String TAG = "HomepageActivity";
+
+    //Variables for permission request
+    private static final int RC_LOCATION_PERM = 124;
+    private static final String[] LOCATION =
+            {Manifest.permission.ACCESS_FINE_LOCATION};
 
 
     @Override
@@ -53,6 +60,11 @@ public class HomepageActivity extends AppCompatActivity {
 
         //Create the Notification channel to be able to display notification
         createNotificationChannel();
+
+        //Request permission to accept location
+        EasyPermissions.requestPermissions(this, getString(R.string.rationale_location),
+                RC_LOCATION_PERM,
+                LOCATION);
     }
 
     public void createEventOnClick(View view) {

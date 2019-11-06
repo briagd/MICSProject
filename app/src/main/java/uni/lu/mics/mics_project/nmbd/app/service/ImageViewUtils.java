@@ -62,12 +62,26 @@ public class ImageViewUtils {
                 .load(strgRef)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
+                .placeholder(R.drawable.event_avatar)
+                .centerCrop()
+
+                .into(imgView);
+    }
+
+    public static void displayPicUri(Context context, Uri uri, ImageView imgView){
+        Glide.with(context)
+                .load(uri)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .placeholder(R.drawable.event_avatar)
+                .centerCrop()
+
                 .into(imgView);
     }
 
     public static void displayAvatarPic(final Context context, Storage storageService, final ImageView imgView){
         final String defaulPictUrl = context.getString(R.string.gsEventsPicsUrl);
-        final String defaultPicId = context.getString(R.string.avatarPicId);
+        final String defaultPicId = context.getString(R.string.eventAvatarPicId);
         storageService.getStorageReference(defaulPictUrl,defaultPicId , new StorageCallback() {
             @Override
             public void onSuccess(StorageReference storageReference) {

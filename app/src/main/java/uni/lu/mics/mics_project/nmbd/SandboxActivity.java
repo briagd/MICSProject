@@ -5,11 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +33,9 @@ import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.OverlayItem;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -173,8 +178,34 @@ public class SandboxActivity extends AppCompatActivity {
         mOverlay.setFocusItemsOnTap(true);
         map.getOverlays().add(mOverlay);
 
+        GeoPoint p = getLocationFromAddress("17 Boulevard de Verdun, 2670 Luxembourg");
+        //Log.d(TAG, String.valueOf(p.getLatitude())+ String.valueOf(p.getLongitude()));
+        clickedCityTextView.setText(String.valueOf(p.getLatitude())+"   "+ String.valueOf(p.getLongitude()));
+    }
 
+    public GeoPoint getLocationFromAddress(String strAddress){
 
+        Geocoder coder = new Geocoder(this);
+        List<Address> address;
+        GeoPoint p1 = null;
+
+        try {
+            address = coder.getFromLocationName(strAddress,5);
+            if (address==null) {
+                return null;
+            }
+            Address location=address.get(0);
+            location.getLatitude();
+            location.getLongitude();
+
+            p1 = new GeoPoint(location.getLatitude(),
+                    location.getLongitude());
+
+            return p1;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return p1;
     }
 
     public void onResume(){

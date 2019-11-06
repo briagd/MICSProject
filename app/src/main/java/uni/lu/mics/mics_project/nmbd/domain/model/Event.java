@@ -1,8 +1,13 @@
 package uni.lu.mics.mics_project.nmbd.domain.model;
 
+import android.content.Context;
+import android.content.res.Resources;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import uni.lu.mics.mics_project.nmbd.R;
 
 public class Event implements Serializable {
 
@@ -24,6 +29,7 @@ public class Event implements Serializable {
     // List of admins by UIDs
     private List<String> eventAdmins;
     private String creator;
+    private int likes;
 
     public Event(){}
 
@@ -37,10 +43,14 @@ public class Event implements Serializable {
         this.creator = creator;
         this.eventParticipants = new ArrayList<>();
         this.eventParticipants.add(creator);
+        this.eventInvited = new ArrayList<>();
         this.eventAdmins = new ArrayList<>();
         this.eventAdmins.add(creator);
         this.category = category;
+        this.coverPicUrl = "event_avatar.jpg";
+        this.likes = 0;
     }
+
 
     public String getName() {
         return name;
@@ -122,6 +132,30 @@ public class Event implements Serializable {
         this.coverPicUrl = coverPicUrl;
     }
 
+    public float getGpsLat() {
+        return gpsLat;
+    }
+
+    public void setGpsLat(float gpsLat) {
+        this.gpsLat = gpsLat;
+    }
+
+    public float getGpsLong() {
+        return gpsLong;
+    }
+
+    public void setGpsLong(float gpsLong) {
+        this.gpsLong = gpsLong;
+    }
+
+    public List<String> getEventInvited() {
+        return eventInvited;
+    }
+
+    public void setEventInvited(List<String> eventInvited) {
+        this.eventInvited = eventInvited;
+    }
+
     public enum EventCategory{
         GENERAL,
         PARTY,
@@ -129,5 +163,13 @@ public class Event implements Serializable {
         CONCERT,
         TRIP
 
+    }
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
     }
 }

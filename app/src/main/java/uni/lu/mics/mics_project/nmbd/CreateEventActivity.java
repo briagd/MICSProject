@@ -2,11 +2,14 @@ package uni.lu.mics.mics_project.nmbd;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
@@ -16,6 +19,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -33,6 +37,8 @@ import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
 import uni.lu.mics.mics_project.nmbd.app.service.StorageUploadCallback;
+import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadConstants;
+import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadStartIntentService;
 import uni.lu.mics.mics_project.nmbd.domain.model.DomainException;
 import uni.lu.mics.mics_project.nmbd.domain.model.Event;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
@@ -67,12 +73,14 @@ public class CreateEventActivity extends AppCompatActivity {
     private Button cancelBtn;
 
     private HashMap<String, Uri> resourceMap;
-    ;
+    private Uri imgUri;
     // Location picker
     // TO DO: find out location
 
     private User currentUser;
     private Event currentEvent;
+
+    private UploadResultReceiver mUpldRessultReceiver;
 
 
     @Override
@@ -89,8 +97,13 @@ public class CreateEventActivity extends AppCompatActivity {
 
         eventCategory = (Spinner) findViewById(R.id.SpinnerEvent);
         cancelBtn = (Button) findViewById(R.id.cancelBtn);
+        eventImageButton = (ImageButton) findViewById(R.id.eventImage);
+        ImageViewUtils.displayAvatarPic(this, storageService, eventImageButton);
         setDobFields();
         setSpinner();
+
+        //Instantiate the receiver for the upload service
+        mUpldRessultReceiver = new UploadResultReceiver(new Handler());
 
 
     }
@@ -99,80 +112,6 @@ public class CreateEventActivity extends AppCompatActivity {
         openImageChooser();
     }
 
-
-    public void onClickSave(View v) {
-
-        saveButton = (Button) findViewById(R.id.SaveBtn);
-        nameEdit = (EditText) findViewById(R.id.eventName);
-        descriptionEdit = (EditText) findViewById(R.id.descriptionText);
-
-        String name = nameEdit.getText().toString();
-        String descr = descriptionEdit.getText().toString();
-        String strDate = dobEdit.getText().toString();
-        String category = eventCategory.getSelectedItem().toString();
-        final Bitmap image = ((BitmapDrawable) eventImageButton.getDrawable()).getBitmap();
-//        getImageUri(image);
-
-        try {
-            final Event event = new Event(name, descr, strDate, currentUser.getId(), category);
-            eventRepo.add(event, new RepoCallback() {
-
-                @Override
-                public void onCallback(Object model) {
-                }
-
-                @Override
-                public void onGetField(String str) {
-                    event.setEventId(str);
-                    CreateEventActivity.this.currentEvent = event;
-                    eventRepo.set(str, event);
-//                    storageService.uploadPic(CreateEventActivity.this, resourceMap.get("ImageUri"), getResources().getString(R.string.gsEventPicsStrgFldr), str, new StorageUploadCallback() {
-//                        @Override
-//                        public void onProgress() {
-//                        }
-//
-//                        @Override
-//                        public void onSuccess(StorageReference storageReference, String filename) {
-//                            //Displays toast on success
-//                            Toast.makeText(CreateEventActivity.this, "Event picture updated", Toast.LENGTH_LONG).show();
-//                            //If the new picture has a different filename than the previous one it will not be replaced so it should be deleted
-//                            if (currentEvent.getCoverPicUrl() != null && !filename.equals(currentEvent.getCoverPicUrl())) {
-//                                storageService.deleteFile(CreateEventActivity.this.getString(R.string.gsEventPicsStrgFldr), currentEvent.getCoverPicUrl());
-//                            }
-//                            //updates current user and repo
-//                            currentEvent.setCoverPicUrl(filename);
-//                            // TO DO: Change field names to R strings
-//                            eventRepo.update(currentEvent.getEventId(), "coverPicUrl", filename);
-//                            //Updates the profile pic displayer
-//                            displayEventPic();
-//                        }
-//
-//                        @Override
-//                        public void onFailure() {
-//                            Log.d(TAG, "Upload failed");
-//                        }
-//                    });
-
-                    Toast.makeText(CreateEventActivity.this, "Event Saved", Toast.LENGTH_SHORT).show();
-
-                    //go to Event activity
-                    Intent intent = getIntent(currentEvent);
-                    startActivity(intent);
-                    finish();
-                }
-            });
-
-        } catch (DomainException e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }
-
-    // Intent for when the user saves an event
-    public Intent getIntent(Event event) {
-        Intent intent = new Intent(CreateEventActivity.this, EventActivity.class);
-        intent.putExtra("currentEvent", event);
-        return intent;
-    }
 
     public void setSpinner() {
         eventCategory.setAdapter(new ArrayAdapter<Event.EventCategory>(this, android.R.layout.simple_spinner_dropdown_item, Event.EventCategory.values()));
@@ -222,38 +161,92 @@ public class CreateEventActivity extends AppCompatActivity {
         super.onActivityResult(reqCode, resultCode, data);
 
         if (resultCode == RESULT_OK) {
-            this.resourceMap = new HashMap<>(1);
-            this.resourceMap.put("ImageUri", data.getData());
-            eventImageButton = (ImageButton) findViewById(R.id.eventImage);
-            eventImageButton.setImageURI(data.getData());
+            imgUri = data.getData();
+            ImageViewUtils.displayPicUri(this,imgUri,eventImageButton);
         } else {
             Toast.makeText(CreateEventActivity.this, "You haven't picked Image", Toast.LENGTH_LONG).show();
         }
     }
 
+    public void onClickSave(View v) {
 
-    private void displayEventPic() {
-        String currentEventPicUrl = currentEvent.getCoverPicUrl();
-        final String gsUrl = this.getString(R.string.gsTb64EventPicUrl);
-        storageService.getStorageReference(gsUrl, currentEventPicUrl, new StorageCallback() {
-            @Override
-            public void onSuccess(StorageReference storageReference) {
-                ImageViewUtils.displayAvatarPic(CreateEventActivity.this, storageService, eventImageButton);
-                Log.d(TAG, "User profile picture correctly retrieved");
-            }
+        saveButton = findViewById(R.id.SaveBtn);
+        nameEdit = findViewById(R.id.eventName);
+        descriptionEdit = findViewById(R.id.descriptionText);
 
-            @Override
-            public void onFailure() {
-                ImageViewUtils.displayAvatarPic(CreateEventActivity.this, storageService, eventImageButton);
-            }
-        });
+        String name = nameEdit.getText().toString();
+        String descr = descriptionEdit.getText().toString();
+        String strDate = dobEdit.getText().toString();
+        String category = eventCategory.getSelectedItem().toString();
+
+        try {
+            final Event event = new Event(name, descr, strDate, currentUser.getId(), category);
+            eventRepo.add(event, new RepoCallback() {
+
+                @Override
+                public void onCallback(Object model) {
+                }
+
+                @Override
+                public void onGetField(String id) {
+                    event.setEventId(id);
+                    CreateEventActivity.this.currentEvent = event;
+                    eventRepo.set(id, event);
+                    uploadFile(imgUri);
+                    Log.d(TAG, currentEvent.getEventId());
+                    Toast.makeText(CreateEventActivity.this, "Event Saved", Toast.LENGTH_SHORT).show();
+                    //go to Event activity
+                    Intent intent = setIntent(currentEvent, imgUri);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+
+        } catch (DomainException e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 
+    // Intent for when the user saves an event
+    public Intent setIntent(Event event, Uri imgUri) {
+        Intent intent = new Intent(CreateEventActivity.this, EventActivity.class);
+        intent.putExtra("currentUser", currentUser);
+        intent.putExtra("currentEvent", event);
+        intent.putExtra("image", imgUri.toString());
+        return intent;
+    }
+
+    private void uploadFile(Uri imgUri){
+        if(imgUri!=null) {
+            Log.d(TAG, "Starting upload service");
+            UploadStartIntentService.startIntentService(this, mUpldRessultReceiver, imgUri,
+                    getString(R.string.gsEventPicsStrgFldr), currentEvent.getEventId(), UploadConstants.EVENT_TYPE);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.d(TAG, "onBackPressed Called");
+        Intent intent = new Intent(this, HomepageActivity.class);
+        intent.putExtra("currentUser", currentUser);
+        startActivity(intent);
+    }
 
     public void cancelOnclick(View view) {
         Intent intent = new Intent(this, HomepageActivity.class);
         intent.putExtra("currentUser", currentUser);
         startActivity(intent);
+    }
+
+    //Intent service to upload file
+    private class UploadResultReceiver extends ResultReceiver {
+        UploadResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+       }
     }
 
 }
