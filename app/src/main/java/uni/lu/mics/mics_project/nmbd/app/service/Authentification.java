@@ -39,7 +39,7 @@ public class Authentification {
         Intent intent = AuthUI.getInstance().createSignInIntentBuilder()
                 .setAvailableProviders(providers)
                 .setTheme(R.style.MyTheme)
-                //.setLogo(R.drawable.firebase)
+                .setLogo(R.drawable.eventzy_logo)
                 .build();
         return intent;
     }
@@ -59,7 +59,7 @@ public class Authentification {
     }
 
     public String getAuthEmail(){
-        return getCurrentUser().getDisplayName();
+        return getCurrentUser().getEmail();
     }
 
     public Boolean isUserSignedIn(){

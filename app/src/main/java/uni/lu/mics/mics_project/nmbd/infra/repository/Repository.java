@@ -5,12 +5,16 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -41,17 +45,18 @@ public class Repository<T> {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        repoCallback.onCallback(null);
+                        //repoCallback.onCallback();
                     }
                 });;
     }
 
-    public void add(T model) {
+    public void add(T model, final RepoCallback repoCallback) {
         this.collectionRef.add(model)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Log.d("DocAdding", "DocumentSnapshot written with ID: " + documentReference.getId());
+                        repoCallback.onGetField(documentReference.getId());
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -60,6 +65,23 @@ public class Repository<T> {
                         Log.w("DocAdding", "Error adding document", e);
                     }
                 });
+    }
+
+    /*
+
+     */
+    public void set(String uid, T model){
+        this.collectionRef.document(uid).set(model).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d("DocSetting", "Model correctly set");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w("DocAdding", "Error adding document", e);
+            }
+        });
     }
 
     public void update(String modelUid, Map<String, Object> updates) {
@@ -121,6 +143,19 @@ public class Repository<T> {
                         Log.w("DocDelete", "Error deleting document", e);
                     }
                 });
+    }
+
+    public void whereGreaterThanOrEqualTo(String field, String toCompare, final RepoMultiCallback<T> repoCallback){
+        this.collectionRef.whereGreaterThanOrEqualTo(field, toCompare).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                ArrayList<T> models = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    models.add(document.toObject(modelClass));
+                }
+                repoCallback.onCallback(models);
+            }
+        });
     }
 
 }
