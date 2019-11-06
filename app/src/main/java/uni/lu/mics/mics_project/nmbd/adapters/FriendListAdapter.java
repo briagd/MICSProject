@@ -25,12 +25,12 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
     private final LinkedList<String> mFriendIDList;
     private HashMap<String, StorageReference> stRefList;
     private LayoutInflater mInflater;
-    private MyClickListener mlistener;
+    private AdapterCallBack mlistener;
     private final Context context;
 
 
     public FriendListAdapter(Context context, LinkedList<String> nameList, LinkedList<String> idList,
-                             HashMap<String, StorageReference> stRefList, MyClickListener listener) {
+                             HashMap<String, StorageReference> stRefList, AdapterCallBack listener) {
         mInflater = LayoutInflater.from(context);
         this.mFriendNameList = nameList;
         this.mFriendIDList = idList;
@@ -64,17 +64,13 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
         return mFriendNameList.size();
     }
 
-    public interface MyClickListener{
-        void onUnfriendRequest(int p);
-
-    }
 
     public class FriendListViewHolder extends RecyclerView.ViewHolder{
         private final TextView friendItemView;
         private final Button unfriendButton;
         private final ImageView friendPicImageView;
         private final FriendListAdapter mAdapter;
-        private FriendListAdapter.MyClickListener myClickListener;
+        private AdapterCallBack myClickListener;
 
         private FriendListViewHolder(View itemView, FriendListAdapter adapter){
             super(itemView);
@@ -84,7 +80,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
             unfriendButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    myClickListener.onUnfriendRequest(getAdapterPosition());
+                    myClickListener.onClickCallback(getAdapterPosition());
                 }
             });
             this.mAdapter = adapter;

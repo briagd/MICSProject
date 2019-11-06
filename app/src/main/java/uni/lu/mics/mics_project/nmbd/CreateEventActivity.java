@@ -126,32 +126,32 @@ public class CreateEventActivity extends AppCompatActivity {
                     event.setEventId(str);
                     CreateEventActivity.this.currentEvent = event;
                     eventRepo.set(str, event);
-                    storageService.uploadPic(CreateEventActivity.this, resourceMap.get("ImageUri"), getResources().getString(R.string.gsEventPicsStrgFldr), str, new StorageUploadCallback() {
-                        @Override
-                        public void onProgress() {
-                        }
-
-                        @Override
-                        public void onSuccess(StorageReference storageReference, String filename) {
-                            //Displays toast on success
-                            Toast.makeText(CreateEventActivity.this, "Event picture updated", Toast.LENGTH_LONG).show();
-                            //If the new picture has a different filename than the previous one it will not be replaced so it should be deleted
-                            if (currentEvent.getCoverPicUrl() != null && !filename.equals(currentEvent.getCoverPicUrl())) {
-                                storageService.deleteFile(CreateEventActivity.this.getString(R.string.gsEventPicsStrgFldr), currentEvent.getCoverPicUrl());
-                            }
-                            //updates current user and repo
-                            currentEvent.setCoverPicUrl(filename);
-                            // TO DO: Change field names to R strings
-                            eventRepo.update(currentEvent.getEventId(), "coverPicUrl", filename);
-                            //Updates the profile pic displayer
-                            displayEventPic();
-                        }
-
-                        @Override
-                        public void onFailure() {
-                            Log.d(TAG, "Upload failed");
-                        }
-                    });
+//                    storageService.uploadPic(CreateEventActivity.this, resourceMap.get("ImageUri"), getResources().getString(R.string.gsEventPicsStrgFldr), str, new StorageUploadCallback() {
+//                        @Override
+//                        public void onProgress() {
+//                        }
+//
+//                        @Override
+//                        public void onSuccess(StorageReference storageReference, String filename) {
+//                            //Displays toast on success
+//                            Toast.makeText(CreateEventActivity.this, "Event picture updated", Toast.LENGTH_LONG).show();
+//                            //If the new picture has a different filename than the previous one it will not be replaced so it should be deleted
+//                            if (currentEvent.getCoverPicUrl() != null && !filename.equals(currentEvent.getCoverPicUrl())) {
+//                                storageService.deleteFile(CreateEventActivity.this.getString(R.string.gsEventPicsStrgFldr), currentEvent.getCoverPicUrl());
+//                            }
+//                            //updates current user and repo
+//                            currentEvent.setCoverPicUrl(filename);
+//                            // TO DO: Change field names to R strings
+//                            eventRepo.update(currentEvent.getEventId(), "coverPicUrl", filename);
+//                            //Updates the profile pic displayer
+//                            displayEventPic();
+//                        }
+//
+//                        @Override
+//                        public void onFailure() {
+//                            Log.d(TAG, "Upload failed");
+//                        }
+//                    });
 
                     Toast.makeText(CreateEventActivity.this, "Event Saved", Toast.LENGTH_SHORT).show();
 

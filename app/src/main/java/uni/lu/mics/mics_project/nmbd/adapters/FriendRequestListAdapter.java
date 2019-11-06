@@ -25,12 +25,12 @@ public class FriendRequestListAdapter extends RecyclerView.Adapter<FriendRequest
     private final LinkedList<String> mRequestIDList;
     private final HashMap<String, StorageReference> stRefList;
     private LayoutInflater mInflater;
-    private MyClickListener mlistener;
+    private AdapterDoubleCallBack mlistener;
     private final Context context;
 
 
     public FriendRequestListAdapter(Context context, LinkedList<String> nameList, LinkedList<String> idList,
-                                    HashMap<String, StorageReference> stRefList, MyClickListener listener) {
+                                    HashMap<String, StorageReference> stRefList, AdapterDoubleCallBack listener) {
         mInflater = LayoutInflater.from(context);
         this.mRequestNameList = nameList;
         this.mRequestIDList = idList;
@@ -63,10 +63,7 @@ public class FriendRequestListAdapter extends RecyclerView.Adapter<FriendRequest
         return mRequestIDList.size();
     }
 
-    public interface MyClickListener{
-        void onAcceptRequest(int p);
-        void onDeclineRequest(int p);
-    }
+
 
     public class FriendRequestViewHolder extends RecyclerView.ViewHolder{
         private final TextView friendRequestItemView;
@@ -74,7 +71,7 @@ public class FriendRequestListAdapter extends RecyclerView.Adapter<FriendRequest
         private final Button declineButton;
         private final ImageView  friendPicImageView;
         private final FriendRequestListAdapter mAdapter;
-        private FriendRequestListAdapter.MyClickListener myClickListener;
+        private AdapterDoubleCallBack myClickListener;
 
         private FriendRequestViewHolder(View itemView, FriendRequestListAdapter adapter){
             super(itemView);

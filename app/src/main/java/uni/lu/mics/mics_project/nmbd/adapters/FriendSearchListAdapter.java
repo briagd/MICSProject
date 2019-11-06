@@ -25,12 +25,12 @@ public class FriendSearchListAdapter  extends RecyclerView.Adapter<FriendSearchL
     private final LinkedList<String> mSearchIDList;
     private HashMap<String, StorageReference> stRefList;
     private LayoutInflater mInflater;
-    private MyClickListener mlistener;
+    private AdapterCallBack mlistener;
     private final Context context;
 
     public FriendSearchListAdapter(Context context,
                                    LinkedList<String> wordList, LinkedList<String> idList,
-                                   HashMap<String, StorageReference> stRefList, MyClickListener listener) {
+                                   HashMap<String, StorageReference> stRefList, AdapterCallBack listener) {
         mInflater = LayoutInflater.from(context);
         this.mSearchResultList = wordList;
         this.mSearchIDList = idList;
@@ -40,9 +40,6 @@ public class FriendSearchListAdapter  extends RecyclerView.Adapter<FriendSearchL
     }
 
 
-    public interface MyClickListener{
-        void onAddFriend(int p);
-    }
 
     @NonNull
     @Override
@@ -79,7 +76,7 @@ public class FriendSearchListAdapter  extends RecyclerView.Adapter<FriendSearchL
         private final TextView friendSearchResultItemView;
         private final Button addFriendButton;
         private final FriendSearchListAdapter mAdapter;
-        private FriendSearchListAdapter.MyClickListener myClickListener;
+        private AdapterCallBack myClickListener;
 
         private FriendSearchViewHolder(View itemView, FriendSearchListAdapter adapter){
             super(itemView);
@@ -89,7 +86,7 @@ public class FriendSearchListAdapter  extends RecyclerView.Adapter<FriendSearchL
             addFriendButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    myClickListener.onAddFriend(getAdapterPosition());
+                    myClickListener.onClickCallback(getAdapterPosition());
                 }
             });
 

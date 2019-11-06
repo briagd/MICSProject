@@ -19,6 +19,8 @@ import android.widget.Toast;
 
 import com.google.firebase.storage.StorageReference;
 
+import uni.lu.mics.mics_project.nmbd.adapters.AdapterCallBack;
+import uni.lu.mics.mics_project.nmbd.adapters.AdapterDoubleCallBack;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendListAdapter ;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendRequestListAdapter ;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendSearchListAdapter ;
@@ -165,10 +167,10 @@ public class FriendsActivity extends AppCompatActivity {
         addStrgRefs(friendList, mFriendListAdapter);
 
         mFriendListAdapter = new FriendListAdapter(FriendsActivity.this,
-                friendList.getNameList(), friendList.getIdList(), friendList.getStrgRefList(), new FriendListAdapter.MyClickListener() {
+                friendList.getNameList(), friendList.getIdList(), friendList.getStrgRefList(), new AdapterCallBack() {
 
             @Override
-            public void onUnfriendRequest(int p) {
+            public void onClickCallback(int p) {
                 String unfriendUserID = friendList.getId(p);//mFriendListIDList.get(p);
                 //Removes the friend ID from the list of current user object list of req received
                 currentUser.removeFriendFromFriendList(unfriendUserID);
@@ -198,7 +200,7 @@ public class FriendsActivity extends AppCompatActivity {
         //Create an adapter and supply the data to be displayed
         mFriendRequestListAdapter = new FriendRequestListAdapter(FriendsActivity.this,
                 friendReqList.getNameList(), friendReqList.getIdList(), friendReqList.getStrgRefList(),
-                new FriendRequestListAdapter.MyClickListener() {
+                new AdapterDoubleCallBack() {
                     @Override
                     public void onAcceptRequest(int p) {
                         String requestUserID = friendReqList.getId(p);
@@ -267,10 +269,10 @@ public class FriendsActivity extends AppCompatActivity {
         // Create an adapter and supply the data to be displayed.
         mFriendSearchListAdapter = new FriendSearchListAdapter(FriendsActivity.this,
                 searchResultList.getNameList(), searchResultList.getIdList(), searchResultList.getStrgRefList(),
-                new FriendSearchListAdapter.MyClickListener() {
+                new AdapterCallBack() {
                     //Add Friend button pressed procedure
                     @Override
-                    public void onAddFriend(int p) {
+                    public void onClickCallback(int p) {
                         //Add friend request to the currentUser object and update database
                         String sendUserID = searchResultList.getId(p);
                         currentUser.addFriendToReqSentList(sendUserID);
@@ -308,6 +310,11 @@ public class FriendsActivity extends AppCompatActivity {
                         }
                     });
                 }
+
+                @Override
+                public void onGetField(String str) {
+
+                }
             });
         }
     }
@@ -330,6 +337,11 @@ public class FriendsActivity extends AppCompatActivity {
                     }
                 });
                 adapter.notifyItemInserted(extListHash.getIdIndexOfLast());
+            }
+
+            @Override
+            public void onGetField(String str) {
+
             }
         });
     }
