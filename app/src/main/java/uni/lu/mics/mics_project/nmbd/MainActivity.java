@@ -48,6 +48,11 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 }
+
+                @Override
+                public void onGetField(String Uid) {
+
+                }
             });
         } else {
             startActivityForResult(authService.createSignInIntent(), MY_REQUEST_CODE);
@@ -76,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "Welcome " + model.getName(), Toast.LENGTH_LONG).show();
                         finish();
                     }
+
+                    @Override
+                    public void onGetField(String str) {}
                 });
             } else {
                 Toast.makeText(this, "" + response.getError().getMessage(), Toast.LENGTH_LONG).show();
