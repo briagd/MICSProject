@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.ResultReceiver;
 import android.provider.MediaStore;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -27,6 +28,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.storage.StorageReference;
 
+import org.osmdroid.util.GeoPoint;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -37,6 +40,7 @@ import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
 import uni.lu.mics.mics_project.nmbd.app.service.StorageUploadCallback;
+import uni.lu.mics.mics_project.nmbd.app.service.location.LocationUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadConstants;
 import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadStartIntentService;
 import uni.lu.mics.mics_project.nmbd.domain.model.DomainException;
@@ -69,13 +73,11 @@ public class CreateEventActivity extends AppCompatActivity {
     private DatePickerDialog datePickerDialog;
     private EditText dobEdit;
 
-    private Button saveButton;
-    private Button cancelBtn;
-
-    private HashMap<String, Uri> resourceMap;
     private Uri imgUri;
     // Location picker
     // TO DO: find out location
+    String address;
+    private EditText addressEdit;
 
     private User currentUser;
     private Event currentEvent;
@@ -95,8 +97,8 @@ public class CreateEventActivity extends AppCompatActivity {
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
 
+        addressEdit = findViewById(R.id.LocationPicker);
         eventCategory = (Spinner) findViewById(R.id.SpinnerEvent);
-        cancelBtn = (Button) findViewById(R.id.cancelBtn);
         eventImageButton = (ImageButton) findViewById(R.id.eventImage);
         ImageViewUtils.displayAvatarPic(this, storageService, eventImageButton);
         setDobFields();
@@ -170,7 +172,6 @@ public class CreateEventActivity extends AppCompatActivity {
 
     public void onClickSave(View v) {
 
-        saveButton = findViewById(R.id.SaveBtn);
         nameEdit = findViewById(R.id.eventName);
         descriptionEdit = findViewById(R.id.descriptionText);
 
@@ -179,8 +180,19 @@ public class CreateEventActivity extends AppCompatActivity {
         String strDate = dobEdit.getText().toString();
         String category = eventCategory.getSelectedItem().toString();
 
+
+
         try {
             final Event event = new Event(name, descr, strDate, currentUser.getId(), category);
+
+            String address = addressEdit.getText().toString();
+            if (!TextUtils.isEmpty(address)){
+                event.setEventAddress(address);
+                GeoPoint p = LocationUtils.getLocationFromAddress(this,address);
+                event.setGpsLat((float)p.getLatitude());
+                event.setGpsLong((float)p.getLongitude());
+            }
+
             eventRepo.add(event, new RepoCallback() {
 
                 @Override
@@ -232,10 +244,17 @@ public class CreateEventActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void cancelOnclick(View view) {
+
+    public void cancelOnClick(View view) {
         Intent intent = new Intent(this, HomepageActivity.class);
         intent.putExtra("currentUser", currentUser);
         startActivity(intent);
+    }
+
+    public void saveLocation(View view) {
+        address = addressEdit.getText().toString();
+        GeoPoint p = LocationUtils.getLocationFromAddress(this,address);
+        Log.d(TAG, String.valueOf(p.getLatitude())+ " " + String.valueOf(p.getLongitude()));
     }
 
     //Intent service to upload file

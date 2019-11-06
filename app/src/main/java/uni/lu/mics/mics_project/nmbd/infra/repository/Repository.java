@@ -145,6 +145,22 @@ public class Repository<T> {
                 });
     }
 
+    public void getAll(final RepoMultiCallback<T> repoCallback){
+        this.collectionRef.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            ArrayList<T> models = new ArrayList<>();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                models.add(document.toObject(modelClass));
+                            }
+                            repoCallback.onCallback(models);
+                        }
+                    }
+                });
+    }
+
     public void whereGreaterThanOrEqualTo(String field, String toCompare, final RepoMultiCallback<T> repoCallback){
         this.collectionRef.whereGreaterThanOrEqualTo(field, toCompare).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override

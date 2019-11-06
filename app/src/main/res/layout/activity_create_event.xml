@@ -140,15 +140,15 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:ems="10"
-                    android:hint="Location"
-                     />
+                    android:hint="Enter the address of the event" />
 
                 <Button
                     android:id="@+id/SaveLocationBtn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="5dp"
                     android:layout_weight="1"
+                    android:onClick="saveLocation"
                     android:text="Save location" />
             </LinearLayout>
 

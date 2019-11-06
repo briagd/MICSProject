@@ -82,8 +82,13 @@ public class HomepageActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void inviteFriendOnClick(View view) {
-        Intent intent = createIntent(SandboxActivity.class, currentUser);
+//    public void inviteFriendOnClick(View view) {
+//        Intent intent = createIntent(SandboxActivity.class, currentUser);
+//        startActivity(intent);
+//    }
+
+    public void eventsMapOnClick(View view) {
+        Intent intent = createIntent(EventsMapActivity.class, currentUser);
         startActivity(intent);
     }
 
@@ -114,4 +119,6 @@ public class HomepageActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
         }
     }
+
+
 }
