@@ -2,7 +2,6 @@ package uni.lu.mics.mics_project.nmbd;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -13,7 +12,6 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -22,46 +20,32 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
 import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
-import uni.lu.mics.mics_project.nmbd.app.service.ServiceFacade;
-import uni.lu.mics.mics_project.nmbd.app.service.ServiceFactory;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
 import uni.lu.mics.mics_project.nmbd.app.service.StorageUploadCallback;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
-import uni.lu.mics.mics_project.nmbd.infra.DbManager;
-import uni.lu.mics.mics_project.nmbd.infra.repository.Factory;
-import uni.lu.mics.mics_project.nmbd.infra.repository.RepoFacade;
 import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
 
 public class ProfileActivity extends AppCompatActivity {
 
     final String TAG = "ProfileActivity";
 
-    DbManager dbManager = new DbManager(new Factory());
-    RepoFacade repoFacade = dbManager.connect();
-    UserRepository userRepo = repoFacade.userRepo();
-    ServiceFacade serviceFacade = new ServiceFacade(new ServiceFactory());
-    Authentification authService = serviceFacade.authentificationService();
-    final Storage storageService = serviceFacade.storageService();
+    AppGlobalState globalState;
+    UserRepository userRepo;
+    Authentification authService;
+    Storage storageService;
 
     //Name Edit Text view
     private EditText nameEdit;
@@ -90,6 +74,12 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        globalState = (AppGlobalState) getApplicationContext();
+        userRepo = globalState.getRepoFacade().userRepo();
+        authService = globalState.getServiceFacade().authentificationService();
+        storageService = globalState.getServiceFacade().storageService();
+
 
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");

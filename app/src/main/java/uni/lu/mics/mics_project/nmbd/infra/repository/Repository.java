@@ -12,7 +12,6 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 
@@ -41,17 +40,18 @@ public class Repository<T> {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        repoCallback.onCallback(null);
+                        //repoCallback.onCallback();
                     }
                 });;
     }
 
-    public void add(T model) {
+    public void add(T model, final RepoCallback repoCallback) {
         this.collectionRef.add(model)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Log.d("DocAdding", "DocumentSnapshot written with ID: " + documentReference.getId());
+                        repoCallback.onGetField(documentReference.getId());
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

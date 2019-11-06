@@ -8,16 +8,17 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 
 public class HomepageActivity extends AppCompatActivity {
 
-
+    AppGlobalState globalState;
+    Authentification auth;
     Button btn_sign_out;
     //currentUser object retrieved from intent
     User currentUser;
-    Authentification auth;
 
     final String TAG = "HomepageActivity";
 
@@ -27,10 +28,11 @@ public class HomepageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_homepage);
 
-        auth = new Authentification();
-        //retrieves intent
+        globalState = (AppGlobalState) getApplicationContext();
+        auth = globalState.getServiceFacade().authentificationService();
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
+
         if(currentUser!=null){
             Log.d(TAG, currentUser.getName());
         }
