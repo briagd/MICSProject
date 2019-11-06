@@ -1,13 +1,13 @@
 package uni.lu.mics.mics_project.nmbd.app.service;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.storage.StorageReference;
-
 import uni.lu.mics.mics_project.nmbd.R;
 
 
@@ -23,8 +23,22 @@ public class ImageViewUtils {
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .circleCrop()
+                .placeholder(R.drawable.ic_profile_icons)
                 .into(imgView);
     }
+
+    public static void displayCirclePicUri(Context context, Uri uri, ImageView imgView){
+        Log.d(TAG,uri.getPath());
+        Glide.with(context)
+                .load(uri)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .circleCrop()
+                .placeholder(R.drawable.ic_profile_icons)
+                .into(imgView);
+    }
+
+
 
     public static void displayCircleAvatarPic(final Context context, Storage storageService, final ImageView imgView){
         final String defaulPictUrl = context.getString(R.string.avatarPicUrl);

@@ -2,10 +2,13 @@ package uni.lu.mics.mics_project.nmbd;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.InputType;
@@ -24,7 +27,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.storage.StorageReference;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -35,6 +37,9 @@ import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
 import uni.lu.mics.mics_project.nmbd.app.service.StorageUploadCallback;
+import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadConstants;
+import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadIntentService;
+import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadStartIntentService;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
 
@@ -63,12 +68,13 @@ public class ProfileActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
     private ImageView thmbProfileImageView;
     private Button uploadPicButton;
-    private ImageView profileImageView;
     private Uri imageUri;
-    private ProgressBar uploadProgressBar;
     //Reference to the user logged in
     private User currentUser;
     private String currentUserID;
+
+    //Receiver from UploadServiceIntent
+    private UploadResultReceiver mUpldRessultReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +91,10 @@ public class ProfileActivity extends AppCompatActivity {
         currentUser = (User) intent.getSerializableExtra("currentUser");
         currentUserID = currentUser.getId();
 
+        //Instantiate the receiver for the upload service
+        mUpldRessultReceiver = new UploadResultReceiver(new Handler());
+
+
         setNameFields();
         setDobFields();
         setPasswordFields();
@@ -95,13 +105,9 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void setPicFields() {
         thmbProfileImageView = findViewById(R.id.profile_activity_thmb_imageView);
-        profileImageView = findViewById(R.id.profile_activity_profile_picture_view);
         uploadPicButton = findViewById(R.id.profile_activity_upload_picture_button);
-        uploadProgressBar = findViewById(R.id.profile_activity_upload_progressbar);
         //Set Upload button and upload progress bar to invisible as no picture has been chosen
         uploadPicButton.setVisibility(View.INVISIBLE);
-        uploadProgressBar.setVisibility(View.INVISIBLE);
-        profileImageView.setVisibility(View.VISIBLE);
     }
 
 
@@ -185,6 +191,14 @@ public class ProfileActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    @Override
+    public void onBackPressed() {
+        Log.d(TAG, "onBackPressed Called");
+        Intent intent = new Intent(this, HomepageActivity.class);
+        intent.putExtra("currentUser", currentUser);
+        startActivity(intent);
+    }
+
     public void setPasswordFields(){
         passwordEdit = findViewById(R.id.profile_activity_password_edit);
         confirmPasswordEdit = findViewById(R.id.profile_activity_confirmpassword_edit);
@@ -258,22 +272,6 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    private void displayProfilePic() {
-        String currentUserProfilePicUrl = currentUser.getProfilePicUrl();
-        final String gsUrl = this.getString(R.string.gsTb64ProfPicUrl);
-        storageService.getStorageReference(gsUrl, currentUserProfilePicUrl, new StorageCallback() {
-            @Override
-            public void onSuccess(StorageReference storageReference) {
-                ImageViewUtils.displayCirclePic(ProfileActivity.this, storageReference, thmbProfileImageView);
-                Log.d(TAG, "User profile picture correctly retrieved");
-            }
-            @Override
-            public void onFailure() {
-                ImageViewUtils.displayCircleAvatarPic(ProfileActivity.this, storageService, thmbProfileImageView);
-            }
-        });
-    }
-
     public void chooseImageOnClick(View view) {
         openImageChooser();
     }
@@ -292,8 +290,6 @@ public class ProfileActivity extends AppCompatActivity {
         //Sets the image view to the image chosen when intent is received
         if (requestCode == PICK_IMAGE_REQUEST && resultCode ==RESULT_OK && data!=null && data.getData()!= null){
             imageUri = data.getData();
-            profileImageView.setVisibility(View.VISIBLE);
-            profileImageView.setImageURI(imageUri);
             //Make the upload button visible
             uploadPicButton.setVisibility(View.VISIBLE);
         }
@@ -305,35 +301,67 @@ public class ProfileActivity extends AppCompatActivity {
         uploadFile();
     }
 
+
+    private void displayProfilePicAfterUpload(){
+        ImageViewUtils.displayCirclePicUri(ProfileActivity.this, imageUri,thmbProfileImageView );
+    }
+
+    private void displayProfilePic() {
+        String currentUserProfilePicUrl = currentUser.getProfilePicUrl();
+        final String gsUrl = this.getString(R.string.gsTb64ProfPicUrl);
+        storageService.getStorageReference(gsUrl, currentUserProfilePicUrl, new StorageCallback() {
+            @Override
+            public void onSuccess(StorageReference storageReference) {
+                ImageViewUtils.displayCirclePic(ProfileActivity.this, storageReference, thmbProfileImageView);
+                Log.d(TAG, "User profile picture correctly retrieved");
+            }
+            @Override
+            public void onFailure() {
+                ImageViewUtils.displayCircleAvatarPic(ProfileActivity.this, storageService, thmbProfileImageView);
+            }
+        });
+    }
+
     private void uploadFile(){
         if(imageUri!=null) {
-            storageService.uploadPic(this, imageUri, this.getString(R.string.gsProfilePicsStrgFldr), currentUserID, new StorageUploadCallback() {
-                @Override
-                public void onProgress() {
-                    uploadProgressBar.setVisibility(View.VISIBLE);
-                }
-                @Override
-                public void onSuccess(StorageReference storageReference, String filename) {
-                    uploadProgressBar.setVisibility(View.INVISIBLE);
-                    //Displays toast on success
-                    Toast.makeText(ProfileActivity.this, "Profile Picture updated", Toast.LENGTH_LONG).show();
-                    //If the new picture has a different filename than the previous one it will not be replaced so it should be deleted
-                    if (currentUser.getProfilePicUrl()!=null && !filename.equals(currentUser.getProfilePicUrl())){
-                        storageService.deleteFile(ProfileActivity.this.getString(R.string.gsProfilePicsStrgFldr), currentUser.getProfilePicUrl());
-                    }
-                    //Hide the imageview to display the image chosen
-                    profileImageView.setVisibility(View.INVISIBLE);
-                    //updates current user and repo
-                    currentUser.setProfilePicUrl(filename);
-                    userRepo.update(currentUserID, "profilePicUrl", filename);
-                    //Updates the profile pic displayer
-                    displayProfilePic();
-                }
-                @Override
-                public void onFailure() {
-                    Log.d(TAG, "Upload failed");
-                }
-            });
+            UploadStartIntentService.startIntentService(this, mUpldRessultReceiver, imageUri,
+                    getString(R.string.gsProfilePicsStrgFldr), currentUserID, UploadConstants.PROFILE_TYPE);
+
         }
     }
+
+    //Intent service to upload file
+    /**
+     * Receiver for data sent from FetchAddressIntentService.
+     */
+    private class UploadResultReceiver extends ResultReceiver {
+        UploadResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        /**
+         * Receives data sent from FetchAddressIntentService and updates the UI in MainActivity.
+         */
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+            //UI things to complete when service intent completed
+            displayProfilePicAfterUpload();
+            String filename = resultData.getString(UploadConstants.FILE_NAME);
+            //If the new picture has a different filename than the previous one it will not be replaced so it should be deleted
+            if (currentUser.getProfilePicUrl()!=null && !filename.equals(currentUser.getProfilePicUrl())
+            && !filename.equals("eventzy_user.png") ){
+                storageService.deleteFile(ProfileActivity.this.getString(R.string.gsProfilePicsStrgFldr), currentUser.getProfilePicUrl());
+                storageService.deleteFile(ProfileActivity.this.getString(R.string.gsProfilePicsStrgFldrtb256), currentUser.getProfilePicUrl());
+                storageService.deleteFile(ProfileActivity.this.getString(R.string.gsProfilePicsStrgFldrtb128), currentUser.getProfilePicUrl());
+                storageService.deleteFile(ProfileActivity.this.getString(R.string.gsProfilePicsStrgFldrtb64), currentUser.getProfilePicUrl());
+            }
+            //Hide the imageview to display the image chosen
+            //updates current user and repo
+            currentUser.setProfilePicUrl(filename);
+
+            //Displays toast on success
+            Toast.makeText(ProfileActivity.this, "Profile Picture updated", Toast.LENGTH_LONG).show();
+        }
+    }
+
 }

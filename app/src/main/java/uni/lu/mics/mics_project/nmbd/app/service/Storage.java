@@ -46,7 +46,7 @@ public class Storage {
         }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                strgCallBack.onProgress();
+                strgCallBack.onProgress(taskSnapshot);
             }
         });
     }
@@ -77,19 +77,11 @@ public class Storage {
             });
     }
 
-
-
-
     private String getFileExtension(Context context, Uri uri){
         ContentResolver cR = context.getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(cR.getType(uri));
     }
-
-
-
-
-
 
 
 }
