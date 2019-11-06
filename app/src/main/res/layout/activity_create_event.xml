@@ -30,6 +30,7 @@
                     android:id="@+id/eventImage"
                     android:layout_width="match_parent"
                     android:layout_height="185dp"
+                    android:onClick="imageOnclick"
                     app:srcCompat="@drawable/fui_idp_button_background_phone" />
 
 
@@ -60,14 +61,6 @@
                     android:hint="Name"
                     android:inputType="textPersonName" />
 
-                <Button
-                    android:id="@+id/saveNameBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
-                    android:layout_weight="1"
-                    android:text="@string/fui_button_text_save" />
-
             </LinearLayout>
 
             <TextView
@@ -90,14 +83,9 @@
                     android:ems="10"
                     android:gravity="center|top"
                     android:hint="Enter a description here"
-                    android:inputType="textMultiLine" />
+                    android:inputType="textMultiLine"
+                    android:textAlignment="viewStart" />
 
-                <Button
-                    android:id="@+id/saveDescriptionBtn"
-                    android:layout_width="104dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
-                    android:text="@string/fui_button_text_save" />
             </LinearLayout>
 
             <TextView
@@ -138,13 +126,6 @@
                     android:hint="Date"
                     android:inputType="date"/>
 
-                <Button
-                    android:id="@+id/SaveDateBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
-                    android:layout_weight="1"
-                    android:text="Save Date" />
             </LinearLayout>
 
             <LinearLayout
@@ -189,6 +170,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="210dp"
                     android:layout_marginTop="0dp"
+                    android:onClick="cancelOnClick"
                     android:text="@android:string/cancel" />
 
                 <Button
@@ -197,6 +179,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="0dp"
+                    android:onClick="onClickSave"
                     android:text="save" />
 
             </LinearLayout>

@@ -15,10 +15,4 @@
     <string name="gsTb64EventPicUrl">gs://mics-android-project.appspot.com/eventsPics/thumb@64_</string>
     <string name="avatarPicUrl">gs://mics-android-project.appspot.com/profilePics/</string>
     <string name="avatarPicId">eventzy_user.png</string>
-    <string-array name="EventCategories">
-        <item>Party</item>
-        <item>Birthday</item>
-        <item>Concert</item>
-        <item>Trip</item>
-    </string-array>
 </resources>
