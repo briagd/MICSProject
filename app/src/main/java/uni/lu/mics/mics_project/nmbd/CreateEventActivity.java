@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -74,9 +76,7 @@ public class CreateEventActivity extends AppCompatActivity {
     private EditText dobEdit;
 
     private Uri imgUri;
-    // Location picker
-    // TO DO: find out location
-    String address;
+    private Boolean isImagePicked = false;
     private EditText addressEdit;
 
     private User currentUser;
@@ -100,6 +100,8 @@ public class CreateEventActivity extends AppCompatActivity {
         addressEdit = findViewById(R.id.LocationPicker);
         eventCategory = (Spinner) findViewById(R.id.SpinnerEvent);
         eventImageButton = (ImageButton) findViewById(R.id.eventImage);
+        nameEdit = findViewById(R.id.eventName);
+        descriptionEdit = findViewById(R.id.descriptionText);
         ImageViewUtils.displayAvatarPic(this, storageService, eventImageButton);
         setDobFields();
         setSpinner();
@@ -144,11 +146,6 @@ public class CreateEventActivity extends AppCompatActivity {
             }
         });
 
-        if (dobEdit.getText().toString().isEmpty()) {
-            Date c = Calendar.getInstance().getTime();
-            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-            dobEdit.setText(df.format(c));
-        }
     }
 
     @SuppressLint("IntentReset")
@@ -164,58 +161,96 @@ public class CreateEventActivity extends AppCompatActivity {
 
         if (resultCode == RESULT_OK) {
             imgUri = data.getData();
+            isImagePicked = true;
             ImageViewUtils.displayPicUri(this,imgUri,eventImageButton);
         } else {
             Toast.makeText(CreateEventActivity.this, "You haven't picked Image", Toast.LENGTH_LONG).show();
         }
     }
 
+    public Boolean isFormFilled(){
+        Boolean isAllFilled = true;
+
+        if(TextUtils.isEmpty(nameEdit.getText().toString())) {
+            isAllFilled = false;
+            TextView nameLabel = findViewById(R.id.EventNameTag);
+            nameLabel.setTextColor(Color.RED);
+            nameLabel.setText("Please enter a name for your event.");
+        }
+
+        if(TextUtils.isEmpty(descriptionEdit.getText().toString())) {
+            isAllFilled = false;
+            TextView label = findViewById(R.id.DescriptionNameTag);
+            label.setTextColor(Color.RED);
+            label.setText("Please enter a description for your event.");
+        }
+
+        if(TextUtils.isEmpty(dobEdit.getText().toString())) {
+            isAllFilled = false;
+            TextView label = findViewById(R.id.DateTag);
+            label.setTextColor(Color.RED);
+            label.setText("Please enter a date for your event.");
+        }
+
+        if(TextUtils.isEmpty(addressEdit.getText().toString())) {
+            isAllFilled = false;
+            TextView label = findViewById(R.id.AddressTag);
+            label.setTextColor(Color.RED);
+            label.setText("Please enter an address for your event.");
+        }
+
+        if(!isImagePicked){
+            Log.d(TAG, "No image chosen");
+            Toast.makeText(this, "Please choose a picture for your event", Toast.LENGTH_LONG).show();
+            isAllFilled = false;
+        }
+
+        return isAllFilled;
+    }
+
     public void onClickSave(View v) {
 
-        nameEdit = findViewById(R.id.eventName);
-        descriptionEdit = findViewById(R.id.descriptionText);
+        if (isFormFilled()) {
+            String name = nameEdit.getText().toString();
+            String descr = descriptionEdit.getText().toString();
+            String strDate = dobEdit.getText().toString();
+            String category = eventCategory.getSelectedItem().toString();
 
-        String name = nameEdit.getText().toString();
-        String descr = descriptionEdit.getText().toString();
-        String strDate = dobEdit.getText().toString();
-        String category = eventCategory.getSelectedItem().toString();
+            try {
+                final Event event = new Event(name, descr, strDate, currentUser.getId(), category);
 
+                String address = addressEdit.getText().toString();
+                if (!TextUtils.isEmpty(address)) {
+                    event.setEventAddress(address);
+                    GeoPoint p = LocationUtils.getLocationFromAddress(this, address);
+                    event.setGpsLat((float) p.getLatitude());
+                    event.setGpsLong((float) p.getLongitude());
+                }
 
+                eventRepo.add(event, new RepoCallback() {
 
-        try {
-            final Event event = new Event(name, descr, strDate, currentUser.getId(), category);
+                    @Override
+                    public void onCallback(Object model) {
+                    }
 
-            String address = addressEdit.getText().toString();
-            if (!TextUtils.isEmpty(address)){
-                event.setEventAddress(address);
-                GeoPoint p = LocationUtils.getLocationFromAddress(this,address);
-                event.setGpsLat((float)p.getLatitude());
-                event.setGpsLong((float)p.getLongitude());
+                    @Override
+                    public void onGetField(String id) {
+                        event.setEventId(id);
+                        CreateEventActivity.this.currentEvent = event;
+                        eventRepo.set(id, event);
+                        uploadFile(imgUri);
+                        Log.d(TAG, currentEvent.getEventId());
+                        Toast.makeText(CreateEventActivity.this, "Event Saved", Toast.LENGTH_SHORT).show();
+                        //go to Event activity
+                        Intent intent = setIntent(currentEvent, imgUri);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+
+            } catch (DomainException e) {
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
             }
-
-            eventRepo.add(event, new RepoCallback() {
-
-                @Override
-                public void onCallback(Object model) {
-                }
-
-                @Override
-                public void onGetField(String id) {
-                    event.setEventId(id);
-                    CreateEventActivity.this.currentEvent = event;
-                    eventRepo.set(id, event);
-                    uploadFile(imgUri);
-                    Log.d(TAG, currentEvent.getEventId());
-                    Toast.makeText(CreateEventActivity.this, "Event Saved", Toast.LENGTH_SHORT).show();
-                    //go to Event activity
-                    Intent intent = setIntent(currentEvent, imgUri);
-                    startActivity(intent);
-                    finish();
-                }
-            });
-
-        } catch (DomainException e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -251,11 +286,11 @@ public class CreateEventActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void saveLocation(View view) {
-        address = addressEdit.getText().toString();
-        GeoPoint p = LocationUtils.getLocationFromAddress(this,address);
-        Log.d(TAG, String.valueOf(p.getLatitude())+ " " + String.valueOf(p.getLongitude()));
-    }
+//    public void saveLocation(View view) {
+//        address = addressEdit.getText().toString();
+//        GeoPoint p = LocationUtils.getLocationFromAddress(this,address);
+//        Log.d(TAG, String.valueOf(p.getLatitude())+ " " + String.valueOf(p.getLongitude()));
+//    }
 
     //Intent service to upload file
     private class UploadResultReceiver extends ResultReceiver {

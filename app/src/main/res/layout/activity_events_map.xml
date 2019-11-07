@@ -24,7 +24,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="161dp"
+            android:layout_height="186dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -54,9 +54,8 @@
 
                 <TextView
                     android:id="@+id/date_textview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -74,7 +73,7 @@
                 <Button
                     android:id="@+id/eventButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="37dp"
                     android:onClick="viewEventOnClick"
                     android:text="View Event Page" />
 

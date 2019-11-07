@@ -223,7 +223,7 @@ public class EventsMapActivity extends AppCompatActivity {
         intent.putExtra("currentUser", currentUser);
         startActivity(intent);
     }
-    
+
     public void viewEventOnClick(View view) {
         final Intent intent = new Intent(this, EventActivity.class);
         intent.putExtra("currentUser", currentUser);
