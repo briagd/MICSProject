@@ -62,22 +62,23 @@ public class ImageViewUtils {
                 .load(strgRef)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
-                .placeholder(R.drawable.event_avatar)
                 .centerCrop()
-
+                .placeholder(R.drawable.event_avatar)
                 .into(imgView);
     }
+
 
     public static void displayPicUri(Context context, Uri uri, ImageView imgView){
         Glide.with(context)
                 .load(uri)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
-                .placeholder(R.drawable.event_avatar)
                 .centerCrop()
-
+                .placeholder(R.drawable.event_avatar)
                 .into(imgView);
     }
+
+
 
     public static void displayAvatarPic(final Context context, Storage storageService, final ImageView imgView){
         final String defaulPictUrl = context.getString(R.string.gsEventsPicsUrl);

@@ -3,23 +3,26 @@
 
     <string name="rationale_location">Location required to display current location on map</string>
     <!-- Storage Strings-->
+    <string name="gsUrl">gs://mics-android-project.appspot.com/</string>
+    <!-- Profile Picture Storage-->
     <string name="gsProfilePicsStrgFldr">profilePics/</string>
     <string name="gsProfilePicsStrgFldrtb256">profilePics/thumb@256_</string>
     <string name="gsProfilePicsStrgFldrtb128">profilePics/thumb@128_</string>
     <string name="gsProfilePicsStrgFldrtb64">profilePics/thumb@64_</string>
-    <string name="gsUrl">gs://mics-android-project.appspot.com/</string>
+    <!-- Event Picture Storage-->
     <string name="gsProfilePicsUrl">gs://mics-android-project.appspot.com/profilePics/</string>
     <string name="gsTb256ProfPicUrl">gs://mics-android-project.appspot.com/profilePics/thumb@256_</string>
     <string name="gsTb128ProfPicUrl">gs://mics-android-project.appspot.com/profilePics/thumb@128_</string>
     <string name="gsTb64ProfPicUrl">gs://mics-android-project.appspot.com/profilePics/thumb@64_</string>
-
-    <string name="gsEventPicsStrgFldr">eventPics/</string>
-    <string name="gsEventsPicsUrl">gs://mics-android-project.appspot.com/eventsPics/</string>
-    <string name="gsTb256EventPicUrl">gs://mics-android-project.appspot.com/eventsPics/thumb@256_</string>
-    <string name="gsTb128EventPicUrl">gs://mics-android-project.appspot.com/eventsPics/thumb@128_</string>
-    <string name="gsTb64EventPicUrl">gs://mics-android-project.appspot.com/eventsPics/thumb@64_</string>
     <string name="avatarPicUrl">gs://mics-android-project.appspot.com/profilePics/</string>
     <string name="avatarPicId">eventzy_user.png</string>
+
+    <string name="gsEventPicsStrgFldr">eventPics/</string>
+    <string name="gsEventsPicsUrl">gs://mics-android-project.appspot.com/eventPics/</string>
+    <string name="gsTb256EventPicUrl">gs://mics-android-project.appspot.com/eventPics/thumb@256_</string>
+    <string name="gsTb128EventPicUrl">gs://mics-android-project.appspot.com/eventPics/thumb@128_</string>
+    <string name="gsTb64EventPicUrl">gs://mics-android-project.appspot.com/eventPics/thumb@64_</string>
+
     <string name="eventAvatarPicId">event_avatar.jpg</string>
 
 
