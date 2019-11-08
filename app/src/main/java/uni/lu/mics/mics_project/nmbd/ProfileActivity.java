@@ -272,7 +272,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    public void chooseImageOnClick(View view) {
+    public void pictureOnClick(View view) {
         openImageChooser();
     }
 
@@ -329,6 +329,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         }
     }
+
+
 
     //Intent service to upload file
     /**

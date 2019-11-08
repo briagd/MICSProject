@@ -23,24 +23,40 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/friends_activity_search_result_recyclerview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content" >
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <View
+            android:id="@+id/divider3"
+            android:layout_width="match_parent"
+            android:layout_height="15dp"
+            android:background="@color/red" />
 
         <TextView
             android:id="@+id/friends_activity_req_pending_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Friend requests pending:" />
+            android:text="Friend requests pending:"
+            android:textSize="18sp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/friends_activity_req_pending_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="match_parent"
+            android:layout_height="15dp"
+            android:background="@color/red" />
+
         <TextView
             android:id="@+id/friends_activity_friends_list_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Friends:" />
+            android:text="Friends:"
+            android:textSize="18sp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/friends_activity_friends_recyclerview"

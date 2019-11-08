@@ -12,22 +12,31 @@
 
         <ImageView
             android:id="@+id/friend_item_pic_imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             app:srcCompat="@drawable/ic_profile_icons" />
 
         <TextView
             android:id="@+id/friend_name_label"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_height="match_parent"
+            android:layout_marginLeft="15dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="Name"
+            android:textSize="18sp" />
 
         <Button
             android:id="@+id/unfriend_button"
-            android:layout_width="8sp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/red"
+            android:padding="4sp"
+            android:shadowColor="#000000"
+            android:shadowRadius="10"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
             android:text="Unfriend" />
     </LinearLayout>
 </LinearLayout>

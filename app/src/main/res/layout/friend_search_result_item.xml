@@ -14,23 +14,24 @@
 
         <ImageView
             android:id="@+id/friend_search_pic_imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             app:srcCompat="@drawable/ic_profile_icons" />
 
         <TextView
             android:id="@+id/friend_search_result_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-             />
+            android:layout_marginLeft="15dp"
+            android:layout_weight="1"
+            android:text="Name"
+            android:textSize="18sp" />
 
         <Button
             android:id="@+id/friend_search_result_add_friend_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.1"
-            android:text="Add Friend"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/plus_b"
             android:textSize="12sp" />
     </LinearLayout>
 

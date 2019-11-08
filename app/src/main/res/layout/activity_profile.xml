@@ -33,23 +33,68 @@
 
                 <Button
                     android:id="@+id/profile_activity_back_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:onClick="backOnclick"
-                    android:text="Back" />
+                    android:background="@drawable/back_b"
+                    android:onClick="backOnclick" />
 
                 <ImageView
                     android:id="@+id/profile_activity_thmb_imageView"
                     android:layout_width="wrap_content"
                     android:layout_height="80sp"
                     android:adjustViewBounds="true"
+                    android:clickable="true"
                     android:focusableInTouchMode="false"
+                    android:onClick="pictureOnClick"
                     android:translationX="200sp"
                     tools:srcCompat="@drawable/ic_profile_icons" />
 
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Tap to select a profile picture"
+                android:translationX="210dp" />
+
+            <View
+                android:id="@+id/divider7"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="@color/fui_transparent" />
+
+            <Button
+                android:id="@+id/profile_activity_upload_picture_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:background="@color/blue"
+                android:padding="4sp"
+                android:shadowColor="#000000"
+                android:shadowRadius="10"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:onClick="uploadPictureOnClick"
+                android:text="Upload Picture"
+                android:translationX="230dp" />
+
+            <View
+                android:id="@+id/divider6"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="@android:color/transparent" />
+
+            <View
+                android:id="@+id/divider4"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:background="@color/red"
+                android:padding="20dp"
+                android:paddingTop="20dp" />
 
             <TextView
                 android:id="@+id/profile_activity_name_label"
@@ -76,7 +121,12 @@
                     android:id="@+id/profile_activity_name_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:background="@color/blue"
+                    android:padding="4sp"
+                    android:shadowColor="#000000"
+                    android:shadowRadius="10"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
                     android:onClick="saveNameOnclick"
                     android:text="Save name" />
             </LinearLayout>
@@ -101,11 +151,23 @@
 
                 <Button
                     android:id="@+id/profile_activity_dob_button"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="@color/blue"
                     android:onClick="saveDobOnClick"
-                    android:text="Save" />
+                    android:padding="4sp"
+                    android:shadowColor="#000000"
+                    android:shadowRadius="10"
+                    android:text="Save"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp" />
             </LinearLayout>
+
+            <View
+                android:id="@+id/divider8"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:background="@color/red" />
 
             <TextView
                 android:id="@+id/profile_activity_password_label"
@@ -144,30 +206,14 @@
                     android:id="@+id/profile_activity_save_password_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:background="@color/blue"
+                    android:padding="4sp"
+                    android:shadowColor="#000000"
+                    android:shadowRadius="10"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
                     android:onClick="savePasswordOnClick"
                     android:text="Save Password" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/profile_activity_choose_image_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="chooseImageOnClick"
-                    android:text="Choose Profile Picture" />
-
-                <Button
-                    android:id="@+id/profile_activity_upload_picture_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="uploadPictureOnClick"
-                    android:text="Upload Picture" />
-
             </LinearLayout>
 
         </LinearLayout>
