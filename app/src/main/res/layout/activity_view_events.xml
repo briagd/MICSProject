@@ -29,7 +29,8 @@
             android:id="@+id/invitation_pending_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Event invitations pending:" />
+            android:text="Event invitations pending:"
+            android:textSize="24sp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/invitation_pending_recyclerview"
@@ -40,7 +41,8 @@
             android:id="@+id/events_list_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Events attending:" />
+            android:text="Events attending:"
+            android:textSize="24sp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/events_recyclerview"

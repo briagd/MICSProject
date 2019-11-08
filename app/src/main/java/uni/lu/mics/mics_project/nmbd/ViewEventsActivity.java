@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -60,10 +61,10 @@ public class ViewEventsActivity extends AppCompatActivity {
     private EventListAdapter mEventSearchListAdapter;
     private EditText searchEdit;
     private RecyclerView mEventInviteListRecyclerView;
-    private FriendRequestListAdapter mEventInviteListAdapter;
+    private EventListAdapter mEventInviteListAdapter;
     private TextView EventInviteLabel;
     private RecyclerView mEventAttRecyclerView;
-    private FriendListAdapter mEventAttListAdapter;
+    private EventListAdapter mEventAttListAdapter;
     private TextView eventAttLabel;
 
 
@@ -147,6 +148,37 @@ public class ViewEventsActivity extends AppCompatActivity {
     }
 
     private void initializeEventsRecyclerView(){
+        mEventAttListAdapter = new EventListAdapter(this, eventAttList, new AdapterCallBack() {
+            @Override
+            public void onClickCallback(int p) {
+                startEventActivity(eventAttList.getId(p));
+            }
+        });
+        //Make the recycler view snap on the current card view
+        SnapHelper snapHelper = new LinearSnapHelper();
+        snapHelper.attachToRecyclerView(mEventAttRecyclerView);
+        // Connect the adapter with the recycler view.
+        mEventAttRecyclerView.setAdapter(mEventAttListAdapter);
+        // Give the recycler view a default layout manager.
+        mEventAttRecyclerView.setLayoutManager(new LinearLayoutManager(ViewEventsActivity.this, RecyclerView.HORIZONTAL, false));
+        updateEventsAttList();
+    }
+
+    private void updateEventsAttList() {
+        //If there are no friend request then the friend request label and recycler view can be set invisible
+        Log.d(TAG, currentUserID);
+        eventRepo.whereArrayContains("eventParticipants", currentUserID, new RepoMultiCallback<Event>() {
+            @Override
+            public void onCallback(ArrayList<Event> models) {
+                for (Event event:models){
+                    Log.d(TAG, "Events attending:"+event.getName());
+                    addEventToExtendedLis(event.getEventId(), eventAttList, mEventAttListAdapter);
+                }
+                if (models.size()==0){
+                    eventAttLabel.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
 
     }
 
@@ -203,6 +235,7 @@ public class ViewEventsActivity extends AppCompatActivity {
             @Override
             public void onCallback(final Event model) {
                 //add the found model to the list
+
                 extList.addElement(model.getName(), model.getEventId(), model.getDate(), model.getCategory(), model.getEventAddress());
                 final String gsUrl = getString(R.string.gsTb256EventPicUrl);
                 //Add the storage reference to the list

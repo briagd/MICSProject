@@ -1,6 +1,7 @@
 package uni.lu.mics.mics_project.nmbd.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,17 +12,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.storage.StorageReference;
-
-import java.util.HashMap;
-import java.util.LinkedList;
 
 import uni.lu.mics.mics_project.nmbd.R;
 import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListEvent;
 import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
 
 public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.EventListViewHolder>{
-
+    private final String TAG = "EventListAdapter";
     private ExtendedListEvent extList;
     private LayoutInflater mInflater;
     private AdapterCallBack mlistener;
@@ -48,6 +45,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
     public void onBindViewHolder(@NonNull EventListViewHolder holder, int position) {
 
         String name = extList.getName(position);
+
         String date = extList.getDate(position);
         String address= extList.getAddress(position);
         String category = extList.getCategory(position);
