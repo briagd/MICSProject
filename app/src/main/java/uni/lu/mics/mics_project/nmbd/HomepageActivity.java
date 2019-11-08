@@ -97,6 +97,11 @@ public class HomepageActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void viewEventsOnClick(View view) {
+        Intent intent = createIntent(ViewEventsActivity.class, currentUser);
+        startActivity(intent);
+    }
+
     private Intent createIntent(Class targetActivity, User user){
         Intent intent = new Intent(this, targetActivity);
         intent.putExtra("currentUser", user);
@@ -119,6 +124,7 @@ public class HomepageActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
         }
     }
+
 
 
 }

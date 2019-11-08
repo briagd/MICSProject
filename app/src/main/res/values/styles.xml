@@ -11,4 +11,13 @@
     <style name="MyTheme" parent="AppTheme">
         <item name="android:windowBackground">@android:color/white</item>
     </style>
+
+    <style name="BlueButton" parent="Theme.AppCompat">
+        <item name="android:background">@color/blue</item>
+        <item name="android:shadowColor">#000000</item>
+        <item name="android:padding">4sp</item>
+        <item name="android:shadowRadius">10</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">16sp</item>
+    </style>
 </resources>

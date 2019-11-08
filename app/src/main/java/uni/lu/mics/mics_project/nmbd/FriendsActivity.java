@@ -62,6 +62,7 @@ public class FriendsActivity extends AppCompatActivity {
     //Reference to the user logged in
     private User currentUser;
     private String currentUserID;
+    //View variables
     private RecyclerView mSearchResultRecyclerView;
     private FriendSearchListAdapter mFriendSearchListAdapter;
     private EditText searchEdit;
@@ -320,11 +321,14 @@ public class FriendsActivity extends AppCompatActivity {
     }
 
     public void addFriendToExtendedListHash(String id, final ExtendedListHash extListHash, final RecyclerView.Adapter adapter) {
+        //Access database to find user corresponding to an id
         userRepo.findById(id, new RepoCallback<User>() {
             @Override
             public void onCallback(final User model) {
+                //add the found model to the list
                 extListHash.addNameID(model.getName(), model.getId());
                 final String gsUrl = FriendsActivity.this.getString(R.string.gsTb64ProfPicUrl);
+                //Add the storage reference to the list
                 storageService.getStorageReference(gsUrl, model.getProfilePicUrl(), new StorageCallback() {
                     @Override
                     public void onSuccess(StorageReference storageReference) {
@@ -336,6 +340,7 @@ public class FriendsActivity extends AppCompatActivity {
                     public void onFailure() {
                     }
                 });
+                //Notifies adapter that the list has been updated so recyclerview can be updated
                 adapter.notifyItemInserted(extListHash.getIdIndexOfLast());
             }
 
