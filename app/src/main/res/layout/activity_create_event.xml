@@ -36,6 +36,12 @@
 
             </LinearLayout>
 
+            <View
+                android:id="@+id/divider13"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:background="@color/red" />
+
             <TextView
                 android:id="@+id/EventNameTag"
                 android:layout_width="wrap_content"
@@ -63,6 +69,12 @@
 
             </LinearLayout>
 
+            <View
+                android:id="@+id/divider9"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:background="@color/red" />
+
             <TextView
                 android:id="@+id/DescriptionNameTag"
                 android:layout_width="wrap_content"
@@ -88,6 +100,12 @@
 
             </LinearLayout>
 
+            <View
+                android:id="@+id/divider10"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:background="@color/red" />
+
             <TextView
                 android:id="@+id/EventTypeTxt"
                 android:layout_width="wrap_content"
@@ -104,6 +122,12 @@
                 android:ems="10"
                 android:inputType="textPassword" />
 
+            <View
+                android:id="@+id/divider11"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:background="@color/red" />
+
             <TextView
                 android:id="@+id/DateTag"
                 android:layout_width="wrap_content"
@@ -119,43 +143,43 @@
 
                 <EditText
                     android:id="@+id/DatePicker"
-                    android:layout_width="wrap_content"
+                    android:layout_width="299dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:ems="10"
                     android:hint="Date"
-                    android:inputType="date"/>
+                    android:inputType="date" />
 
             </LinearLayout>
+
+            <View
+                android:id="@+id/divider12"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:background="@color/red" />
 
             <TextView
                 android:id="@+id/AddressTag"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="10dp"
                 android:text="Address" />
 
-            <LinearLayout
+            <EditText
+                android:id="@+id/LocationPicker"
+                android:layout_width="299dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:hint="Enter the address of the event"
+                android:inputType="textMultiLine" />
+
+            <View
+                android:id="@+id/divider14"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="45dp"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/LocationPicker"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:ems="10"
-                    android:inputType="textMultiLine"
-                    android:hint="Enter the address of the event" />
-
-            </LinearLayout>
-
-            <ImageView
-                android:id="@+id/profile_activity_profile_picture_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true" />
+                android:layout_height="15dp"
+                android:background="@color/red" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -165,21 +189,27 @@
 
                 <Button
                     android:id="@+id/cancelBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:layout_marginLeft="210dp"
                     android:layout_marginTop="0dp"
-                    android:onClick="cancelOnClick"
-                    android:text="@android:string/cancel" />
+                    android:background="@drawable/cross"
+                    android:onClick="cancelOnClick" />
+
+                <View
+                    android:id="@+id/divider5"
+                    android:layout_width="45dp"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
 
                 <Button
                     android:id="@+id/SaveBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="0dp"
-                    android:onClick="onClickSave"
-                    android:text="save" />
+                    android:background="@drawable/check"
+                    android:onClick="onClickSave" />
 
             </LinearLayout>
 
