@@ -62,6 +62,12 @@
             android:id="@+id/friends_activity_friends_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <View
+            android:id="@+id/divider15"
+            android:layout_width="match_parent"
+            android:layout_height="15dp"
+            android:background="@color/red" />
     </LinearLayout>
 
 
