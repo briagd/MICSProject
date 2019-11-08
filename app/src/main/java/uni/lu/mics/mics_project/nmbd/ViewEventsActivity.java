@@ -62,7 +62,7 @@ public class ViewEventsActivity extends AppCompatActivity {
     private EditText searchEdit;
     private RecyclerView mEventInviteListRecyclerView;
     private EventListAdapter mEventInviteListAdapter;
-    private TextView EventInviteLabel;
+    private TextView eventInviteLabel;
     private RecyclerView mEventAttRecyclerView;
     private EventListAdapter mEventAttListAdapter;
     private TextView eventAttLabel;
@@ -86,7 +86,7 @@ public class ViewEventsActivity extends AppCompatActivity {
 
         //Initialize the different views in layout
         searchEdit = findViewById(R.id.search_edit);
-                EventInviteLabel = findViewById(R.id.invitation_pending_label);
+        eventInviteLabel = findViewById(R.id.invitation_pending_label);
         eventAttLabel = findViewById(R.id.events_list_label);
         //Attaching the recycler views to their corresponding View items
         mSearchResultRecyclerView = findViewById(R.id.search_result_recyclerview);
@@ -166,7 +166,6 @@ public class ViewEventsActivity extends AppCompatActivity {
 
     private void updateEventsAttList() {
         //If there are no friend request then the friend request label and recycler view can be set invisible
-        Log.d(TAG, currentUserID);
         eventRepo.whereArrayContains("eventParticipants", currentUserID, new RepoMultiCallback<Event>() {
             @Override
             public void onCallback(ArrayList<Event> models) {
@@ -179,11 +178,38 @@ public class ViewEventsActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     private void initializeEventsInviteRecyclerView(){
+        mEventInviteListAdapter = new EventListAdapter(this, eventInviteList, new AdapterCallBack() {
+            @Override
+            public void onClickCallback(int p) {
+                startEventActivity(eventInviteList.getId(p));
+            }
+        });
+        //Make the recycler view snap on the current card view
+        SnapHelper snapHelper = new LinearSnapHelper();
+        snapHelper.attachToRecyclerView(mEventInviteListRecyclerView);
+        // Connect the adapter with the recycler view.
+        mEventInviteListRecyclerView.setAdapter(mEventInviteListAdapter);
+        // Give the recycler view a default layout manager.
+        mEventInviteListRecyclerView.setLayoutManager(new LinearLayoutManager(ViewEventsActivity.this, RecyclerView.HORIZONTAL, false));
+        updateEventsInviteList();
+    }
 
+    private void updateEventsInviteList() {
+        eventRepo.whereArrayContains("eventInvited", currentUserID, new RepoMultiCallback<Event>() {
+            @Override
+            public void onCallback(ArrayList<Event> models) {
+                for (Event event:models){
+                    Log.d(TAG, "Events invited:"+event.getName());
+                    addEventToExtendedLis(event.getEventId(), eventInviteList, mEventInviteListAdapter);
+                }
+                if (models.size()==0){
+                    eventInviteLabel.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
     }
 
     public void startEventActivity (String eventId){
