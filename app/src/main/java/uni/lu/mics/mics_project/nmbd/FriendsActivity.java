@@ -1,6 +1,7 @@
 package uni.lu.mics.mics_project.nmbd;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
@@ -72,7 +73,8 @@ public class FriendsActivity extends AppCompatActivity {
     private RecyclerView mFriendListRecyclerView;
     private FriendListAdapter mFriendListAdapter;
     private TextView friendsLabel;
-
+    private View friendsDivider;
+    private View friendsReqDivider;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +93,8 @@ public class FriendsActivity extends AppCompatActivity {
         mFriendReqListRecyclerView = findViewById(R.id.friends_activity_req_pending_recyclerview);
         mFriendListRecyclerView = findViewById(R.id.friends_activity_friends_recyclerview);
         mSearchResultRecyclerView = findViewById(R.id.friends_activity_search_result_recyclerview);
-
+        friendsDivider = findViewById(R.id.friends_divider);
+        friendsReqDivider = findViewById(R.id.request_divider);
         //initialize the friend search recyclerView, friend request recycler view
         initializeSearchRecyclerView();
         initializeFriendRecyclerView();
@@ -153,9 +156,11 @@ public class FriendsActivity extends AppCompatActivity {
         if (currentUser.getFriendList().size() == 0) {
             friendsLabel.setText("You do not have any friend.");
             mFriendListRecyclerView.setVisibility(View.INVISIBLE);
+            friendsDivider.setVisibility(View.INVISIBLE);
         } else {
             friendsLabel.setText("Friends: ");
             mFriendListRecyclerView.setVisibility(View.VISIBLE);
+            friendsDivider.setVisibility(View.VISIBLE);
             friendList.clearLists();
             mFriendListAdapter.notifyDataSetChanged();
             for (String id : currentUser.getFriendList()) {
@@ -186,6 +191,7 @@ public class FriendsActivity extends AppCompatActivity {
                 if (currentUser.getFriendList().size() == 0) {
                     friendsLabel.setText("You do not have any friend.");
                     mFriendListRecyclerView.setVisibility(View.INVISIBLE);
+                    friendsDivider.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -224,6 +230,7 @@ public class FriendsActivity extends AppCompatActivity {
                         updateFriendList();
 
                         if (currentUser.getFriendReqReceivedList().size() == 0) {
+                            friendsReqDivider.setVisibility(View.INVISIBLE);
                             frReqPendingLabel.setVisibility(View.INVISIBLE);
                             mFriendReqListRecyclerView.setVisibility(View.INVISIBLE);
                         }
