@@ -137,15 +137,15 @@
                 app:cardCornerRadius="10dp"
                 app:cardElevation="10dp">
 
-                <Button
-                    android:id="@+id/view_friends_button"
+                <ImageView
+                    android:id="@+id/imageView2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
                     android:onClick="viewFriendsOnClick"
-                    android:text="Friends List" />
+                    app:srcCompat="@drawable/connect_friends" />
+
             </androidx.cardview.widget.CardView>
 
             <View
