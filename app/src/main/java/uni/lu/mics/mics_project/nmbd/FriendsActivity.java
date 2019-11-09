@@ -1,6 +1,7 @@
 package uni.lu.mics.mics_project.nmbd;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
@@ -9,7 +10,10 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +23,7 @@ import uni.lu.mics.mics_project.nmbd.adapters.FriendListAdapter ;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendRequestListAdapter ;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendSearchListAdapter ;
 import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListUser;
+import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.ServiceFacade;
 import uni.lu.mics.mics_project.nmbd.app.service.ServiceFactory;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
@@ -59,6 +64,7 @@ public class FriendsActivity extends AppCompatActivity {
     private FriendListAdapter mFriendListAdapter;
     private TextView friendsLabel;
 
+    private LinearLayout friendsReqLayout;
     private View friendsReqDivider;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +84,8 @@ public class FriendsActivity extends AppCompatActivity {
         mFriendReqListRecyclerView = findViewById(R.id.friends_activity_req_pending_recyclerview);
         mFriendListRecyclerView = findViewById(R.id.friends_activity_friends_recyclerview);
         mSearchResultRecyclerView = findViewById(R.id.friends_activity_search_result_recyclerview);
-        friendsReqDivider = findViewById(R.id.request_divider);
+        friendsReqLayout =  findViewById(R.id.friend_req_layout);
+        friendsReqDivider = findViewById(R.id.friends_divider);
         //initialize the friend search recyclerView, friend request recycler view
         initializeSearchRecyclerView();
         initializeFriendRecyclerView();
@@ -125,14 +132,8 @@ public class FriendsActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
             }
         });
-    }
 
-    @Override
-    public void onBackPressed() {
-        Log.d(TAG, "onBackPressed Called");
-        Intent intent = new Intent(this, HomepageActivity.class);
-        intent.putExtra("currentUser", currentUser);
-        startActivity(intent);
+        setupToolbar();
     }
 
     public void updateFriendList() {
@@ -208,9 +209,9 @@ public class FriendsActivity extends AppCompatActivity {
                         updateFriendList();
 
                         if (currentUser.getFriendReqReceivedList().size() == 0) {
-                            friendsReqDivider.setVisibility(View.INVISIBLE);
-                            frReqPendingLabel.setVisibility(View.INVISIBLE);
-                            mFriendReqListRecyclerView.setVisibility(View.INVISIBLE);
+                            friendsReqLayout.setVisibility(View.INVISIBLE);
+
+
                         }
                     }
 
@@ -227,7 +228,7 @@ public class FriendsActivity extends AppCompatActivity {
                         friendReqList.removeElement(p);
                         mFriendRequestListAdapter.notifyDataSetChanged();
                         if (currentUser.getFriendReqReceivedList().size() == 0) {
-                            frReqPendingLabel.setVisibility(View.INVISIBLE);
+                            friendsReqLayout.setVisibility(View.INVISIBLE);
                             mFriendReqListRecyclerView.setVisibility(View.INVISIBLE);
                         }
                     }
@@ -242,7 +243,7 @@ public class FriendsActivity extends AppCompatActivity {
     public void updateFriendReqLists() {
         //If there are no friend request then the friend request label and recycler view can be set invisible
         if (currentUser.getFriendReqReceivedList().size() == 0) {
-            frReqPendingLabel.setVisibility(View.INVISIBLE);
+            friendsReqLayout.setVisibility(View.INVISIBLE);
             mFriendReqListRecyclerView.setVisibility(View.INVISIBLE);
         } else {
             for (String id : currentUser.getFriendReqReceivedList()) {
@@ -291,6 +292,39 @@ public class FriendsActivity extends AppCompatActivity {
 
             @Override
             public void onGetField(String str) { }
+        });
+    }
+
+    public void backToHomepage(){
+        Intent intent = new Intent(FriendsActivity.this, HomepageActivity.class);
+        intent.putExtra("currentUser", currentUser);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.d(TAG, "onBackPressed Called");
+        backToHomepage();
+    }
+
+    private void setupToolbar() {
+        ImageView profileImageView = findViewById(R.id.profile_pic);
+        ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(),profileImageView );
+        profileImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(FriendsActivity.this, ProfileActivity.class);
+                intent.putExtra("currentUser", currentUser);
+                startActivity(intent);
+                finish();
+            }
+        });
+        Button backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                backToHomepage();
+            }
         });
     }
 

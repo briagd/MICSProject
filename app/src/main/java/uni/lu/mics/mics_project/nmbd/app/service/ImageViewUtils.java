@@ -164,10 +164,12 @@ public class ImageViewUtils {
     }
 
 
-
-    public static void displayAvatarPic(final Context context, Storage storageService, final ImageView imgView){
+    @SuppressLint("RestrictedApi")
+    public static void displayEventUploadPic(final Context context,  final ImageView imgView){
         final String defaulPictUrl = context.getString(R.string.gsEventsPicsUrl);
-        final String defaultPicId = context.getString(R.string.eventAvatarPicId);
+        final String defaultPicId = context.getString(R.string.eventUploadPicId);
+        AppGlobalState globalState = (AppGlobalState) getApplicationContext();
+        final Storage storageService = globalState.getServiceFacade().storageService();
         storageService.getStorageReference(defaulPictUrl,defaultPicId , new StorageCallback() {
             @Override
             public void onSuccess(StorageReference storageReference) {

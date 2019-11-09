@@ -102,7 +102,7 @@ public class CreateEventActivity extends AppCompatActivity {
         eventImageButton = (ImageButton) findViewById(R.id.eventImage);
         nameEdit = findViewById(R.id.eventName);
         descriptionEdit = findViewById(R.id.descriptionText);
-        ImageViewUtils.displayAvatarPic(this, storageService, eventImageButton);
+        ImageViewUtils.displayEventUploadPic(this, eventImageButton);
         setDobFields();
         setSpinner();
 

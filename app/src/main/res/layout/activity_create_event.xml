@@ -21,6 +21,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <View
+                android:id="@+id/divider40"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="@android:color/transparent" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -37,9 +43,17 @@
             </LinearLayout>
 
             <View
+                android:id="@+id/divider42"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="@android:color/transparent" />
+
+            <View
                 android:id="@+id/divider13"
                 android:layout_width="match_parent"
                 android:layout_height="15dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
                 android:background="@color/red" />
 
             <TextView
@@ -73,6 +87,8 @@
                 android:id="@+id/divider9"
                 android:layout_width="match_parent"
                 android:layout_height="15dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
                 android:background="@color/red" />
 
             <TextView
@@ -104,6 +120,8 @@
                 android:id="@+id/divider10"
                 android:layout_width="match_parent"
                 android:layout_height="15dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
                 android:background="@color/red" />
 
             <TextView
@@ -126,6 +144,8 @@
                 android:id="@+id/divider11"
                 android:layout_width="match_parent"
                 android:layout_height="15dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
                 android:background="@color/red" />
 
             <TextView
@@ -156,6 +176,8 @@
                 android:id="@+id/divider12"
                 android:layout_width="match_parent"
                 android:layout_height="15dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
                 android:background="@color/red" />
 
             <TextView
@@ -179,6 +201,8 @@
                 android:id="@+id/divider14"
                 android:layout_width="match_parent"
                 android:layout_height="15dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
                 android:background="@color/red" />
 
             <LinearLayout
@@ -212,6 +236,12 @@
                     android:onClick="onClickSave" />
 
             </LinearLayout>
+
+            <View
+                android:id="@+id/divider41"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:background="@android:color/transparent" />
 
         </LinearLayout>
     </ScrollView>

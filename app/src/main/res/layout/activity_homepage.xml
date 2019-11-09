@@ -20,6 +20,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+            <include
+                layout="@layout/toolbar_no_back_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
             <View
                 android:id="@+id/divider16"
@@ -38,12 +42,6 @@
                     android:layout_height="match_parent"
                     android:background="@android:color/transparent" />
 
-                <ImageView
-                    android:id="@+id/profile_imageview"
-                    android:layout_width="match_parent"
-                    android:layout_height="70dp"
-                    android:onClick="viewProfileOnClick"
-                    app:srcCompat="@drawable/ic_profile_icons" />
             </LinearLayout>
 
             <View

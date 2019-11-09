@@ -64,7 +64,8 @@ public class EventsMapActivity extends AppCompatActivity {
     //Open Map variables
     IMapController mapController;
     GeoPoint startPoint;
-    Marker startMarker;
+
+
 
     //Location variable
     Location userlocation;
@@ -113,7 +114,7 @@ public class EventsMapActivity extends AppCompatActivity {
         //sets default start position to MNO
         startPoint = new GeoPoint(49.503723, 5.947590);
         mapController.setCenter(startPoint);
-        startMarker = new Marker(map);
+
         //Move to the phone last know position
         LocationUtils.getLastLocation(this, new LocationCallBack() {
             @Override
@@ -124,6 +125,7 @@ public class EventsMapActivity extends AppCompatActivity {
         });
 
         displayEventMarkers();
+        setupToolbar();
     }
 
 
@@ -156,7 +158,9 @@ public class EventsMapActivity extends AppCompatActivity {
                 Log.d(TAG, String.valueOf(models.size()));
                 for (Event e:models) {
                     //add markers
-                    overlayItems.add(new OverlayItem(e.getName(), e.getDescription(), new GeoPoint(e.getGpsLat(), e.getGpsLong())));
+                    OverlayItem overlayItem = new OverlayItem(e.getName(), e.getDescription(), new GeoPoint(e.getGpsLat(), e.getGpsLong()));
+
+                    overlayItems.add(overlayItem);
                     eventIds.add(e.getEventId());
                     //add event to the extended list to display cards in recycler view
                     eventExtList.addElement(e.getName(),e.getEventId(), e.getDate(), e.getCategory(), e.getEventAddress());
@@ -226,12 +230,37 @@ public class EventsMapActivity extends AppCompatActivity {
         });
     }
 
+    public void backToHomepage(){
+        Intent intent = new Intent(EventsMapActivity.this, HomepageActivity.class);
+        intent.putExtra("currentUser", currentUser);
+        startActivity(intent);
+    }
+
     @Override
     public void onBackPressed() {
         Log.d(TAG, "onBackPressed Called");
-        Intent intent = new Intent(this, HomepageActivity.class);
-        intent.putExtra("currentUser", currentUser);
-        startActivity(intent);
+        backToHomepage();
+    }
+
+    private void setupToolbar() {
+        ImageView profileImageView = findViewById(R.id.profile_pic);
+        ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(),profileImageView );
+        profileImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(EventsMapActivity.this, ProfileActivity.class);
+                intent.putExtra("currentUser", currentUser);
+                startActivity(intent);
+                finish();
+            }
+        });
+        Button backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                backToHomepage();
+            }
+        });
     }
 
 }

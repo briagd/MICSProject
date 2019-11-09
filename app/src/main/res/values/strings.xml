@@ -22,7 +22,7 @@
     <string name="gsTb256EventPicUrl">gs://mics-android-project.appspot.com/eventPics/thumb@256_</string>
     <string name="gsTb128EventPicUrl">gs://mics-android-project.appspot.com/eventPics/thumb@128_</string>
     <string name="gsTb64EventPicUrl">gs://mics-android-project.appspot.com/eventPics/thumb@64_</string>
-
+    <string name="eventUploadPicId">event_upload.jpg</string>
     <string name="eventAvatarPicId">event_avatar.jpg</string>
 
 

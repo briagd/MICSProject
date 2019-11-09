@@ -5,10 +5,22 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+    <View
+        android:id="@+id/divider25"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@android:color/transparent" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
+        <View
+            android:id="@+id/divider29"
+            android:layout_width="15dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent" />
 
         <ImageView
             android:id="@+id/friend_item_pic_imageView"
@@ -38,5 +50,17 @@
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:text="Unfriend" />
+
+        <View
+            android:id="@+id/divider31"
+            android:layout_width="20dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent" />
     </LinearLayout>
+
+    <View
+        android:id="@+id/divider26"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@android:color/transparent" />
 </LinearLayout>

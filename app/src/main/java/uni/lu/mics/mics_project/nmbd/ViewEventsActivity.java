@@ -12,7 +12,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.storage.StorageReference;
@@ -24,6 +26,7 @@ import uni.lu.mics.mics_project.nmbd.adapters.EventListAdapter;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
 import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListEvent;
+import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
 import uni.lu.mics.mics_project.nmbd.domain.model.Event;
@@ -123,6 +126,8 @@ public class ViewEventsActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
             }
         });
+
+        setupToolbar();
     }
 
     private void initializeSearchRecyclerView(){
@@ -245,12 +250,36 @@ public class ViewEventsActivity extends AppCompatActivity {
             }
         });
     }
+    public void backToHomepage(){
+        Intent intent = new Intent(ViewEventsActivity.this, HomepageActivity.class);
+        intent.putExtra("currentUser", currentUser);
+        startActivity(intent);
+    }
 
     @Override
     public void onBackPressed() {
         Log.d(TAG, "onBackPressed Called");
-        Intent intent = new Intent(this, HomepageActivity.class);
-        intent.putExtra("currentUser", currentUser);
-        startActivity(intent);
+        backToHomepage();
+    }
+
+    private void setupToolbar() {
+        ImageView profileImageView = findViewById(R.id.profile_pic);
+        ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(),profileImageView );
+        profileImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ViewEventsActivity.this, ProfileActivity.class);
+                intent.putExtra("currentUser", currentUser);
+                startActivity(intent);
+                finish();
+            }
+        });
+        Button backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                backToHomepage();
+            }
+        });
     }
 }

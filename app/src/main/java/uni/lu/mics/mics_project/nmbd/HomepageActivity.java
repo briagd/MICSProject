@@ -27,6 +27,7 @@ public class HomepageActivity extends AppCompatActivity {
     //currentUser object retrieved from intent
     User currentUser;
 
+
     final String TAG = "HomepageActivity";
 
     private ImageView profileImageView;
@@ -51,11 +52,12 @@ public class HomepageActivity extends AppCompatActivity {
         if(currentUser!=null){
             Log.d(TAG, currentUser.getName());
         }
-        profileImageView = findViewById(R.id.profile_imageview);
-        ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(),profileImageView );
-        mapImageView = findViewById(R.id.map_imageview);
-        mapImageView.setImageDrawable(getDrawable(R.drawable.openstreetmap));
 
+        mapImageView = findViewById(R.id.map_imageview);
+        mapImageView.setImageDrawable(getResources().getDrawable(R.drawable.openstreetmap));
+
+        profileImageView = findViewById(R.id.profile_pic);
+        ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(),profileImageView );
         btn_sign_out = findViewById(R.id.sign_out_button);
 
         //Sets up the sign out button to take action if pressed
@@ -73,6 +75,21 @@ public class HomepageActivity extends AppCompatActivity {
         EasyPermissions.requestPermissions(this, getString(R.string.rationale_location),
                 RC_LOCATION_PERM,
                 LOCATION);
+        setupToolbar();
+    }
+
+    public void setupToolbar(){
+        profileImageView = findViewById(R.id.profile_pic);
+        ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(),profileImageView );
+        profileImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomepageActivity.this, ProfileActivity.class);
+                intent.putExtra("currentUser", currentUser);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     public void createEventOnClick(View view) {
