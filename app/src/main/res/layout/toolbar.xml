@@ -30,20 +30,20 @@
 
             <View
                 android:id="@+id/divider38"
-                android:layout_width="115dp"
+                android:layout_width="100dp"
                 android:layout_height="match_parent"
                 android:background="@android:color/transparent" />
 
             <ImageView
                 android:id="@+id/imageView"
-                android:layout_width="50dp"
+                android:layout_width="70dp"
                 android:layout_height="50dp"
                 android:layout_gravity="center_vertical"
                 app:srcCompat="@drawable/eventzy_logo_w_t" />
 
             <View
                 android:id="@+id/divider39"
-                android:layout_width="120dp"
+                android:layout_width="100dp"
                 android:layout_height="match_parent"
                 android:background="@android:color/transparent" />
 

@@ -1,9 +1,11 @@
 package uni.lu.mics.mics_project.nmbd;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
@@ -28,6 +30,7 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import org.osmdroid.util.GeoPoint;
@@ -175,40 +178,62 @@ public class CreateEventActivity extends AppCompatActivity {
     }
 
     private void selectImage() {
-        final CharSequence[] options = { "Take Photo", "Choose from Gallery","Cancel" };
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Choose your profile picture");
-        builder.setItems(options, new DialogInterface.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (options[item].equals("Take Photo")) {
-                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                        File image = null;
-                        try {
-                            image = createImageFile();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        if (image != null) {
-                            Uri photoURI = FileProvider.getUriForFile(CreateEventActivity.this,
-                                    "com.example.android.fileprovider",
-                                    image);
-                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                            startActivityForResult(takePictureIntent, PICFROMCAMERA);
-                        }
-                    }
-                } else if (options[item].equals("Choose from Gallery")) {
-                    Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(pickPhoto , PICFROMGALLERY);
+        //Check if camera permission has been granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            final CharSequence[] options = {"Choose from Gallery", "Cancel"};
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Choose your profile picture");
+            builder.setItems(options, new DialogInterface.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.N)
+                @Override
+                public void onClick(DialogInterface dialog, int item) {
+                    if (options[item].equals("Choose from Gallery")) {
+                        Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(pickPhoto, PICFROMGALLERY);
 
-                } else if (options[item].equals("Cancel")) {
-                    dialog.dismiss();
+                    } else if (options[item].equals("Cancel")) {
+                        dialog.dismiss();
+                    }
                 }
-            }
-        });
-        builder.show();
+            });
+            builder.show();
+        }else {
+            final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Choose your profile picture");
+            builder.setItems(options, new DialogInterface.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.N)
+                @Override
+                public void onClick(DialogInterface dialog, int item) {
+                    if (options[item].equals("Take Photo")) {
+                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                            File image = null;
+                            try {
+                                image = createImageFile();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            if (image != null) {
+                                Uri photoURI = FileProvider.getUriForFile(CreateEventActivity.this,
+                                        "com.example.android.fileprovider",
+                                        image);
+                                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                                startActivityForResult(takePictureIntent, PICFROMCAMERA);
+                            }
+                        }
+                    } else if (options[item].equals("Choose from Gallery")) {
+                        Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(pickPhoto, PICFROMGALLERY);
+
+                    } else if (options[item].equals("Cancel")) {
+                        dialog.dismiss();
+                    }
+                }
+            });
+            builder.show();
+        }
     }
     //Create a file when a picture with a unique name to be stored locally
     private File createImageFile() throws IOException {
