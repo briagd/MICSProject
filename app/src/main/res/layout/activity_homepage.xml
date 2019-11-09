@@ -83,12 +83,15 @@
                 app:cardCornerRadius="10dp"
                 app:cardElevation="10dp">
 
-                <Button
-                    android:id="@+id/homepage_view_events_button"
+                <ImageView
+                    android:id="@+id/imageView5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
                     android:onClick="viewEventsOnClick"
-                    android:text="View Events" />
+                    app:srcCompat="@drawable/view_events" />
+
             </androidx.cardview.widget.CardView>
 
             <View
@@ -115,15 +118,6 @@
                     app:srcCompat="@android:color/transparent"
                     tools:srcCompat="@drawable/openstreetmap" />
 
-                <TextView
-                    android:id="@+id/textView4"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center_horizontal|center_vertical"
-                    android:text="Search events on Map"
-                    android:textColor="#000000"
-                    android:textSize="30sp"
-                    android:textStyle="normal" />
             </androidx.cardview.widget.CardView>
 
             <View
