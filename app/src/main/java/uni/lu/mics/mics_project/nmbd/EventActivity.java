@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 
 import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.domain.model.Event;
@@ -34,4 +35,14 @@ public class EventActivity extends AppCompatActivity {
 //        }
 
     }
+
+
+//     Uncomment to be able to pass user as intent when back button is pressed
+//    @Override
+//    public void onBackPressed() {
+//        Log.d(TAG, "onBackPressed Called");
+//        Intent intent = new Intent(this, HomepageActivity.class);
+//        intent.putExtra("currentUser", currentUser);
+//        startActivity(intent);
+//    }
 }

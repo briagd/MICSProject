@@ -135,6 +135,7 @@
                 android:id="@+id/profile_activity_dob_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:text="Birthday:" />
 
             <LinearLayout
@@ -147,6 +148,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ems="10"
+                    android:layout_marginStart="8dp"
                     android:inputType="textPersonName" />
 
                 <Button
@@ -173,6 +175,7 @@
                 android:id="@+id/profile_activity_password_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:text="Password:" />
 
             <EditText
@@ -181,12 +184,14 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Enter new password"
+                android:layout_marginStart="8dp"
                 android:inputType="textPassword" />
 
             <TextView
                 android:id="@+id/profile_activity_confirmpassword_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:text="Confirm Password:" />
 
             <LinearLayout
@@ -200,6 +205,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="Confirm password"
+                    android:layout_marginStart="8dp"
                     android:inputType="textPassword" />
 
                 <Button

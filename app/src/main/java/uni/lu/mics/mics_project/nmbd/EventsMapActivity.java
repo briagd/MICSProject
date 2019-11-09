@@ -1,6 +1,10 @@
 package uni.lu.mics.mics_project.nmbd;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSnapHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SnapHelper;
 
 import android.content.Context;
 import android.content.Intent;
@@ -28,7 +32,12 @@ import org.osmdroid.views.overlay.OverlayItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import uni.lu.mics.mics_project.nmbd.adapters.AdapterCallBack;
+import uni.lu.mics.mics_project.nmbd.adapters.EventListAdapter;
+import uni.lu.mics.mics_project.nmbd.adapters.EventMapCallBack;
+import uni.lu.mics.mics_project.nmbd.adapters.EventMapListAdapter;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
+import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListEvent;
 import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
@@ -59,19 +68,16 @@ public class EventsMapActivity extends AppCompatActivity {
 
     //Location variable
     Location userlocation;
-
-    //Events
-    ImageView imgView;
-    TextView eventNameView;
-    TextView eventDateView;
-    TextView eventAddressView;
-    Button eventButton;
-    TextView eventCategory;
-    //Id of event selected to be passed in intent
-    String eventId;
+    final ArrayList<OverlayItem> overlayItems = new ArrayList<OverlayItem>();
 
     //Event Ids
     final ArrayList<String> eventIds = new ArrayList<>();
+
+    //Recycler view
+    private RecyclerView mEventListRecyclerView;
+    private EventMapListAdapter mEventListAdapter;
+    //Extended list to pass to the adapter
+    final private ExtendedListEvent eventExtList = new ExtendedListEvent();
 
 
 
@@ -93,20 +99,7 @@ public class EventsMapActivity extends AppCompatActivity {
         currentUser = (User) intent.getSerializableExtra("currentUser");
 
         //View variables
-        imgView = findViewById(R.id.imageView);
-
-        eventNameView = findViewById(R.id.event_name);
-        eventNameView.setText("Click on a marker on the map to know about an event");
-        eventDateView = findViewById(R.id.date_textview);
-
-        eventAddressView = findViewById(R.id.address_view);
-        eventButton = findViewById(R.id.eventButton);
-        eventCategory = findViewById(R.id.event_type_textview);
-        eventDateView.setVisibility(View.INVISIBLE);
-        imgView.setVisibility(View.INVISIBLE);
-        eventAddressView.setVisibility(View.INVISIBLE);
-        eventButton.setVisibility(View.INVISIBLE);
-        eventCategory.setVisibility(View.INVISIBLE);
+        mEventListRecyclerView = findViewById(R.id.events_recyclerview);
 
         //Map variables
         userlocation = new Location("");
@@ -121,7 +114,7 @@ public class EventsMapActivity extends AppCompatActivity {
         startPoint = new GeoPoint(49.503723, 5.947590);
         mapController.setCenter(startPoint);
         startMarker = new Marker(map);
-
+        //Move to the phone last know position
         LocationUtils.getLastLocation(this, new LocationCallBack() {
             @Override
             public void onSuccess(Location location) {
@@ -132,6 +125,9 @@ public class EventsMapActivity extends AppCompatActivity {
 
         displayEventMarkers();
     }
+
+
+
 
     public void onResume(){
         super.onResume();
@@ -152,47 +148,28 @@ public class EventsMapActivity extends AppCompatActivity {
     }
 
     private void displayEventMarkers(){
-        final ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+
 
         eventRepo.getAll(new RepoMultiCallback<Event>() {
             @Override
             public void onCallback(ArrayList<Event> models) {
                 Log.d(TAG, String.valueOf(models.size()));
                 for (Event e:models) {
-                    items.add(new OverlayItem(e.getName(), e.getDescription(), new GeoPoint(e.getGpsLat(), e.getGpsLong())));
+                    //add markers
+                    overlayItems.add(new OverlayItem(e.getName(), e.getDescription(), new GeoPoint(e.getGpsLat(), e.getGpsLong())));
                     eventIds.add(e.getEventId());
+                    //add event to the extended list to display cards in recycler view
+                    eventExtList.addElement(e.getName(),e.getEventId(), e.getDate(), e.getCategory(), e.getEventAddress());
                 }
+                //Initialize recycler view
+                initializeEventsRecyclerView();
                 ItemizedOverlayWithFocus<OverlayItem> mOverlay;
-                mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items,
+                mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(overlayItems,
                         new OnItemGestureListener<OverlayItem>() {
                             @Override
                             public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
-                                setFieldsVisible();
-                                if (eventIds.get(index)!=null) {
-                                    eventId= eventIds.get(index);
-                                    eventRepo.findById(eventIds.get(index), new RepoCallback<Event>() {
-                                        @Override
-                                        public void onCallback(Event model) {
-                                            storageService.getStorageReference(getString(R.string.gsTb256EventPicUrl), model.getCoverPicUrl(), new StorageCallback() {
-                                                @Override
-                                                public void onSuccess(StorageReference storageReference) {
-                                                    ImageViewUtils.displayPic(EventsMapActivity.this, storageReference, imgView);
-                                                }
-                                                @Override
-                                                public void onFailure() { }
-                                            });
-                                            eventCategory.setText(model.getCategory());
-                                            eventNameView.setText(model.getName());
-                                            eventDateView.setText(model.getDate());
-                                            eventAddressView.setText(model.getEventAddress());
-                                        }
-
-                                        @Override
-                                        public void onGetField(String str) {
-
-                                        }
-                                    });
-                                }
+                                //Moves Recycler view to the selected event
+                                mEventListRecyclerView.smoothScrollToPosition(index);
                                 return true;
                             }
                             @Override
@@ -200,7 +177,7 @@ public class EventsMapActivity extends AppCompatActivity {
                                 return false;
                             }
                         }, EventsMapActivity.this);
-                Log.d(TAG, String.valueOf(items.size()));
+                Log.d(TAG, String.valueOf(overlayItems.size()));
                 mOverlay.setFocusItemsOnTap(true);
                 map.getOverlays().add(mOverlay);
             }
@@ -208,23 +185,32 @@ public class EventsMapActivity extends AppCompatActivity {
 
     }
 
-    public void setFieldsVisible(){
-        eventDateView.setVisibility(View.VISIBLE);
-        imgView.setVisibility(View.VISIBLE);
-        eventAddressView.setVisibility(View.VISIBLE);
-        eventButton.setVisibility(View.VISIBLE);
-        eventCategory.setVisibility(View.VISIBLE);
+    private void initializeEventsRecyclerView() {
+        //Initialize the adatpter for the recycler view
+        mEventListAdapter = new EventMapListAdapter(this, eventExtList, new EventMapCallBack() {
+            @Override
+            public void onViewEventClick(int p) {
+                //Takes to event activty when button clicked
+                startEventActivity(eventExtList.getId(p));
+            }
+
+            @Override
+            public void onShowOnMapClick(int p) {
+                //Move to corresponding point on Map
+                mapController.animateTo(overlayItems.get(p).getPoint());
+            }
+        });
+        //Make the recycler view snap on the current card view
+        SnapHelper snapHelper = new LinearSnapHelper();
+        snapHelper.attachToRecyclerView(mEventListRecyclerView);
+        // Connect the adapter with the recycler view.
+        mEventListRecyclerView.setAdapter(mEventListAdapter);
+        // Give the recycler view a default layout manager.
+        mEventListRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
     }
 
-    @Override
-    public void onBackPressed() {
-        Log.d(TAG, "onBackPressed Called");
-        Intent intent = new Intent(this, HomepageActivity.class);
-        intent.putExtra("currentUser", currentUser);
-        startActivity(intent);
-    }
 
-    public void viewEventOnClick(View view) {
+    public void startEventActivity (String eventId){
         final Intent intent = new Intent(this, EventActivity.class);
         intent.putExtra("currentUser", currentUser);
         eventRepo.findById(eventId, new RepoCallback<Event>() {
@@ -236,10 +222,16 @@ public class EventsMapActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onGetField(String str) {
-
-            }
+            public void onGetField(String str) { }
         });
-
     }
+
+    @Override
+    public void onBackPressed() {
+        Log.d(TAG, "onBackPressed Called");
+        Intent intent = new Intent(this, HomepageActivity.class);
+        intent.putExtra("currentUser", currentUser);
+        startActivity(intent);
+    }
+
 }

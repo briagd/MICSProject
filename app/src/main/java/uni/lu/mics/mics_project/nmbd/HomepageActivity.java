@@ -9,12 +9,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import pub.devrel.easypermissions.EasyPermissions;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
+import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 
 public class HomepageActivity extends AppCompatActivity {
@@ -26,6 +28,9 @@ public class HomepageActivity extends AppCompatActivity {
     User currentUser;
 
     final String TAG = "HomepageActivity";
+
+    private ImageView profileImageView;
+    private ImageView mapImageView;
 
     //Variables for permission request
     private static final int RC_LOCATION_PERM = 124;
@@ -46,7 +51,10 @@ public class HomepageActivity extends AppCompatActivity {
         if(currentUser!=null){
             Log.d(TAG, currentUser.getName());
         }
-
+        profileImageView = findViewById(R.id.profile_imageview);
+        ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(),profileImageView );
+        mapImageView = findViewById(R.id.map_imageview);
+        mapImageView.setImageDrawable(getDrawable(R.drawable.openstreetmap));
 
         btn_sign_out = findViewById(R.id.sign_out_button);
 
@@ -81,11 +89,6 @@ public class HomepageActivity extends AppCompatActivity {
         Intent intent = createIntent(FriendsActivity.class, currentUser);
         startActivity(intent);
     }
-
-//    public void inviteFriendOnClick(View view) {
-//        Intent intent = createIntent(SandboxActivity.class, currentUser);
-//        startActivity(intent);
-//    }
 
     public void eventsMapOnClick(View view) {
         Intent intent = createIntent(EventsMapActivity.class, currentUser);
