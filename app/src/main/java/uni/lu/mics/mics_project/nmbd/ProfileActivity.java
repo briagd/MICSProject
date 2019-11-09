@@ -2,7 +2,6 @@ package uni.lu.mics.mics_project.nmbd;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -19,14 +18,12 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.storage.StorageReference;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -35,10 +32,7 @@ import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
 import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
-import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
-import uni.lu.mics.mics_project.nmbd.app.service.StorageUploadCallback;
 import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadConstants;
-import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadIntentService;
 import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadStartIntentService;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;

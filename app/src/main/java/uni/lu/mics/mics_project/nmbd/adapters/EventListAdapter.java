@@ -50,9 +50,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
         String address= extList.getAddress(position);
         String category = extList.getCategory(position);
 
-        if(extList.getStrgListSize()>position) {
-            ImageViewUtils.displayPic(context, extList.getStrgRef(position), holder.eventPicImageView);
-        }
+        ImageViewUtils.displayEventPicID(context, extList.getId(position),holder.eventPicImageView);
         holder.nameItemView.setText(name);
         holder.addressTextView.setText(address);
         holder.dateTextView.setText(date);

@@ -286,11 +286,6 @@ public class CreateEventActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-//    public void saveLocation(View view) {
-//        address = addressEdit.getText().toString();
-//        GeoPoint p = LocationUtils.getLocationFromAddress(this,address);
-//        Log.d(TAG, String.valueOf(p.getLatitude())+ " " + String.valueOf(p.getLongitude()));
-//    }
 
     //Intent service to upload file
     private class UploadResultReceiver extends ResultReceiver {

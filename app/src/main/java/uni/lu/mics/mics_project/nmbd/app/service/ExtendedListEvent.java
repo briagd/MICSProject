@@ -11,12 +11,10 @@ public class ExtendedListEvent {
     private HashMap<String, String> dates;
     private HashMap<String, String>  categories;
     private HashMap<String, String> addresses;
-    private HashMap<String, StorageReference> strgReferences;
 
     public ExtendedListEvent(){
         this.ids = new LinkedList<>();
         this.names = new HashMap<>();
-        this.strgReferences = new HashMap<>();
         this.dates = new HashMap<>();
         this.categories = new HashMap<>();
         this.addresses = new HashMap<>();
@@ -27,7 +25,6 @@ public class ExtendedListEvent {
     }
 
     public void removeElement(int pos){
-        strgReferences.remove(ids.get(pos));
         names.remove(ids.get(pos));
         ids.remove(ids.get(pos));
         dates.remove(ids.get(pos));
@@ -38,7 +35,6 @@ public class ExtendedListEvent {
     public void clearLists(){
         names.clear();
         ids.clear();
-        strgReferences.clear();
         dates.clear();
         categories.clear();
         addresses.clear();
@@ -48,9 +44,6 @@ public class ExtendedListEvent {
     public String getId(int pos){
     return ids.get(pos);
 }
-    public StorageReference getStrgRef(int pos){
-        return strgReferences.get(ids.get(pos));
-    }
     public String getName (int pos){
         return names.get(ids.get(pos));
     }
@@ -72,17 +65,8 @@ public class ExtendedListEvent {
         addresses.put(id, address);
     }
 
-    public int getStrgListSize(){
-        return strgReferences.size();
-    }
-
     public int getSize(){
         return ids.size();
-    }
-
-
-    public void addStrgRef(String id, StorageReference stRef){
-        strgReferences.put(id, stRef);
     }
 
     public int getIdIndexOfLast(){

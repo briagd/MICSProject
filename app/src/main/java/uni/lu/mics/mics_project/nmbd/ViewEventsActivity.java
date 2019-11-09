@@ -47,7 +47,6 @@ public class ViewEventsActivity extends AppCompatActivity {
     AppGlobalState globalState;
     UserRepository userRepo;
     Authentification authService;
-    Storage storageService;
     EventRepository eventRepo;
 
     User currentUser;
@@ -74,7 +73,6 @@ public class ViewEventsActivity extends AppCompatActivity {
         userRepo = globalState.getRepoFacade().userRepo();
         eventRepo = globalState.getRepoFacade().eventRepo();
         authService = globalState.getServiceFacade().authentificationService();
-        storageService = globalState.getServiceFacade().storageService();
         //Get intent from previous Activity and retrieve and initialize the current user
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
@@ -228,27 +226,6 @@ public class ViewEventsActivity extends AppCompatActivity {
 
 
     //Helper function to add a storage reference to a list
-    public void addStrgRefs(final ExtendedListEvent extList, final RecyclerView.Adapter adapter) {
-        for (final String id : extList.getIdList()) {
-            final String gsUrl = this.getString(R.string.gsTb256EventPicUrl);
-            eventRepo.findById(id, new RepoCallback<Event>() {
-                @Override
-                public void onCallback(Event model) {
-                    storageService.getStorageReference(gsUrl, model.getCoverPicUrl(), new StorageCallback() {
-                        @Override
-                        public void onSuccess(StorageReference storageReference) {
-                            extList.addStrgRef(id, storageReference);
-                            adapter.notifyItemChanged(extList.getIdIndexOfLast());
-                        }
-                        @Override
-                        public void onFailure() { }
-                    });
-                }
-                @Override
-                public void onGetField(String str) { }
-            });
-        }
-    }
 
 
     public void addEventToExtendedLis(String id, final ExtendedListEvent extList, final RecyclerView.Adapter adapter) {
@@ -257,21 +234,7 @@ public class ViewEventsActivity extends AppCompatActivity {
             @Override
             public void onCallback(final Event model) {
                 //add the found model to the list
-
                 extList.addElement(model.getName(), model.getEventId(), model.getDate(), model.getCategory(), model.getEventAddress());
-                final String gsUrl = getString(R.string.gsTb256EventPicUrl);
-                //Add the storage reference to the list
-                storageService.getStorageReference(gsUrl, model.getCoverPicUrl(), new StorageCallback() {
-                    @Override
-                    public void onSuccess(StorageReference storageReference) {
-                        extList.addStrgRef(model.getEventId(), storageReference);
-                        adapter.notifyItemChanged(extList.getIdIndexOfLast());
-                    }
-
-                    @Override
-                    public void onFailure() {
-                    }
-                });
                 //Notifies adapter that the list has been updated so recyclerview can be updated
                 adapter.notifyItemInserted(extList.getIdIndexOfLast());
             }

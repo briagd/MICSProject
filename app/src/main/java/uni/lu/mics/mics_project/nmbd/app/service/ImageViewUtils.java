@@ -13,7 +13,9 @@ import com.google.firebase.storage.StorageReference;
 import uni.lu.mics.mics_project.nmbd.ProfileActivity;
 import uni.lu.mics.mics_project.nmbd.R;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
+import uni.lu.mics.mics_project.nmbd.domain.model.Event;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
+import uni.lu.mics.mics_project.nmbd.infra.repository.EventRepository;
 import uni.lu.mics.mics_project.nmbd.infra.repository.RepoCallback;
 import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
 
@@ -112,6 +114,33 @@ public class ImageViewUtils {
             }
         });
     }
+
+    @SuppressLint("RestrictedApi")
+    public static void displayEventPicID(final Context context, String eventId, final ImageView imgView){
+         AppGlobalState globalState = (AppGlobalState) getApplicationContext();
+        final Storage storageService = globalState.getServiceFacade().storageService();
+        EventRepository eventRepo= globalState.getRepoFacade().eventRepo();
+        eventRepo.findById(eventId, new RepoCallback<Event>() {
+            @Override
+            public void onCallback(Event model) {
+                String eventPicUrl = model.getCoverPicUrl();
+                final String gsUrl = context.getString(R.string.gsTb256EventPicUrl);
+                storageService.getStorageReference(gsUrl, eventPicUrl, new StorageCallback() {
+                    @Override
+                    public void onSuccess(StorageReference storageReference) {
+                        ImageViewUtils.displayPic(context, storageReference, imgView);
+                        Log.d(TAG, "Event picture correctly retrieved");
+                    }
+                    @Override
+                    public void onFailure() { }
+                });
+            }
+
+            @Override
+            public void onGetField(String str) { }
+        });
+    }
+
 
     public static void displayPic(Context context, StorageReference strgRef, ImageView imgView){
         Glide.with(context)
