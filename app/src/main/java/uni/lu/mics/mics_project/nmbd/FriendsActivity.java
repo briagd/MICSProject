@@ -1,36 +1,33 @@
 package uni.lu.mics.mics_project.nmbd;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.ResultReceiver;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
 
 import uni.lu.mics.mics_project.nmbd.adapters.AdapterCallBack;
 import uni.lu.mics.mics_project.nmbd.adapters.AdapterDoubleCallBack;
-import uni.lu.mics.mics_project.nmbd.adapters.FriendListAdapter ;
-import uni.lu.mics.mics_project.nmbd.adapters.FriendRequestListAdapter ;
-import uni.lu.mics.mics_project.nmbd.adapters.FriendSearchListAdapter ;
+import uni.lu.mics.mics_project.nmbd.adapters.FriendListAdapter;
+import uni.lu.mics.mics_project.nmbd.adapters.FriendRequestListAdapter;
+import uni.lu.mics.mics_project.nmbd.adapters.FriendSearchListAdapter;
 import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListHash;
 import uni.lu.mics.mics_project.nmbd.app.service.ServiceFacade;
 import uni.lu.mics.mics_project.nmbd.app.service.ServiceFactory;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
-import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadConstants;
-import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadIntentService;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.DbManager;
 import uni.lu.mics.mics_project.nmbd.infra.repository.Factory;
@@ -38,12 +35,6 @@ import uni.lu.mics.mics_project.nmbd.infra.repository.RepoCallback;
 import uni.lu.mics.mics_project.nmbd.infra.repository.RepoFacade;
 import uni.lu.mics.mics_project.nmbd.infra.repository.RepoMultiCallback;
 import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
-
-import java.util.ArrayList;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
 public class FriendsActivity extends AppCompatActivity {
 
@@ -310,11 +301,6 @@ public class FriendsActivity extends AppCompatActivity {
                         }
                     });
                 }
-
-                @Override
-                public void onGetField(String str) {
-
-                }
             });
         }
     }
@@ -337,11 +323,6 @@ public class FriendsActivity extends AppCompatActivity {
                     }
                 });
                 adapter.notifyItemInserted(extListHash.getIdIndexOfLast());
-            }
-
-            @Override
-            public void onGetField(String str) {
-
             }
         });
     }

@@ -19,8 +19,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.Map;
 
+import uni.lu.mics.mics_project.nmbd.domain.model.Entity;
 
-public class Repository<T> {
+
+public class Repository<T extends Entity> {
 
     protected CollectionReference collectionRef;
     // class object whose is model (event or user)
@@ -31,8 +33,26 @@ public class Repository<T> {
         this.modelClass = modelClass;
     }
 
-    public void findById(String docID, final RepoCallback<T> repoCallback) {
-        DocumentReference docRef = this.collectionRef.document(docID);
+    public String generateId() {
+        return this.collectionRef.document().getId();
+    }
+
+    public void list(final RepoMultiCallback<T> repoCallback){
+        collectionRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()){
+                    ArrayList<T> models = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : task.getResult())
+                        models.add(document.toObject(modelClass));
+                    repoCallback.onCallback(models);
+                }
+            }
+        });
+    }
+
+    public void findById(final String docId, final RepoCallback<T> repoCallback) {
+        DocumentReference docRef = this.collectionRef.document(docId);
         docRef.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
@@ -45,26 +65,28 @@ public class Repository<T> {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        //repoCallback.onCallback();
+                        Log.e("Repository", String.format("Entity (%s) not found ", docId));
+                        repoCallback.onCallback(null);
                     }
                 });;
     }
 
-    public void add(T model, final RepoCallback repoCallback) {
-        this.collectionRef.add(model)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d("DocAdding", "DocumentSnapshot written with ID: " + documentReference.getId());
-                        repoCallback.onGetField(documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("DocAdding", "Error adding document", e);
-                    }
-                });
+
+    public void add(final T model, final RepoCallback<Void> repoCallback) {
+        DocumentReference doc = this.collectionRef.document(model.getId());
+        doc.set(model)
+            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void v) {
+                    repoCallback.onCallback(v);
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w("DocAdding", "Error adding document", e);
+                }
+            });
     }
 
     /*

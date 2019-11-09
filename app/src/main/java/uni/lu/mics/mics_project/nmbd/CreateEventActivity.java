@@ -32,7 +32,6 @@ import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
-import uni.lu.mics.mics_project.nmbd.app.service.StorageUploadCallback;
 import uni.lu.mics.mics_project.nmbd.domain.model.DomainException;
 import uni.lu.mics.mics_project.nmbd.domain.model.Event;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
@@ -114,18 +113,24 @@ public class CreateEventActivity extends AppCompatActivity {
 //        getImageUri(image);
 
         try {
-            final Event event = new Event(name, descr, strDate, currentUser.getId(), category);
-            eventRepo.add(event, new RepoCallback() {
-
+            String id = eventRepo.generateId();
+            final Event event = new Event(id, name, descr, strDate, currentUser.getId(), category);
+            eventRepo.add(event, new RepoCallback<Void>() {
                 @Override
-                public void onCallback(Object model) {
+                public void onCallback(Void v) {
+                    Toast.makeText(CreateEventActivity.this, "Event Saved", Toast.LENGTH_SHORT).show();
+
+                    //go to Event activity
+                    Intent intent = getIntent(currentEvent);
+                    startActivity(intent);
+                    finish();
                 }
 
-                @Override
-                public void onGetField(String str) {
-                    event.setEventId(str);
-                    CreateEventActivity.this.currentEvent = event;
-                    eventRepo.set(str, event);
+//                @Override
+//                public void onGetField(String str) {
+//                    event.setEventId(str);
+//                    CreateEventActivity.this.currentEvent = event;
+//                    eventRepo.set(str, event);
 //                    storageService.uploadPic(CreateEventActivity.this, resourceMap.get("ImageUri"), getResources().getString(R.string.gsEventPicsStrgFldr), str, new StorageUploadCallback() {
 //                        @Override
 //                        public void onProgress() {
@@ -153,13 +158,13 @@ public class CreateEventActivity extends AppCompatActivity {
 //                        }
 //                    });
 
-                    Toast.makeText(CreateEventActivity.this, "Event Saved", Toast.LENGTH_SHORT).show();
-
-                    //go to Event activity
-                    Intent intent = getIntent(currentEvent);
-                    startActivity(intent);
-                    finish();
-                }
+//                    Toast.makeText(CreateEventActivity.this, "Event Saved", Toast.LENGTH_SHORT).show();
+//
+//                    //go to Event activity
+//                    Intent intent = getIntent(currentEvent);
+//                    startActivity(intent);
+//                    finish();
+//                }
             });
 
         } catch (DomainException e) {

@@ -26,4 +26,5 @@
     <string name="UpldNotifName">Upload notification</string>
     <string name="UpldNotifTitle">Uploading your picture</string>
     <string name="UpldNotifContent">Your picture is being uploaded</string>
+
 </resources>

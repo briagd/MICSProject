@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Event implements Serializable {
+public class Event implements Entity, Serializable {
 
-    private String eventId;
+    private String id;
     private String name;
     private String description;
     private String date;
@@ -27,10 +27,11 @@ public class Event implements Serializable {
 
     public Event(){}
 
-    public Event(String name, String description, String date, String creator, String category) throws DomainException {
+    public Event(String id, String name, String description, String date, String creator, String category) throws DomainException {
         if (name == null || name.isEmpty()){
             throw new DomainException("name can't be empty");
         }
+        this.id = id;
         this.name = name;
         this.description = description;
         this.date = date;
@@ -40,6 +41,10 @@ public class Event implements Serializable {
         this.eventAdmins = new ArrayList<>();
         this.eventAdmins.add(creator);
         this.category = category;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getName() {
@@ -96,14 +101,6 @@ public class Event implements Serializable {
 
     public void setCreator(String creator) {
         this.creator = creator;
-    }
-
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
-    }
-
-    public String getEventId() {
-        return eventId;
     }
 
     public String getCategory() {

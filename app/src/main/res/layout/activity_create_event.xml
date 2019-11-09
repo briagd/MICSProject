@@ -30,6 +30,7 @@
                     android:id="@+id/eventImage"
                     android:layout_width="match_parent"
                     android:layout_height="185dp"
+                    android:background="@android:color/transparent"
                     android:onClick="imageOnclick"
                     app:srcCompat="@drawable/fui_idp_button_background_phone" />
 
@@ -53,12 +54,13 @@
 
                 <EditText
                     android:id="@+id/eventName"
-                    android:layout_width="299dp"
+                    android:layout_width="391dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="0dp"
                     android:ems="10"
                     android:hint="Name"
+                    android:maxLength="64"
                     android:inputType="textPersonName" />
 
             </LinearLayout>
@@ -77,7 +79,7 @@
 
                 <EditText
                     android:id="@+id/descriptionText"
-                    android:layout_width="299dp"
+                    android:layout_width="390dp"
                     android:layout_height="101dp"
                     android:layout_marginStart="8dp"
                     android:ems="10"
@@ -105,7 +107,7 @@
                 android:inputType="textPassword" />
 
             <TextView
-                android:id="@+id/DateTag"
+                android:id="@+id/dateTag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -170,7 +172,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="210dp"
                     android:layout_marginTop="0dp"
-                    android:onClick="cancelOnClick"
+                    android:onClick="cancelOnclick"
                     android:text="@android:string/cancel" />
 
                 <Button
