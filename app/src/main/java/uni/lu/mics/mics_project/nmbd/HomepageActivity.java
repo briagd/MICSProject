@@ -17,12 +17,18 @@ import pub.devrel.easypermissions.EasyPermissions;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
+import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
+import uni.lu.mics.mics_project.nmbd.infra.repository.EventRepository;
+import uni.lu.mics.mics_project.nmbd.infra.repository.RepoCallback;
+import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
 
 public class HomepageActivity extends AppCompatActivity {
 
     AppGlobalState globalState;
-    Authentification auth;
+    UserRepository userRepo;
+    Authentification authService;
+    Storage storageService;
     Button btn_sign_out;
     //currentUser object retrieved from intent
     User currentUser;
@@ -45,7 +51,9 @@ public class HomepageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_homepage);
 
         globalState = (AppGlobalState) getApplicationContext();
-        auth = globalState.getServiceFacade().authentificationService();
+        userRepo = globalState.getRepoFacade().userRepo();
+        storageService = globalState.getServiceFacade().storageService();
+        authService = globalState.getServiceFacade().authentificationService();
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
 
@@ -54,17 +62,17 @@ public class HomepageActivity extends AppCompatActivity {
         }
 
         mapImageView = findViewById(R.id.map_imageview);
-        mapImageView.setImageDrawable(getResources().getDrawable(R.drawable.openstreetmap));
+        mapImageView.setImageDrawable(getDrawable(R.drawable.openstreetmap));
 
         profileImageView = findViewById(R.id.profile_pic);
-        ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(),profileImageView );
+        ImageViewUtils.displayUserCirclePic(this, currentUser,profileImageView );
         btn_sign_out = findViewById(R.id.sign_out_button);
 
         //Sets up the sign out button to take action if pressed
         btn_sign_out.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                auth.signOut(HomepageActivity.this, MainActivity.class);
+                authService.signOut(HomepageActivity.this, MainActivity.class);
             }
         });
 
@@ -144,6 +152,8 @@ public class HomepageActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
         }
     }
+
+
 
 
 

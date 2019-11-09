@@ -389,11 +389,15 @@ public class ProfileActivity extends AppCompatActivity {
 
 
     private void displayProfilePicAfterUpload(){
-        ImageViewUtils.displayCirclePicUri(ProfileActivity.this, imageUri,thmbProfileImageView );
+        if (imageUri!=null) {
+            ImageViewUtils.displayCirclePicUri(ProfileActivity.this, imageUri, thmbProfileImageView);
+        } else{
+            displayProfilePic();
+        }
     }
 
     private void displayProfilePic() {
-        ImageViewUtils.displayUserCirclePic(this, currentUser, thmbProfileImageView );
+        ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(),thmbProfileImageView );
     }
 
     private void uploadFile(){

@@ -4,6 +4,7 @@ package uni.lu.mics.mics_project.nmbd.infra.repository;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -12,7 +13,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -21,6 +24,7 @@ import java.util.Map;
 
 
 public class Repository<T> {
+
 
     protected CollectionReference collectionRef;
     // class object whose is model (event or user)
@@ -183,6 +187,27 @@ public class Repository<T> {
                     models.add(document.toObject(modelClass));
                 }
                 repoCallback.onCallback(models);
+            }
+        });
+    }
+
+    public void addUpdateListener(String uid, final RepoCallback<T> repoCallback){
+        this.collectionRef.document(uid).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w("addUpdateListener", "Listen failed.", e);
+                    return;
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    Log.d("addUpdateListener", "Current data: " + snapshot.getData());
+                    T model = snapshot.toObject(modelClass);
+                    repoCallback.onCallback(model);
+                } else {
+                    Log.d("addUpdateListener", "Current data: null");
+                }
             }
         });
     }

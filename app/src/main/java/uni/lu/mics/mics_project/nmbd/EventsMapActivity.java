@@ -151,7 +151,7 @@ public class EventsMapActivity extends AppCompatActivity {
                 for (Event e:models) {
                     //add markers
                     OverlayItem overlayItem = new OverlayItem(e.getName(), e.getDescription(), new GeoPoint(e.getGpsLat(), e.getGpsLong()));
-
+                    overlayItem.setMarker(getDrawable(R.drawable.map_marker));
                     overlayItems.add(overlayItem);
                     eventIds.add(e.getEventId());
                     //add event to the extended list to display cards in recycler view
@@ -174,7 +174,6 @@ public class EventsMapActivity extends AppCompatActivity {
                             }
                         }, EventsMapActivity.this);
                 Log.d(TAG, String.valueOf(overlayItems.size()));
-                mOverlay.setFocusItemsOnTap(true);
                 map.getOverlays().add(mOverlay);
             }
         });
