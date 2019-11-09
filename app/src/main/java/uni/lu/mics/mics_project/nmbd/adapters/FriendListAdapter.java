@@ -17,26 +17,23 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import uni.lu.mics.mics_project.nmbd.R;
+import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListUser;
 import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
 
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.FriendListViewHolder>{
 
-    private final LinkedList<String> mFriendNameList;
-    private final LinkedList<String> mFriendIDList;
-    private HashMap<String, StorageReference> stRefList;
+    private final ExtendedListUser mFriendList;
     private LayoutInflater mInflater;
     private AdapterCallBack mlistener;
     private final Context context;
 
 
-    public FriendListAdapter(Context context, LinkedList<String> nameList, LinkedList<String> idList,
-                             HashMap<String, StorageReference> stRefList, AdapterCallBack listener) {
+    public FriendListAdapter(Context context, ExtendedListUser extListUser,
+                             AdapterCallBack listener) {
         mInflater = LayoutInflater.from(context);
-        this.mFriendNameList = nameList;
-        this.mFriendIDList = idList;
+        this.mFriendList = extListUser;
         this.mlistener = listener;
         this.context = context;
-        this.stRefList = stRefList;
     }
 
     @NonNull
@@ -51,17 +48,16 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
     @Override
     public void onBindViewHolder(@NonNull FriendListViewHolder holder, int position) {
 
-        String mCurrent = mFriendNameList.get(position);
-        if(stRefList.size()>position) {
-            ImageViewUtils.displayCirclePic(context, stRefList.get(mFriendIDList.get(position)), holder.friendPicImageView);
-        }
+        String mCurrent = mFriendList.getName(position);
+        ImageViewUtils.displayUserCirclePicID(context, mFriendList.getId(position), holder.friendPicImageView);
+
         holder.friendItemView.setText(mCurrent);
         holder.myClickListener = mlistener;
     }
 
     @Override
     public int getItemCount() {
-        return mFriendNameList.size();
+        return mFriendList.getSize();
     }
 
 

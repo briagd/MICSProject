@@ -17,26 +17,28 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import uni.lu.mics.mics_project.nmbd.R;
+import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListUser;
 import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
 
 public class FriendSearchListAdapter  extends RecyclerView.Adapter<FriendSearchListAdapter.FriendSearchViewHolder> {
 
-    private final LinkedList<String> mSearchResultList;
-    private final LinkedList<String> mSearchIDList;
-    private HashMap<String, StorageReference> stRefList;
+//    private final LinkedList<String> mSearchResultList;
+//    private final LinkedList<String> mSearchIDList;
+    private final ExtendedListUser mFriendList;
+
     private LayoutInflater mInflater;
     private AdapterCallBack mlistener;
     private final Context context;
 
     public FriendSearchListAdapter(Context context,
-                                   LinkedList<String> wordList, LinkedList<String> idList,
-                                   HashMap<String, StorageReference> stRefList, AdapterCallBack listener) {
+                                   ExtendedListUser extListUser,
+                                   AdapterCallBack listener) {
         mInflater = LayoutInflater.from(context);
-        this.mSearchResultList = wordList;
-        this.mSearchIDList = idList;
+//        this.mSearchResultList = wordList;
+//        this.mSearchIDList = idList;
         this.mlistener = listener;
         this.context =context;
-        this. stRefList = stRefList;
+        this.mFriendList = extListUser;
     }
 
 
@@ -54,17 +56,15 @@ public class FriendSearchListAdapter  extends RecyclerView.Adapter<FriendSearchL
 
     @Override
     public void onBindViewHolder(@NonNull FriendSearchListAdapter.FriendSearchViewHolder holder, final int position) {
-        String mCurrent = mSearchResultList.get(position);
-        if(stRefList.size()>position) {
-            ImageViewUtils.displayCirclePic(context, stRefList.get(mSearchIDList.get(position)), holder.searchPicImageView);
-        }
+        String mCurrent = mFriendList.getName(position);
+        ImageViewUtils.displayUserCirclePicID(context, mFriendList.getId(position), holder.searchPicImageView);
         holder.friendSearchResultItemView.setText(mCurrent);
         holder.myClickListener = mlistener;
     }
 
     @Override
     public int getItemCount() {
-        return mSearchResultList.size();
+        return mFriendList.getSize();
     }
 
 

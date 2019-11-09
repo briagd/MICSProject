@@ -307,19 +307,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void displayProfilePic() {
-        String currentUserProfilePicUrl = currentUser.getProfilePicUrl();
-        final String gsUrl = this.getString(R.string.gsTb64ProfPicUrl);
-        storageService.getStorageReference(gsUrl, currentUserProfilePicUrl, new StorageCallback() {
-            @Override
-            public void onSuccess(StorageReference storageReference) {
-                ImageViewUtils.displayCirclePic(ProfileActivity.this, storageReference, thmbProfileImageView);
-                Log.d(TAG, "User profile picture correctly retrieved");
-            }
-            @Override
-            public void onFailure() {
-                ImageViewUtils.displayCircleAvatarPic(ProfileActivity.this, storageService, thmbProfileImageView);
-            }
-        });
+        ImageViewUtils.displayUserCirclePic(this, currentUser, thmbProfileImageView );
     }
 
     private void uploadFile(){

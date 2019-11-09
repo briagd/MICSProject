@@ -17,24 +17,21 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import uni.lu.mics.mics_project.nmbd.R;
+import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListUser;
 import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
 
 public class FriendRequestListAdapter extends RecyclerView.Adapter<FriendRequestListAdapter.FriendRequestViewHolder>{
 
-    private final LinkedList<String> mRequestNameList;
-    private final LinkedList<String> mRequestIDList;
-    private final HashMap<String, StorageReference> stRefList;
+    private final ExtendedListUser mFriendList;
     private LayoutInflater mInflater;
     private AdapterDoubleCallBack mlistener;
     private final Context context;
 
 
-    public FriendRequestListAdapter(Context context, LinkedList<String> nameList, LinkedList<String> idList,
-                                    HashMap<String, StorageReference> stRefList, AdapterDoubleCallBack listener) {
+    public FriendRequestListAdapter(Context context, ExtendedListUser extListUser,
+                                    AdapterDoubleCallBack listener) {
         mInflater = LayoutInflater.from(context);
-        this.mRequestNameList = nameList;
-        this.mRequestIDList = idList;
-        this.stRefList = stRefList;
+        this.mFriendList = extListUser;
         this.mlistener = listener;
         this.context = context;
     }
@@ -50,17 +47,15 @@ public class FriendRequestListAdapter extends RecyclerView.Adapter<FriendRequest
 
     @Override
     public void onBindViewHolder(@NonNull FriendRequestViewHolder holder, int position) {
-        String mCurrent = mRequestNameList.get(position);
+        String mCurrent = mFriendList.getName(position);
         holder.friendRequestItemView.setText(mCurrent);
-        if(stRefList.size()>position) {
-            ImageViewUtils.displayCirclePic(context, stRefList.get(mRequestIDList.get(position)), holder.friendPicImageView);
-        }
+        ImageViewUtils.displayUserCirclePicID(context, mFriendList.getId(position), holder.friendPicImageView);
         holder.myClickListener = mlistener;
     }
 
     @Override
     public int getItemCount() {
-        return mRequestIDList.size();
+        return mFriendList.getSize();
     }
 
 

@@ -1,37 +1,27 @@
 package uni.lu.mics.mics_project.nmbd;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.ResultReceiver;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.firebase.storage.StorageReference;
 
 import uni.lu.mics.mics_project.nmbd.adapters.AdapterCallBack;
 import uni.lu.mics.mics_project.nmbd.adapters.AdapterDoubleCallBack;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendListAdapter ;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendRequestListAdapter ;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendSearchListAdapter ;
-import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListHash;
+import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListUser;
 import uni.lu.mics.mics_project.nmbd.app.service.ServiceFacade;
 import uni.lu.mics.mics_project.nmbd.app.service.ServiceFactory;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
-import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
-import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadConstants;
-import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadIntentService;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.DbManager;
 import uni.lu.mics.mics_project.nmbd.infra.repository.Factory;
@@ -42,24 +32,19 @@ import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
 
 import java.util.ArrayList;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
 public class FriendsActivity extends AppCompatActivity {
 
     final private String TAG = "FriendsActivity";
     //Friend search results
-    private final ExtendedListHash searchResultList = new ExtendedListHash();
+    private final ExtendedListUser searchResultList = new ExtendedListUser();
     //Friend Requests received
-    private final ExtendedListHash friendReqList = new ExtendedListHash();
+    private final ExtendedListUser friendReqList = new ExtendedListUser();
     //Friend List
-    private final ExtendedListHash friendList = new ExtendedListHash();
+    private final ExtendedListUser friendList = new ExtendedListUser();
     DbManager dbManager = new DbManager(new Factory());
     RepoFacade repoFacade = dbManager.connect();
     UserRepository userRepo = repoFacade.userRepo();
     ServiceFacade serviceFacade = new ServiceFacade(new ServiceFactory());
-    final Storage storageService = serviceFacade.storageService();
     //Reference to the user logged in
     private User currentUser;
     private String currentUserID;
@@ -167,10 +152,8 @@ public class FriendsActivity extends AppCompatActivity {
     }
 
     public void initializeFriendRecyclerView() {
-        addStrgRefs(friendList, mFriendListAdapter);
-
         mFriendListAdapter = new FriendListAdapter(FriendsActivity.this,
-                friendList.getNameList(), friendList.getIdList(), friendList.getStrgRefList(), new AdapterCallBack() {
+                friendList, new AdapterCallBack() {
 
             @Override
             public void onClickCallback(int p) {
@@ -199,10 +182,9 @@ public class FriendsActivity extends AppCompatActivity {
     }
 
     public void initializeFriendReqRecyclerView() {
-        addStrgRefs(friendReqList, mFriendRequestListAdapter);
         //Create an adapter and supply the data to be displayed
         mFriendRequestListAdapter = new FriendRequestListAdapter(FriendsActivity.this,
-                friendReqList.getNameList(), friendReqList.getIdList(), friendReqList.getStrgRefList(),
+                friendReqList,
                 new AdapterDoubleCallBack() {
                     @Override
                     public void onAcceptRequest(int p) {
@@ -272,7 +254,7 @@ public class FriendsActivity extends AppCompatActivity {
     public void initializeSearchRecyclerView() {
         // Create an adapter and supply the data to be displayed.
         mFriendSearchListAdapter = new FriendSearchListAdapter(FriendsActivity.this,
-                searchResultList.getNameList(), searchResultList.getIdList(), searchResultList.getStrgRefList(),
+                searchResultList,
                 new AdapterCallBack() {
                     //Add Friend button pressed procedure
                     @Override
@@ -296,61 +278,19 @@ public class FriendsActivity extends AppCompatActivity {
         mSearchResultRecyclerView.setLayoutManager(new LinearLayoutManager(FriendsActivity.this));
     }
 
-    public void addStrgRefs(final ExtendedListHash extList, final RecyclerView.Adapter adapter) {
-        for (final String id : extList.getIdList()) {
-            final String gsUrl = this.getString(R.string.gsTb64ProfPicUrl);
-            userRepo.findById(id, new RepoCallback<User>() {
-                @Override
-                public void onCallback(User model) {
-                    storageService.getStorageReference(gsUrl, model.getProfilePicUrl(), new StorageCallback() {
-                        @Override
-                        public void onSuccess(StorageReference storageReference) {
-                            extList.addStrgRef(id, storageReference);
-                            adapter.notifyItemChanged(extList.getIdIndexOfLast());
-                        }
-
-                        @Override
-                        public void onFailure() {
-                        }
-                    });
-                }
-
-                @Override
-                public void onGetField(String str) {
-
-                }
-            });
-        }
-    }
-
-    public void addFriendToExtendedListHash(String id, final ExtendedListHash extListHash, final RecyclerView.Adapter adapter) {
+    public void addFriendToExtendedListHash(String id, final ExtendedListUser extListHash, final RecyclerView.Adapter adapter) {
         //Access database to find user corresponding to an id
         userRepo.findById(id, new RepoCallback<User>() {
             @Override
             public void onCallback(final User model) {
                 //add the found model to the list
                 extListHash.addNameID(model.getName(), model.getId());
-                final String gsUrl = FriendsActivity.this.getString(R.string.gsTb64ProfPicUrl);
-                //Add the storage reference to the list
-                storageService.getStorageReference(gsUrl, model.getProfilePicUrl(), new StorageCallback() {
-                    @Override
-                    public void onSuccess(StorageReference storageReference) {
-                        extListHash.addStrgRef(model.getId(), storageReference);
-                        adapter.notifyItemChanged(extListHash.getIdIndexOfLast());
-                    }
-
-                    @Override
-                    public void onFailure() {
-                    }
-                });
                 //Notifies adapter that the list has been updated so recyclerview can be updated
                 adapter.notifyItemInserted(extListHash.getIdIndexOfLast());
             }
 
             @Override
-            public void onGetField(String str) {
-
-            }
+            public void onGetField(String str) { }
         });
     }
 

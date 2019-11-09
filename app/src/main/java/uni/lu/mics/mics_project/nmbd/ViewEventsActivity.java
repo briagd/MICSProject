@@ -21,13 +21,9 @@ import java.util.ArrayList;
 
 import uni.lu.mics.mics_project.nmbd.adapters.AdapterCallBack;
 import uni.lu.mics.mics_project.nmbd.adapters.EventListAdapter;
-import uni.lu.mics.mics_project.nmbd.adapters.FriendListAdapter;
-import uni.lu.mics.mics_project.nmbd.adapters.FriendRequestListAdapter;
-import uni.lu.mics.mics_project.nmbd.adapters.FriendSearchListAdapter;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
 import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListEvent;
-import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListHash;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
 import uni.lu.mics.mics_project.nmbd.domain.model.Event;
