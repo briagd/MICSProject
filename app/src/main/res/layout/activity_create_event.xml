@@ -51,10 +51,10 @@
             <View
                 android:id="@+id/divider13"
                 android:layout_width="match_parent"
-                android:layout_height="15dp"
+                android:layout_height="10dp"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
-                android:background="@color/red" />
+                android:background="@color/orange" />
 
             <TextView
                 android:id="@+id/EventNameTag"
@@ -86,10 +86,10 @@
             <View
                 android:id="@+id/divider9"
                 android:layout_width="match_parent"
-                android:layout_height="15dp"
+                android:layout_height="10dp"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
-                android:background="@color/red" />
+                android:background="@color/orange" />
 
             <TextView
                 android:id="@+id/DescriptionNameTag"
@@ -119,10 +119,10 @@
             <View
                 android:id="@+id/divider10"
                 android:layout_width="match_parent"
-                android:layout_height="15dp"
+                android:layout_height="10dp"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
-                android:background="@color/red" />
+                android:background="@color/orange" />
 
             <TextView
                 android:id="@+id/EventTypeTxt"
@@ -143,10 +143,10 @@
             <View
                 android:id="@+id/divider11"
                 android:layout_width="match_parent"
-                android:layout_height="15dp"
+                android:layout_height="10dp"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
-                android:background="@color/red" />
+                android:background="@color/orange" />
 
             <TextView
                 android:id="@+id/DateTag"
@@ -175,10 +175,10 @@
             <View
                 android:id="@+id/divider12"
                 android:layout_width="match_parent"
-                android:layout_height="15dp"
+                android:layout_height="10dp"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
-                android:background="@color/red" />
+                android:background="@color/orange" />
 
             <TextView
                 android:id="@+id/AddressTag"
@@ -200,10 +200,10 @@
             <View
                 android:id="@+id/divider14"
                 android:layout_width="match_parent"
-                android:layout_height="15dp"
+                android:layout_height="10dp"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
-                android:background="@color/red" />
+                android:background="@color/orange" />
 
             <LinearLayout
                 android:layout_width="match_parent"

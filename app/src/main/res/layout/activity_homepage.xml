@@ -58,12 +58,15 @@
                 app:cardCornerRadius="10dp"
                 app:cardElevation="10dp">
 
-                <Button
-                    android:id="@+id/create_event_button"
+                <ImageView
+                    android:id="@+id/imageView3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="createEventOnClick"
-                    android:text="Create event " />
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    app:srcCompat="@drawable/create_event" />
+
             </androidx.cardview.widget.CardView>
 
             <View
