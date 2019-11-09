@@ -1,17 +1,13 @@
 package uni.lu.mics.mics_project.nmbd.domain.model;
 
-import android.content.Context;
-import android.content.res.Resources;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import uni.lu.mics.mics_project.nmbd.R;
+public class Event implements Entity, Serializable {
 
-public class Event implements Serializable {
 
-    private String eventId;
+    private String id;
     private String name;
     private String description;
     private String date;
@@ -33,10 +29,11 @@ public class Event implements Serializable {
 
     public Event(){}
 
-    public Event(String name, String description, String date, String creator, String category) throws DomainException {
+    public Event(String id, String name, String description, String date, String creator, String category) throws DomainException {
         if (name == null || name.isEmpty()){
             throw new DomainException("name can't be empty");
         }
+        this.id = id;
         this.name = name;
         this.description = description;
         this.date = date;
@@ -51,6 +48,9 @@ public class Event implements Serializable {
         this.likes = 0;
     }
 
+    public String getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
@@ -106,14 +106,6 @@ public class Event implements Serializable {
 
     public void setCreator(String creator) {
         this.creator = creator;
-    }
-
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
-    }
-
-    public String getEventId() {
-        return eventId;
     }
 
     public String getCategory() {

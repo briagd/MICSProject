@@ -36,6 +36,7 @@
                     android:id="@+id/eventImage"
                     android:layout_width="match_parent"
                     android:layout_height="185dp"
+                    android:background="@android:color/transparent"
                     android:onClick="imageOnclick"
                     app:srcCompat="@drawable/fui_idp_button_background_phone" />
 
@@ -79,6 +80,7 @@
                     android:layout_marginTop="0dp"
                     android:ems="10"
                     android:hint="Name"
+                    android:maxLength="64"
                     android:inputType="textPersonName" />
 
             </LinearLayout>
@@ -168,7 +170,7 @@
                     android:layout_marginStart="8dp"
                     android:ems="10"
                     android:hint="Date"
-                    android:inputType="date" />
+                    android:inputType="date"/>
 
             </LinearLayout>
 

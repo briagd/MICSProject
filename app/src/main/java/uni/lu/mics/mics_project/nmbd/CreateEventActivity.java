@@ -43,6 +43,7 @@ import java.util.Date;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
+import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
 import uni.lu.mics.mics_project.nmbd.app.service.location.LocationUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadConstants;
 import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadStartIntentService;
@@ -152,6 +153,11 @@ public class CreateEventActivity extends AppCompatActivity {
             }
         });
 
+//        if (dobEdit.getText().toString().isEmpty()) {
+//            Date c = Calendar.getInstance().getTime();
+//            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+//            dobEdit.setText(df.format(c));
+//        }
     }
 
 
