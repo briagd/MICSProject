@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import uni.lu.mics.mics_project.nmbd.R;
 import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListEvent;
-import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
+import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 
 public class EventMapListAdapter extends RecyclerView.Adapter<EventMapListAdapter.EventListViewHolder>{
     private final String TAG = "EventListAdapter";

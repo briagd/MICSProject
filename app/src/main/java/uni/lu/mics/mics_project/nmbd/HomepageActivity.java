@@ -16,7 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import pub.devrel.easypermissions.EasyPermissions;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
-import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
+import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 
 public class HomepageActivity extends AppCompatActivity {
@@ -34,9 +34,9 @@ public class HomepageActivity extends AppCompatActivity {
     private ImageView mapImageView;
 
     //Variables for permission request
-    private static final int RC_LOCATION_PERM = 124;
-    private static final String[] LOCATION =
-            {Manifest.permission.ACCESS_FINE_LOCATION};
+    private static final int RC_CAMERA_AND_LOCATION_STORAGE = 124;
+    private static final String[] PERMISSIONS =
+            {Manifest.permission.CAMERA, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
 
     @Override
@@ -72,9 +72,9 @@ public class HomepageActivity extends AppCompatActivity {
         createNotificationChannel();
 
         //Request permission to accept location
-        EasyPermissions.requestPermissions(this, getString(R.string.rationale_location),
-                RC_LOCATION_PERM,
-                LOCATION);
+        EasyPermissions.requestPermissions(this, getString(R.string.rationale_camera_location),
+                RC_CAMERA_AND_LOCATION_STORAGE,
+                PERMISSIONS);
         setupToolbar();
     }
 

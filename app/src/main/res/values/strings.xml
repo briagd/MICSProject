@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Eventzy</string>
-
+    <!-- permission -->
+    <string name="rationale_camera_location">Location required to display current location on map and camera required to upload pictures directly from camera</string>
     <string name="rationale_location">Location required to display current location on map</string>
     <!-- Storage Strings-->
     <string name="gsUrl">gs://mics-android-project.appspot.com/</string>

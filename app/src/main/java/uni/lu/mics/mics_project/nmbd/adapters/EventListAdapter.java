@@ -1,7 +1,6 @@
 package uni.lu.mics.mics_project.nmbd.adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import uni.lu.mics.mics_project.nmbd.R;
 import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListEvent;
-import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
+import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 
 public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.EventListViewHolder>{
     private final String TAG = "EventListAdapter";

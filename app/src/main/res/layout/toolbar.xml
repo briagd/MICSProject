@@ -49,8 +49,8 @@
 
             <ImageView
                 android:id="@+id/profile_pic"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_gravity="center_horizontal|center_vertical"
                 app:srcCompat="@drawable/user_avatar_b" />
 

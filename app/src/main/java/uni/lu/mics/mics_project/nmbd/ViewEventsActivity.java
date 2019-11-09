@@ -17,8 +17,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.firebase.storage.StorageReference;
-
 import java.util.ArrayList;
 
 import uni.lu.mics.mics_project.nmbd.adapters.AdapterCallBack;
@@ -26,9 +24,7 @@ import uni.lu.mics.mics_project.nmbd.adapters.EventListAdapter;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
 import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListEvent;
-import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
-import uni.lu.mics.mics_project.nmbd.app.service.Storage;
-import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
+import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.domain.model.Event;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.repository.EventRepository;

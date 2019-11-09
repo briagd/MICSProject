@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "uni.lu.mics.mics_project.nmbd"
-        minSdkVersion 19
+        minSdkVersion 24
         targetSdkVersion 29
         multiDexEnabled true
         versionCode 1
@@ -54,6 +54,7 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.10.0'
 
     implementation 'com.github.rubensousa:gravitysnaphelper:2.2.0'
+
 }
 
 apply plugin: 'com.google.gms.google-services'

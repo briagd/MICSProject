@@ -1,7 +1,6 @@
 package uni.lu.mics.mics_project.nmbd;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
@@ -23,10 +22,9 @@ import uni.lu.mics.mics_project.nmbd.adapters.FriendListAdapter ;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendRequestListAdapter ;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendSearchListAdapter ;
 import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListUser;
-import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
+import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.ServiceFacade;
 import uni.lu.mics.mics_project.nmbd.app.service.ServiceFactory;
-import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.DbManager;
 import uni.lu.mics.mics_project.nmbd.infra.repository.Factory;

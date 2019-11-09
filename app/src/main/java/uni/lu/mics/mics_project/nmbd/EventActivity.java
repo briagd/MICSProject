@@ -2,14 +2,7 @@ package uni.lu.mics.mics_project.nmbd;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
-
-import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
-import uni.lu.mics.mics_project.nmbd.domain.model.Event;
-import uni.lu.mics.mics_project.nmbd.domain.model.User;
 
 public class EventActivity extends AppCompatActivity {
 

@@ -11,14 +11,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.storage.StorageReference;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-
 import uni.lu.mics.mics_project.nmbd.R;
 import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListUser;
-import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
+import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.FriendListViewHolder>{
 

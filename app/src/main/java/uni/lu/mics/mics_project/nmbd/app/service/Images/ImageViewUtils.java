@@ -1,4 +1,4 @@
-package uni.lu.mics.mics_project.nmbd.app.service;
+package uni.lu.mics.mics_project.nmbd.app.service.Images;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -10,9 +10,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.storage.StorageReference;
 
-import uni.lu.mics.mics_project.nmbd.ProfileActivity;
 import uni.lu.mics.mics_project.nmbd.R;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
+import uni.lu.mics.mics_project.nmbd.app.service.Storage;
+import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
 import uni.lu.mics.mics_project.nmbd.domain.model.Event;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.repository.EventRepository;

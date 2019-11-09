@@ -1,11 +1,14 @@
 package uni.lu.mics.mics_project.nmbd;
 
-import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.provider.MediaStore;
@@ -21,16 +24,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
-import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
+import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadConstants;
 import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadStartIntentService;
@@ -69,6 +75,11 @@ public class ProfileActivity extends AppCompatActivity {
 
     //Receiver from UploadServiceIntent
     private UploadResultReceiver mUpldRessultReceiver;
+
+    //Variables for selecting picture
+    private String currentPhotoPath;
+    private final int PICFROMGALLERY = 1;
+    private final int PICFROMCAMERA = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -267,27 +278,83 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     public void pictureOnClick(View view) {
-        openImageChooser();
-    }
-
-    @SuppressLint("IntentReset")
-    private void openImageChooser(){
-        //Opens the images from Gallery saved on the phone to choose a profile picture
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        selectImage();
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        //Sets the image view to the image chosen when intent is received
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode ==RESULT_OK && data!=null && data.getData()!= null){
-            imageUri = data.getData();
-            //Make the upload button visible
-            uploadPicButton.setVisibility(View.VISIBLE);
+    protected void onActivityResult(int reqCode, int resultCode, Intent data) {
+        super.onActivityResult(reqCode, resultCode, data);
+        if(resultCode != RESULT_CANCELED) {
+            if (resultCode == RESULT_OK ) {
+                switch (reqCode) {
+                    case PICFROMCAMERA:
+                        File file = new File(currentPhotoPath);
+                        imageUri  = Uri.fromFile(file);
+                        break;
+                    case PICFROMGALLERY:
+                        imageUri = data.getData();
+                        break;
+                }
+                uploadPicButton.setVisibility(View.VISIBLE);
+                ImageViewUtils.displayCirclePicUri(this, imageUri, thmbProfileImageView);
+            }else {
+                Toast.makeText(this, "You haven't picked Image", Toast.LENGTH_LONG).show();
+            }
         }
     }
+
+    private void selectImage() {
+        final CharSequence[] options = { "Take Photo", "Choose from Gallery","Cancel" };
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose your profile picture");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (options[item].equals("Take Photo")) {
+                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                        File image = null;
+                        try {
+                            image = createImageFile();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        if (image != null) {
+                            Uri photoURI = FileProvider.getUriForFile(ProfileActivity.this,
+                                    "com.example.android.fileprovider",
+                                    image);
+                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                            startActivityForResult(takePictureIntent, PICFROMCAMERA);
+                        }
+                    }
+                } else if (options[item].equals("Choose from Gallery")) {
+                    Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(pickPhoto , PICFROMGALLERY);
+
+                } else if (options[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+    }
+    //Create a file when a picture with a unique name to be stored locally
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new android.icu.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
 
     public void uploadPictureOnClick(View view) {
         //Hides button so no attempt to upload multiple times possible

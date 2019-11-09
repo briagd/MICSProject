@@ -15,9 +15,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.google.firebase.storage.StorageReference;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -26,21 +23,16 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay.OnItemGestureListener;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
-import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.OverlayItem;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import uni.lu.mics.mics_project.nmbd.adapters.AdapterCallBack;
-import uni.lu.mics.mics_project.nmbd.adapters.EventListAdapter;
 import uni.lu.mics.mics_project.nmbd.adapters.EventMapCallBack;
 import uni.lu.mics.mics_project.nmbd.adapters.EventMapListAdapter;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListEvent;
-import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
+import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
-import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
 import uni.lu.mics.mics_project.nmbd.app.service.location.LocationCallBack;
 import uni.lu.mics.mics_project.nmbd.app.service.location.LocationUtils;
 import uni.lu.mics.mics_project.nmbd.domain.model.Event;
@@ -202,6 +194,7 @@ public class EventsMapActivity extends AppCompatActivity {
             public void onShowOnMapClick(int p) {
                 //Move to corresponding point on Map
                 mapController.animateTo(overlayItems.get(p).getPoint());
+                mapController.setZoom(15.);
             }
         });
         //Make the recycler view snap on the current card view
