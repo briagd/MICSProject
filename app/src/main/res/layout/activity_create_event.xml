@@ -170,9 +170,10 @@
                     android:layout_width="299dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
+                    android:editable="false"
                     android:ems="10"
                     android:hint="Date"
-                    android:inputType="date"/>
+                    android:inputType="date" />
 
             </LinearLayout>
 

@@ -39,17 +39,17 @@ import org.osmdroid.util.GeoPoint;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
-import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
 import uni.lu.mics.mics_project.nmbd.app.service.location.LocationUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadConstants;
 import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadStartIntentService;
-import uni.lu.mics.mics_project.nmbd.domain.model.DomainException;
 import uni.lu.mics.mics_project.nmbd.domain.model.Event;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.repository.EventRepository;
@@ -186,8 +186,21 @@ public class CreateEventActivity extends AppCompatActivity {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+
                                 String eventDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
-                                dobEdit.setText(eventDate);
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+                                try {
+                                    Date enteredDate = sdf.parse(eventDate);
+                                    Date currentDate = cldr.getTime();
+                                    if (enteredDate.compareTo(currentDate)>=0){
+                                        dobEdit.setText(eventDate);
+                                    } else {
+                                        Toast.makeText(CreateEventActivity.this, "Please set a date in the future for your event", Toast.LENGTH_LONG).show();
+                                    }
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+
                             }
                         }, year, month, day);
                 datePickerDialog.show();
