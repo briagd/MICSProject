@@ -1,6 +1,7 @@
 package uni.lu.mics.mics_project.nmbd;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
+import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.domain.model.Event;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
@@ -34,15 +36,15 @@ public class EventActivity extends AppCompatActivity {
     AppGlobalState globalState;
     EventRepository eventRepo;
     UserRepository userRepo;
-    Storage storageService;
 
-    private ImageButton eventImage;
+    private ImageButton imgView;
     private TextView eventTitle;
     private TextView dateField;
     private TextView place;
     private TextView eventType;
     private TextView host;
     private User currentUser;
+    private String currentUserID;
     private Event currentEvent;
 
 
@@ -50,79 +52,66 @@ public class EventActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
-//        Retrieve Intent and get current user and event
-//        Intent intent = getIntent();
-//        currentUser = (User) intent.getSerializableExtra("currentUser");
-//        currentUserID = currentUser.getId();
-//        currentEvent =  (Event) intent.getSerializableExtra("currentEvent");
-//        Check if there is an image uri,this would happen if the event was just created and the picture is still being
-//        uploaded
-//        , otherwise display the picture from the eventID.
-//        imgView: is the imageView object where you want the picture to be displayed
-//        if(intent.hasExtra("image")){
-//            Uri imageUri = Uri.parse(intent.getStringExtra("image"));
-//
-//            ImageViewUtils.displayPicUri(this,imageUri,imgView);
-//        } else {
-//            ImageViewUtils.displayEventPicID(this, currentEvent.getEventId(), imgView);
-//        }
-
-
-
-//     Uncomment to be able to pass user as intent when back button is pressed
-//    @Override
-//    public void onBackPressed() {
-//        Log.d(TAG, "onBackPressed Called");
-//        Intent intent = new Intent(this, HomepageActivity.class);
-//        intent.putExtra("currentUser", currentUser);
-//        startActivity(intent);
-//    }
-
 
         globalState = (AppGlobalState) getApplicationContext();
         eventRepo = globalState.getRepoFacade().eventRepo();
         userRepo = globalState.getRepoFacade().userRepo();
+        imgView = findViewById(R.id.eventImageBtn);
+//        Retrieve Intent and get current user and event
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
+        currentUserID = currentUser.getId();
+        currentEvent =  (Event) intent.getSerializableExtra("currentEvent");
+//        Check if there is an image uri,this would happen if the event was just created and the picture is still being
+//        uploaded
+//        , otherwise display the picture from the eventID.
+//        imgView: is the imageView object where you want the picture to be displayed
 
 
-//        currentEvent = new Event();
-//        eventRepo.findById("fBXEcke6ylGqIJLmuGme", new RepoCallback<Event>() {
-//            @Override
-//            public void onCallback(Event event) {
-//                EventActivity.this.currentEvent = event;
-//                setEventName(event.getName());
-//                setDate(event.getDate());
-//                setAdress(event.getEventAddress());
-//                setCategory(event.getCategory());
-//                String creatorId = event.getCreator();
-//                Log.d(TAG, "Listing Users");
-//                userRepo.list(new RepoMultiCallback<User>() {
-//                    @Override
-//                    public void onCallback(ArrayList<User> users) {
-//                        for (User u : users) {
-//                            Log.d(TAG, "listing user: " + u.getId());
-//                            Toast.makeText(EventActivity.this, u.getName(), Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                });
-//
+        if(intent.hasExtra("image")){
+            Uri imageUri = Uri.parse(intent.getStringExtra("image"));
 
-//                userRepo.findById(creatorId, new RepoCallback<User>() {
-//                    @Override
-//                    public void onCallback(User user) {
-//                        host=(TextView)findViewById(R.id.hosted_by);
-//                        host.setText(user.getName());
-//                        Log.d(TAG, "I am finding the user");
-//                        //setHost("Hosted by " + model.getName());
-//                        //Toast.makeText(EventActivity.this, model.getName(), Toast.LENGTH_LONG).show();
-//                    }
-//                    @Override
-//                    public void onGetField(String str) {Log.d(TAG, "I am not finding the user");}
-//                });
-//            }
-//        });
-        //Toast.makeText(EventActivity.this, currentEvent.getEventId(), Toast.LENGTH_LONG).show();
+            ImageViewUtils.displayPicUri(this,imageUri,imgView);
+        } else {
+            ImageViewUtils.displayEventPicID(this, currentEvent.getId(), imgView);
+        }
+
+
+
+
+
+
+
+
+                setEventName(currentEvent.getName());
+                setDate(currentEvent.getDate());
+                setAdress(currentEvent.getEventAddress());
+                setCategory(currentEvent.getCategory());
+                String creatorId = currentEvent.getCreator();
+                Log.d(TAG, "Listing Users");
+                userRepo.list(new RepoMultiCallback<User>() {
+                    @Override
+                    public void onCallback(ArrayList<User> users) {
+                        for (User u : users) {
+                            Log.d(TAG, "listing user: " + u.getId());
+                            Toast.makeText(EventActivity.this, u.getName(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+
+                userRepo.findById(creatorId, new RepoCallback<User>() {
+                    @Override
+                    public void onCallback(User user) {
+                        host=(TextView)findViewById(R.id.hosted_by);
+                        host.setText(user.getName());
+                        Log.d(TAG, "I am finding the user");
+                        //setHost("Hosted by " + model.getName());
+                        //Toast.makeText(EventActivity.this, model.getName(), Toast.LENGTH_LONG).show();
+                    }
+            });
+
+        Toast.makeText(EventActivity.this, currentEvent.getId(), Toast.LENGTH_LONG).show();
     }
 
     private void setEventName(String name){
@@ -158,6 +147,15 @@ public class EventActivity extends AppCompatActivity {
         host = (TextView)findViewById(R.id.hosted_by);
         host.setText(hostName);
 
+    }
+
+//         Uncomment to be able to pass user as intent when back button is pressed
+    @Override
+    public void onBackPressed() {
+        Log.d(TAG, "onBackPressed Called");
+        Intent intent = new Intent(this, HomepageActivity.class);
+        intent.putExtra("currentUser", currentUser);
+        startActivity(intent);
     }
 
 
