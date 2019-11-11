@@ -11,6 +11,8 @@ public class Event implements Entity, Serializable {
     private String name;
     private String description;
     private String date;
+    private String startTime;
+    private String endTime;
     private String category;
     private String coverPicUrl;
 
@@ -33,6 +35,8 @@ public class Event implements Entity, Serializable {
         this.eventAdmins = new ArrayList<>();
         this.coverPicUrl = "event_avatar.jpg";
         this.likes = 0;
+        this.startTime = "00:00";
+        this.endTime = "00:01";
     }
 
     public Event(String name, String description, String date, String creator, String category) throws DomainException {
@@ -176,6 +180,28 @@ public class Event implements Entity, Serializable {
     }
 
     public void addParticipant(String uid){
-        eventParticipants.add(uid);
+        if (!eventParticipants.contains(uid)) {
+            eventParticipants.add(uid);
+        }
+    }
+
+    public void removeParticipant(String uid){
+        eventParticipants.remove(uid);
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 }
