@@ -287,9 +287,6 @@ public class FriendsActivity extends AppCompatActivity {
                 //Notifies adapter that the list has been updated so recyclerview can be updated
                 adapter.notifyItemInserted(extListHash.getIdIndexOfLast());
             }
-
-            @Override
-            public void onGetField(String str) { }
         });
     }
 

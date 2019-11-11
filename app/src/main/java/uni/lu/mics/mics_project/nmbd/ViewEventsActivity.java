@@ -111,7 +111,7 @@ public class ViewEventsActivity extends AppCompatActivity {
                         public void onCallback(ArrayList<Event> models) {
                             for (Event event : models) {
                                 //add the the name and user id to the lists send to the recyclerview
-                                addEventToExtendedLis(event.getEventId(), searchResultList, mEventSearchListAdapter);
+                                addEventToExtendedLis(event.getId(), searchResultList, mEventSearchListAdapter);
                                     Log.d(TAG, event.getName() + "was found in search");
                             }
                         }
@@ -164,9 +164,10 @@ public class ViewEventsActivity extends AppCompatActivity {
         eventRepo.whereArrayContains("eventParticipants", currentUserID, new RepoMultiCallback<Event>() {
             @Override
             public void onCallback(ArrayList<Event> models) {
+                Log.d(TAG, "Number of Events found:"+models.size());
                 for (Event event:models){
                     Log.d(TAG, "Events attending:"+event.getName());
-                    addEventToExtendedLis(event.getEventId(), eventAttList, mEventAttListAdapter);
+                    addEventToExtendedLis(event.getId(), eventAttList, mEventAttListAdapter);
                 }
                 if (models.size()==0){
                     eventAttLabel.setVisibility(View.INVISIBLE);
@@ -198,7 +199,7 @@ public class ViewEventsActivity extends AppCompatActivity {
             public void onCallback(ArrayList<Event> models) {
                 for (Event event:models){
                     Log.d(TAG, "Events invited:"+event.getName());
-                    addEventToExtendedLis(event.getEventId(), eventInviteList, mEventInviteListAdapter);
+                    addEventToExtendedLis(event.getId(), eventInviteList, mEventInviteListAdapter);
                 }
                 if (models.size()==0){
                     eventInviteLabel.setVisibility(View.INVISIBLE);
@@ -218,10 +219,6 @@ public class ViewEventsActivity extends AppCompatActivity {
                 finish();
             }
 
-            @Override
-            public void onGetField(String str) {
-
-            }
         });
     }
 
@@ -235,14 +232,9 @@ public class ViewEventsActivity extends AppCompatActivity {
             @Override
             public void onCallback(final Event model) {
                 //add the found model to the list
-                extList.addElement(model.getName(), model.getEventId(), model.getDate(), model.getCategory(), model.getEventAddress());
+                extList.addElement(model.getName(), model.getId(), model.getDate(), model.getCategory(), model.getEventAddress());
                 //Notifies adapter that the list has been updated so recyclerview can be updated
                 adapter.notifyItemInserted(extList.getIdIndexOfLast());
-            }
-
-            @Override
-            public void onGetField(String str) {
-
             }
         });
     }

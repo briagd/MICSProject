@@ -67,9 +67,6 @@ public class ImageViewUtils {
                     public void onFailure() { }
                 });
             }
-
-            @Override
-            public void onGetField(String str) { }
         });
 
 
@@ -136,9 +133,6 @@ public class ImageViewUtils {
                     public void onFailure() { }
                 });
             }
-
-            @Override
-            public void onGetField(String str) { }
         });
     }
 

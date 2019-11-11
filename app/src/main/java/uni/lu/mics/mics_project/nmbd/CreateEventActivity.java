@@ -82,7 +82,7 @@ public class CreateEventActivity extends AppCompatActivity {
     private EditText addressEdit;
 
     private User currentUser;
-    private Event currentEvent;
+    final private Event event = new Event();
 
     private UploadResultReceiver mUpldRessultReceiver;
 
@@ -309,8 +309,14 @@ public class CreateEventActivity extends AppCompatActivity {
             String strDate = dobEdit.getText().toString();
             String category = eventCategory.getSelectedItem().toString();
 
-            try {
-                final Event event = new Event(name, descr, strDate, currentUser.getId(), category);
+                event.setName(name);
+                event.setDescription(descr);
+                event.setDate(strDate);
+                event.setCreator(currentUser.getId());
+                event.setCategory(category);
+                event.setCreator(currentUser.getId());
+                event.addParticipant(currentUser.getId());
+
 
                 String address = addressEdit.getText().toString();
                 if (!TextUtils.isEmpty(address)) {
@@ -318,32 +324,27 @@ public class CreateEventActivity extends AppCompatActivity {
                     GeoPoint p = LocationUtils.getLocationFromAddress(this, address);
                     event.setGpsLat((float) p.getLatitude());
                     event.setGpsLong((float) p.getLongitude());
+
                 }
 
-                eventRepo.add(event, new RepoCallback() {
+                eventRepo.addWithoutId(event, new RepoCallback<String>() {
+                            @Override
+                            public void onCallback(String model) {
+                                eventRepo.update(model, "id", model);
+                                event.setId(model);
+                                uploadFile(imgUri);
 
-                    @Override
-                    public void onCallback(Object model) {
-                    }
+                                Toast.makeText(CreateEventActivity.this, "Event Saved", Toast.LENGTH_SHORT).show();
+                                //go to Event activity
+                                Intent intent = setIntent(event, imgUri);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
 
-                    @Override
-                    public void onGetField(String id) {
-                        event.setEventId(id);
-                        CreateEventActivity.this.currentEvent = event;
-                        eventRepo.set(id, event);
-                        uploadFile(imgUri);
-                        Log.d(TAG, currentEvent.getEventId());
-                        Toast.makeText(CreateEventActivity.this, "Event Saved", Toast.LENGTH_SHORT).show();
-                        //go to Event activity
-                        Intent intent = setIntent(currentEvent, imgUri);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
 
-            } catch (DomainException e) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-            }
+
+
         }
     }
 
@@ -360,7 +361,7 @@ public class CreateEventActivity extends AppCompatActivity {
         if(imgUri!=null) {
             Log.d(TAG, "Starting upload service");
             UploadStartIntentService.startIntentService(this, mUpldRessultReceiver, imgUri,
-                    getString(R.string.gsEventPicsStrgFldr), currentEvent.getEventId(), UploadConstants.EVENT_TYPE);
+                    getString(R.string.gsEventPicsStrgFldr), event.getId(), UploadConstants.EVENT_TYPE);
         }
     }
 

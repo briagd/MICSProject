@@ -1,5 +1,6 @@
 package uni.lu.mics.mics_project.nmbd;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -85,27 +86,27 @@ public class EventActivity extends AppCompatActivity {
         currentUser = (User) intent.getSerializableExtra("currentUser");
 
 
-        currentEvent = new Event();
-        eventRepo.findById("fBXEcke6ylGqIJLmuGme", new RepoCallback<Event>() {
-            @Override
-            public void onCallback(Event event) {
-                EventActivity.this.currentEvent = event;
-                setEventName(event.getName());
-                setDate(event.getDate());
-                setAdress(event.getEventAddress());
-                setCategory(event.getCategory());
-                String creatorId = event.getCreator();
-                Log.d(TAG, "Listing Users");
-                userRepo.list(new RepoMultiCallback<User>() {
-                    @Override
-                    public void onCallback(ArrayList<User> users) {
-                        for (User u : users) {
-                            Log.d(TAG, "listing user: " + u.getId());
-                            Toast.makeText(EventActivity.this, u.getName(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-
+//        currentEvent = new Event();
+//        eventRepo.findById("fBXEcke6ylGqIJLmuGme", new RepoCallback<Event>() {
+//            @Override
+//            public void onCallback(Event event) {
+//                EventActivity.this.currentEvent = event;
+//                setEventName(event.getName());
+//                setDate(event.getDate());
+//                setAdress(event.getEventAddress());
+//                setCategory(event.getCategory());
+//                String creatorId = event.getCreator();
+//                Log.d(TAG, "Listing Users");
+//                userRepo.list(new RepoMultiCallback<User>() {
+//                    @Override
+//                    public void onCallback(ArrayList<User> users) {
+//                        for (User u : users) {
+//                            Log.d(TAG, "listing user: " + u.getId());
+//                            Toast.makeText(EventActivity.this, u.getName(), Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                });
+//
 
 //                userRepo.findById(creatorId, new RepoCallback<User>() {
 //                    @Override
@@ -119,8 +120,8 @@ public class EventActivity extends AppCompatActivity {
 //                    @Override
 //                    public void onGetField(String str) {Log.d(TAG, "I am not finding the user");}
 //                });
-            }
-        });
+//            }
+//        });
         //Toast.makeText(EventActivity.this, currentEvent.getEventId(), Toast.LENGTH_LONG).show();
     }
 

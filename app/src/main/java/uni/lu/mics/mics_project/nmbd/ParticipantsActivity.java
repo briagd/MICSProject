@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 import uni.lu.mics.mics_project.nmbd.adapters.ParticipantsAdapter;
 
-public class Participants extends AppCompatActivity {
+public class ParticipantsActivity extends AppCompatActivity {
 
     private static final String TAG = "ParticipantsActivity";
 
@@ -34,13 +34,13 @@ public class Participants extends AppCompatActivity {
         mProfileNames.add("havasu falls");
         mImagesUrl.add("https://i.redd.it/tpsnoz5bzo501.jpg");
         mProfileNames.add("Trondheim");
-        initRecyclerView();
+        //initRecyclerView();
     }
 
-    private void initRecyclerView(){
-        RecyclerView recyclerView = findViewById(R.id.participants_recycler_view);
-        ParticipantsAdapter adapter = new ParticipantsAdapter(this, mProfileNames, mImagesUrl);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-    }
+//    private void initRecyclerView(){
+//        RecyclerView recyclerView = findViewById(R.id.participants_recycler_view);
+//        ParticipantsAdapter adapter = new ParticipantsAdapter(this, mProfileNames, mImagesUrl);
+//        recyclerView.setAdapter(adapter);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//    }
 }

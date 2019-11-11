@@ -93,6 +93,21 @@ public class Repository<T extends Entity> {
             });
     }
 
+    public void addWithoutId(final T model, final RepoCallback<String> repoCallback) {
+        this.collectionRef.add(model)
+        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            @Override
+            public void onSuccess(DocumentReference documentReference) {
+                 repoCallback.onCallback(documentReference.getId());
+            }
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
     /*
 
      */

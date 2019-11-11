@@ -153,9 +153,9 @@ public class EventsMapActivity extends AppCompatActivity {
                     OverlayItem overlayItem = new OverlayItem(e.getName(), e.getDescription(), new GeoPoint(e.getGpsLat(), e.getGpsLong()));
                     overlayItem.setMarker(getDrawable(R.drawable.map_marker));
                     overlayItems.add(overlayItem);
-                    eventIds.add(e.getEventId());
+                    eventIds.add(e.getId());
                     //add event to the extended list to display cards in recycler view
-                    eventExtList.addElement(e.getName(),e.getEventId(), e.getDate(), e.getCategory(), e.getEventAddress());
+                    eventExtList.addElement(e.getName(),e.getId(), e.getDate(), e.getCategory(), e.getEventAddress());
                 }
                 //Initialize recycler view
                 initializeEventsRecyclerView();
@@ -216,9 +216,6 @@ public class EventsMapActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
-
-            @Override
-            public void onGetField(String str) { }
         });
     }
 
