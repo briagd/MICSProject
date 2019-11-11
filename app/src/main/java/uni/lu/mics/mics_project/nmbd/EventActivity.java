@@ -75,14 +75,6 @@ public class EventActivity extends AppCompatActivity {
         } else {
             ImageViewUtils.displayEventPicID(this, currentEvent.getId(), imgView);
         }
-
-
-
-
-
-
-
-
                 setEventName(currentEvent.getName());
                 setDate(currentEvent.getDate());
                 setAdress(currentEvent.getEventAddress());
