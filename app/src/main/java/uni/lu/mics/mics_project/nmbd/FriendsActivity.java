@@ -23,8 +23,6 @@ import uni.lu.mics.mics_project.nmbd.adapters.FriendRequestListAdapter ;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendSearchListAdapter ;
 import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListUser;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
-import uni.lu.mics.mics_project.nmbd.app.service.ServiceFacade;
-import uni.lu.mics.mics_project.nmbd.app.service.ServiceFactory;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.DbManager;
 import uni.lu.mics.mics_project.nmbd.infra.repository.Factory;
@@ -47,7 +45,6 @@ public class FriendsActivity extends AppCompatActivity {
     DbManager dbManager = new DbManager(new Factory());
     RepoFacade repoFacade = dbManager.connect();
     UserRepository userRepo = repoFacade.userRepo();
-    ServiceFacade serviceFacade = new ServiceFacade(new ServiceFactory());
     //Reference to the user logged in
     private User currentUser;
     private String currentUserID;
@@ -117,7 +114,7 @@ public class FriendsActivity extends AppCompatActivity {
                                 Boolean isAlreadyFriend = currentUser.getFriendList().contains(idOfSearched);
                                 if (!isSearchedSameAsCurrentUser && !isReqAlreadySent && !isReqAlreadyReceived && !isAlreadyFriend) {
                                     //add the the name and user id to the lists send to the recyclerview
-                                    addFriendToExtendedListHash(idOfSearched, searchResultList, mFriendSearchListAdapter);
+                                    addFriendToExtendedList(idOfSearched, searchResultList, mFriendSearchListAdapter);
                                     Log.d(TAG, u.getName() + " of userID " + idOfSearched + "was found in search");
                                 }
                             }
@@ -145,7 +142,19 @@ public class FriendsActivity extends AppCompatActivity {
             friendList.clearLists();
             mFriendListAdapter.notifyDataSetChanged();
             for (String id : currentUser.getFriendList()) {
-                addFriendToExtendedListHash(id, friendList, mFriendListAdapter);
+                addFriendToExtendedList(id, friendList, mFriendListAdapter);
+            }
+        }
+    }
+
+    public void updateFriendReqLists() {
+        //If there are no friend request then the friend request label and recycler view can be set invisible
+        if (currentUser.getFriendReqReceivedList().size() == 0) {
+            friendsReqLayout.setVisibility(View.INVISIBLE);
+            mFriendReqListRecyclerView.setVisibility(View.INVISIBLE);
+        } else {
+            for (String id : currentUser.getFriendReqReceivedList()) {
+                addFriendToExtendedList(id, friendReqList, mFriendRequestListAdapter);
             }
         }
     }
@@ -156,7 +165,7 @@ public class FriendsActivity extends AppCompatActivity {
 
             @Override
             public void onClickCallback(int p) {
-                String unfriendUserID = friendList.getId(p);//mFriendListIDList.get(p);
+                String unfriendUserID = friendList.getId(p);
                 //Removes the friend ID from the list of current user object list of req received
                 currentUser.removeFriendFromFriendList(unfriendUserID);
                 //Updates the database
@@ -238,17 +247,7 @@ public class FriendsActivity extends AppCompatActivity {
         updateFriendReqLists();
     }
 
-    public void updateFriendReqLists() {
-        //If there are no friend request then the friend request label and recycler view can be set invisible
-        if (currentUser.getFriendReqReceivedList().size() == 0) {
-            friendsReqLayout.setVisibility(View.INVISIBLE);
-            mFriendReqListRecyclerView.setVisibility(View.INVISIBLE);
-        } else {
-            for (String id : currentUser.getFriendReqReceivedList()) {
-                addFriendToExtendedListHash(id, friendReqList, mFriendRequestListAdapter);
-            }
-        }
-    }
+
 
     public void initializeSearchRecyclerView() {
         // Create an adapter and supply the data to be displayed.
@@ -277,15 +276,15 @@ public class FriendsActivity extends AppCompatActivity {
         mSearchResultRecyclerView.setLayoutManager(new LinearLayoutManager(FriendsActivity.this));
     }
 
-    public void addFriendToExtendedListHash(String id, final ExtendedListUser extListHash, final RecyclerView.Adapter adapter) {
+    public void addFriendToExtendedList(String id, final ExtendedListUser extList, final RecyclerView.Adapter adapter) {
         //Access database to find user corresponding to an id
         userRepo.findById(id, new RepoCallback<User>() {
             @Override
             public void onCallback(final User model) {
                 //add the found model to the list
-                extListHash.addNameID(model.getName(), model.getId());
+                extList.addNameID(model.getName(), model.getId());
                 //Notifies adapter that the list has been updated so recyclerview can be updated
-                adapter.notifyItemInserted(extListHash.getIdIndexOfLast());
+                adapter.notifyItemInserted(extList.getIdIndexOfLast());
             }
         });
     }

@@ -20,6 +20,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import uni.lu.mics.mics_project.nmbd.domain.model.Entity;
