@@ -4,12 +4,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-
-import uni.lu.mics.mics_project.nmbd.adapters.ParticipantsAdapter;
 
 public class ParticipantsActivity extends AppCompatActivity {
 
@@ -27,9 +23,8 @@ public class ParticipantsActivity extends AppCompatActivity {
         initImageBitmaps();
     }
 
-    private void initImageBitmaps(){
+    private void initImageBitmaps() {
         Log.d(TAG, "initImageBitmaps: preparing bitmaps.");
-
         mImagesUrl.add("https://c1.staticflickr.com/5/46/36/253116407448_de5fbf183d_o.jpg");
         mProfileNames.add("havasu falls");
         mImagesUrl.add("https://i.redd.it/tpsnoz5bzo501.jpg");
