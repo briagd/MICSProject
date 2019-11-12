@@ -32,7 +32,7 @@ public class LocationUtils{
 
             try {
                 address = coder.getFromLocationName(strAddress,5);
-                if (address==null) {
+                if (address==null || address.size()==0) {
                     return null;
                 }
                 Address location=address.get(0);

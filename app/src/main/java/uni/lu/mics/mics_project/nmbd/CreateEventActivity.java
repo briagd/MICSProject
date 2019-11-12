@@ -3,6 +3,7 @@ package uni.lu.mics.mics_project.nmbd;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -26,6 +27,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -37,8 +39,10 @@ import org.osmdroid.util.GeoPoint;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
@@ -71,6 +75,14 @@ public class CreateEventActivity extends AppCompatActivity {
     // Date picker
     private DatePickerDialog datePickerDialog;
     private EditText dobEdit;
+
+
+    //Time Picker
+    private TimePickerDialog startTimePickerDialog;
+    private EditText startTimeEdit;
+    private TimePickerDialog endTimePickerDialog;
+    private EditText endTimeEdit;
+
     private Uri imgUri;
     private Boolean isImagePicked = false;
     private EditText addressEdit;
@@ -97,22 +109,55 @@ public class CreateEventActivity extends AppCompatActivity {
         nameEdit = findViewById(R.id.eventName);
         descriptionEdit = findViewById(R.id.descriptionText);
         ImageViewUtils.displayEventUploadPic(this, eventImageButton);
+        setTimeFields();
         setDobFields();
         setSpinner();
 
         //Instantiate the receiver for the upload service
         mUpldRessultReceiver = new UploadResultReceiver(new Handler());
-
-
     }
 
     public void imageOnclick(View view) {
         selectImage();
     }
 
-
     public void setSpinner() {
         eventCategory.setAdapter(new ArrayAdapter<Event.EventCategory>(this, android.R.layout.simple_spinner_dropdown_item, Event.EventCategory.values()));
+    }
+
+    private void setTimeFields() {
+        startTimeEdit = findViewById(R.id.start_time_edit);
+        startTimeEdit.setInputType(InputType.TYPE_NULL);
+        endTimeEdit = findViewById(R.id.end_time_edit);
+        endTimeEdit.setInputType(InputType.TYPE_NULL);
+        final int h = 0;
+        final int m = 0;
+        startTimeEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startTimePickerDialog = new TimePickerDialog(CreateEventActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        String time = hourOfDay + ":" + minute;
+                        startTimeEdit.setText(time);
+                    }
+                }, h, m, true);
+                startTimePickerDialog.show();
+            }
+        });
+        endTimeEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                endTimePickerDialog = new TimePickerDialog(CreateEventActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        String time = hourOfDay + ":" + minute;
+                        endTimeEdit.setText(time);
+                    }
+                }, h, m, true);
+                endTimePickerDialog.show();
+            }
+        });
     }
 
     public void setDobFields() {
@@ -132,8 +177,21 @@ public class CreateEventActivity extends AppCompatActivity {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+
                                 String eventDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
-                                dobEdit.setText(eventDate);
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+                                try {
+                                    Date enteredDate = sdf.parse(eventDate);
+                                    Date currentDate = cldr.getTime();
+                                    if (enteredDate.compareTo(currentDate)>=0){
+                                        dobEdit.setText(eventDate);
+                                    } else {
+                                        Toast.makeText(CreateEventActivity.this, "Please set a date in the future for your event", Toast.LENGTH_LONG).show();
+                                    }
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+
                             }
                         }, year, month, day);
                 datePickerDialog.show();
@@ -146,7 +204,6 @@ public class CreateEventActivity extends AppCompatActivity {
 //            dobEdit.setText(df.format(c));
 //        }
     }
-
 
     @Override
     protected void onActivityResult(int reqCode, int resultCode, Intent data) {
@@ -283,6 +340,19 @@ public class CreateEventActivity extends AppCompatActivity {
             Toast.makeText(this, "Please choose a picture for your event", Toast.LENGTH_LONG).show();
             isAllFilled = false;
         }
+        if (TextUtils.isEmpty(startTimeEdit.getText().toString())) {
+            isAllFilled = false;
+            TextView label = findViewById(R.id.start_time_label);
+            label.setTextColor(Color.RED);
+            label.setText("Please enter a start time.");
+        }
+
+        if (TextUtils.isEmpty(endTimeEdit.getText().toString())) {
+            isAllFilled = false;
+            TextView label = findViewById(R.id.end_time_label);
+            label.setTextColor(Color.RED);
+            label.setText("Please enter an end time.");
+        }
 
         return isAllFilled;
     }
@@ -297,6 +367,9 @@ public class CreateEventActivity extends AppCompatActivity {
             String strDate = dobEdit.getText().toString();
             String category = eventCategory.getSelectedItem().toString();
 
+            String startTime = startTimeEdit.getText().toString();
+            String endTime = endTimeEdit.getText().toString();
+
             event.setName(name);
             event.setDescription(descr);
             event.setDate(strDate);
@@ -304,13 +377,23 @@ public class CreateEventActivity extends AppCompatActivity {
             event.setCategory(category);
             event.setCreator(currentUser.getId());
             event.addParticipant(currentUser.getId());
+
+            event.setStartTime(startTime);
+            event.setEndTime(endTime);
+
             event.addAdmin(currentUser.getId());
+
 
 
             String address = addressEdit.getText().toString();
             if (!TextUtils.isEmpty(address)) {
                 event.setEventAddress(address);
                 GeoPoint p = LocationUtils.getLocationFromAddress(this, address);
+
+                if (p!=null) {
+                    event.setGpsLat((float) p.getLatitude());
+                    event.setGpsLong((float) p.getLongitude());
+                }
                 event.setGpsLat((float) p.getLatitude());
                 event.setGpsLong((float) p.getLongitude());
 
@@ -330,8 +413,6 @@ public class CreateEventActivity extends AppCompatActivity {
                     finish();
                 }
             });
-
-
         }
     }
 
@@ -361,13 +442,11 @@ public class CreateEventActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
     public void cancelOnClick(View view) {
         Intent intent = new Intent(this, HomepageActivity.class);
         intent.putExtra("currentUser", currentUser);
         startActivity(intent);
     }
-
 
     //Intent service to upload file
     private class UploadResultReceiver extends ResultReceiver {
