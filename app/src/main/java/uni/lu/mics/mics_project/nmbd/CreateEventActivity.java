@@ -43,11 +43,9 @@ import java.util.Date;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
-import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
 import uni.lu.mics.mics_project.nmbd.app.service.location.LocationUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadConstants;
 import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadStartIntentService;
-import uni.lu.mics.mics_project.nmbd.domain.model.DomainException;
 import uni.lu.mics.mics_project.nmbd.domain.model.Event;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.repository.EventRepository;
@@ -56,41 +54,30 @@ import uni.lu.mics.mics_project.nmbd.infra.repository.RepoCallback;
 public class CreateEventActivity extends AppCompatActivity {
 
     final String TAG = "CreateEventActivity";
+    final private Event event = new Event();
+    private final int PICFROMGALLERY = 1;
+    private final int PICFROMCAMERA = 0;
     int PICK_IMAGE_REQUEST = 1;
-
     AppGlobalState globalState;
     EventRepository eventRepo;
     Storage storageService;
-
     // Image picker
     ImageButton eventImageButton;
-
     // Name
     private EditText nameEdit;
-
     // Description
     private EditText descriptionEdit;
-
     private Spinner eventCategory;
-
     // Date picker
     private DatePickerDialog datePickerDialog;
     private EditText dobEdit;
-
     private Uri imgUri;
     private Boolean isImagePicked = false;
     private EditText addressEdit;
-
     private User currentUser;
-    final private Event event = new Event();
-
     private UploadResultReceiver mUpldRessultReceiver;
-
     //Variables for selecting picture
     private String currentPhotoPath;
-    private final int PICFROMGALLERY = 1;
-    private final int PICFROMCAMERA = 0;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,12 +151,12 @@ public class CreateEventActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int reqCode, int resultCode, Intent data) {
         super.onActivityResult(reqCode, resultCode, data);
-        if(resultCode != RESULT_CANCELED) {
-            if (resultCode == RESULT_OK ) {
+        if (resultCode != RESULT_CANCELED) {
+            if (resultCode == RESULT_OK) {
                 switch (reqCode) {
                     case PICFROMCAMERA:
                         File file = new File(currentPhotoPath);
-                        imgUri  = Uri.fromFile(file);
+                        imgUri = Uri.fromFile(file);
                         break;
                     case PICFROMGALLERY:
                         imgUri = data.getData();
@@ -177,7 +164,7 @@ public class CreateEventActivity extends AppCompatActivity {
                 }
                 isImagePicked = true;
                 ImageViewUtils.displayPicUri(this, imgUri, eventImageButton);
-            }else {
+            } else {
                 Toast.makeText(CreateEventActivity.this, "You haven't picked Image", Toast.LENGTH_LONG).show();
             }
         }
@@ -204,7 +191,7 @@ public class CreateEventActivity extends AppCompatActivity {
                 }
             });
             builder.show();
-        }else {
+        } else {
             final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Choose your profile picture");
@@ -241,7 +228,9 @@ public class CreateEventActivity extends AppCompatActivity {
             builder.show();
         }
     }
+
     //Create a file when a picture with a unique name to be stored locally
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -258,39 +247,38 @@ public class CreateEventActivity extends AppCompatActivity {
     }
 
 
-
-    public Boolean isFormFilled(){
+    public Boolean isFormFilled() {
         Boolean isAllFilled = true;
 
-        if(TextUtils.isEmpty(nameEdit.getText().toString())) {
+        if (TextUtils.isEmpty(nameEdit.getText().toString())) {
             isAllFilled = false;
             TextView nameLabel = findViewById(R.id.EventNameTag);
             nameLabel.setTextColor(Color.RED);
             nameLabel.setText("Please enter a name for your event.");
         }
 
-        if(TextUtils.isEmpty(descriptionEdit.getText().toString())) {
+        if (TextUtils.isEmpty(descriptionEdit.getText().toString())) {
             isAllFilled = false;
             TextView label = findViewById(R.id.DescriptionNameTag);
             label.setTextColor(Color.RED);
             label.setText("Please enter a description for your event.");
         }
 
-        if(TextUtils.isEmpty(dobEdit.getText().toString())) {
+        if (TextUtils.isEmpty(dobEdit.getText().toString())) {
             isAllFilled = false;
             TextView label = findViewById(R.id.DateTag);
             label.setTextColor(Color.RED);
             label.setText("Please enter a date for your event.");
         }
 
-        if(TextUtils.isEmpty(addressEdit.getText().toString())) {
+        if (TextUtils.isEmpty(addressEdit.getText().toString())) {
             isAllFilled = false;
             TextView label = findViewById(R.id.AddressTag);
             label.setTextColor(Color.RED);
             label.setText("Please enter an address for your event.");
         }
 
-        if(!isImagePicked){
+        if (!isImagePicked) {
             Log.d(TAG, "No image chosen");
             Toast.makeText(this, "Please choose a picture for your event", Toast.LENGTH_LONG).show();
             isAllFilled = false;
@@ -309,40 +297,39 @@ public class CreateEventActivity extends AppCompatActivity {
             String strDate = dobEdit.getText().toString();
             String category = eventCategory.getSelectedItem().toString();
 
-                event.setName(name);
-                event.setDescription(descr);
-                event.setDate(strDate);
-                event.setCreator(currentUser.getId());
-                event.setCategory(category);
-                event.setCreator(currentUser.getId());
-                event.addParticipant(currentUser.getId());
+            event.setName(name);
+            event.setDescription(descr);
+            event.setDate(strDate);
+            event.setCreator(currentUser.getId());
+            event.setCategory(category);
+            event.setCreator(currentUser.getId());
+            event.addParticipant(currentUser.getId());
+            event.addAdmin(currentUser.getId());
 
 
-                String address = addressEdit.getText().toString();
-                if (!TextUtils.isEmpty(address)) {
-                    event.setEventAddress(address);
-                    GeoPoint p = LocationUtils.getLocationFromAddress(this, address);
-                    event.setGpsLat((float) p.getLatitude());
-                    event.setGpsLong((float) p.getLongitude());
+            String address = addressEdit.getText().toString();
+            if (!TextUtils.isEmpty(address)) {
+                event.setEventAddress(address);
+                GeoPoint p = LocationUtils.getLocationFromAddress(this, address);
+                event.setGpsLat((float) p.getLatitude());
+                event.setGpsLong((float) p.getLongitude());
 
+            }
+
+            eventRepo.addWithoutId(event, new RepoCallback<String>() {
+                @Override
+                public void onCallback(String model) {
+                    eventRepo.update(model, "id", model);
+                    event.setId(model);
+                    uploadFile(imgUri);
+
+                    Toast.makeText(CreateEventActivity.this, "Event Saved", Toast.LENGTH_SHORT).show();
+                    //go to Event activity
+                    Intent intent = setIntent(event, imgUri);
+                    startActivity(intent);
+                    finish();
                 }
-
-                eventRepo.addWithoutId(event, new RepoCallback<String>() {
-                            @Override
-                            public void onCallback(String model) {
-                                eventRepo.update(model, "id", model);
-                                event.setId(model);
-                                uploadFile(imgUri);
-
-                                Toast.makeText(CreateEventActivity.this, "Event Saved", Toast.LENGTH_SHORT).show();
-                                //go to Event activity
-                                Intent intent = setIntent(event, imgUri);
-                                startActivity(intent);
-                                finish();
-                            }
-                        });
-
-
+            });
 
 
         }
@@ -357,13 +344,14 @@ public class CreateEventActivity extends AppCompatActivity {
         return intent;
     }
 
-    private void uploadFile(Uri imgUri){
-        if(imgUri!=null) {
+    private void uploadFile(Uri imgUri) {
+        if (imgUri != null) {
             Log.d(TAG, "Starting upload service");
             UploadStartIntentService.startIntentService(this, mUpldRessultReceiver, imgUri,
                     getString(R.string.gsEventPicsStrgFldr), event.getId(), UploadConstants.EVENT_TYPE);
         }
     }
+
 
     @Override
     public void onBackPressed() {
@@ -389,7 +377,7 @@ public class CreateEventActivity extends AppCompatActivity {
 
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
-       }
+        }
     }
 
 }
