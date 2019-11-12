@@ -2,21 +2,14 @@ package uni.lu.mics.mics_project.nmbd;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.preference.PreferenceManager;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
-
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -39,11 +32,6 @@ import java.util.Random;
 
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
-
-import uni.lu.mics.mics_project.nmbd.app.service.Storage;
-import uni.lu.mics.mics_project.nmbd.app.service.location.LocationCallBack;
-import uni.lu.mics.mics_project.nmbd.app.service.location.LocationUtils;
-
 import uni.lu.mics.mics_project.nmbd.domain.model.Event;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.repository.EventRepository;
@@ -93,6 +81,7 @@ public class EventActivity extends AppCompatActivity {
         eventRepo = globalState.getRepoFacade().eventRepo();
         userRepo = globalState.getRepoFacade().userRepo();
         imgView = findViewById(R.id.eventImageBtn);
+        numberOfParticipants = findViewById(R.id.number_peeps_going);
 //        Retrieve Intent and get current user and event
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
@@ -229,45 +218,53 @@ public class EventActivity extends AppCompatActivity {
     }
 
     public void joinLeaveEvent(View view) {
+        int numParticipants = currentEvent.getEventParticipants().size();
         if (joinLeaveBtn.getText() == "Join") {
             currentEvent.getEventParticipants().add(currentUser.getId());
             eventRepo.addElement(currentEvent.getId(), "eventParticipants", currentUser.getId());
             joinLeaveBtn.setText("Leave");
+            numParticipants++;
+
         } else {
             currentEvent.getEventParticipants().remove(currentUser.getId());
             eventRepo.removeElement(currentEvent.getId(), "eventParticipants", currentUser.getId());
             joinLeaveBtn.setText("Join");
+            numParticipants--;
+        }
+        if (numParticipants == 1 || numParticipants == 0){
+            numberOfParticipants.setText(numParticipants + " person is going");
+        } else {
+            numberOfParticipants.setText(numParticipants + " people are going");
         }
     }
   
 
 
     private void setParticipants() {
-        numberOfParticipants = findViewById(R.id.number_peeps_going);
         List<String> participants = currentEvent.getEventParticipants();
         int numParticipants = participants.size();
-        if (number == 1) {
-            numberOfParticipants.setText(number + " person is going");
+        if (numParticipants == 1 || numParticipants == 0 ) {
+            numberOfParticipants.setText(numParticipants + " person is going");
         } else {
-            numberOfParticipants.setText(number + " people are going");
+            numberOfParticipants.setText(numParticipants + " people are going");
         }
         ImageView prof1 = findViewById(R.id.profile1);
         ImageView prof2 = findViewById(R.id.profile2);
         ImageView prof3 = findViewById(R.id.profile3);
-        if (numberOfParticipants==0){
-          prof1.setVisibility(View.INVISBLE);
+        if (numParticipants==0){
+          prof1.setVisibility(View.INVISIBLE);
           prof2.setVisibility(View.INVISIBLE);
             prof3.setVisibility(View.INVISIBLE);
-        } else if (numberOfParticipants==1){
+        } else if (numParticipants==1){
             prof2.setVisibility(View.INVISIBLE);
             prof3.setVisibility(View.INVISIBLE);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(0), prof1);
-        } else if (numberOfParticipants==2){
+        } else if (numParticipants==2){
 
             prof3.setVisibility(View.INVISIBLE);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(0), prof1);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(1), prof2);
-        } else if (numberOfParticipants==3){
+        } else if (numParticipants==3){
             ImageViewUtils.displayUserCirclePicID(this, participants.get(0), prof1);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(1), prof2);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(2), prof3);

@@ -151,16 +151,6 @@
                 android:layout_height="15dp"
                 android:background="@android:color/transparent" />
 
-            <Button
-                android:id="@+id/view_event_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:onClick="viewEventOnClick"
-                android:text="view event" />
-
             <View
                 android:id="@+id/divider21"
                 android:layout_width="match_parent"

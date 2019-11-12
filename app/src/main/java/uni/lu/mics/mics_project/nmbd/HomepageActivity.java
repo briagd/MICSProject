@@ -19,8 +19,6 @@ import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
-import uni.lu.mics.mics_project.nmbd.infra.repository.EventRepository;
-import uni.lu.mics.mics_project.nmbd.infra.repository.RepoCallback;
 import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
 
 public class HomepageActivity extends AppCompatActivity {
@@ -105,11 +103,6 @@ public class HomepageActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void viewEventOnClick(View view) {
-        Intent intent = createIntent(EventActivity.class, currentUser);
-        startActivity(intent);
-    }
-
     public void viewFriendsOnClick(View view) {
         Intent intent = createIntent(FriendsActivity.class, currentUser);
         startActivity(intent);
@@ -152,9 +145,4 @@ public class HomepageActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
         }
     }
-
-
-
-
-
 }
