@@ -58,26 +58,24 @@ import uni.lu.mics.mics_project.nmbd.infra.repository.RepoCallback;
 public class CreateEventActivity extends AppCompatActivity {
 
     final String TAG = "CreateEventActivity";
+    final private Event event = new Event();
+    private final int PICFROMGALLERY = 1;
+    private final int PICFROMCAMERA = 0;
     int PICK_IMAGE_REQUEST = 1;
-
     AppGlobalState globalState;
     EventRepository eventRepo;
     Storage storageService;
-
     // Image picker
     ImageButton eventImageButton;
-
     // Name
     private EditText nameEdit;
-
     // Description
     private EditText descriptionEdit;
-
     private Spinner eventCategory;
-
     // Date picker
     private DatePickerDialog datePickerDialog;
     private EditText dobEdit;
+
 
     //Time Picker
     private TimePickerDialog startTimePickerDialog;
@@ -88,17 +86,10 @@ public class CreateEventActivity extends AppCompatActivity {
     private Uri imgUri;
     private Boolean isImagePicked = false;
     private EditText addressEdit;
-
     private User currentUser;
-    final private Event event = new Event();
-
     private UploadResultReceiver mUpldRessultReceiver;
-
     //Variables for selecting picture
     private String currentPhotoPath;
-    private final int PICFROMGALLERY = 1;
-    private final int PICFROMCAMERA = 0;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -296,6 +287,7 @@ public class CreateEventActivity extends AppCompatActivity {
     }
 
     //Create a file when a picture with a unique name to be stored locally
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -374,6 +366,7 @@ public class CreateEventActivity extends AppCompatActivity {
             String descr = descriptionEdit.getText().toString();
             String strDate = dobEdit.getText().toString();
             String category = eventCategory.getSelectedItem().toString();
+
             String startTime = startTimeEdit.getText().toString();
             String endTime = endTimeEdit.getText().toString();
 
@@ -384,17 +377,26 @@ public class CreateEventActivity extends AppCompatActivity {
             event.setCategory(category);
             event.setCreator(currentUser.getId());
             event.addParticipant(currentUser.getId());
+
             event.setStartTime(startTime);
             event.setEndTime(endTime);
+
+            event.addAdmin(currentUser.getId());
+
+
 
             String address = addressEdit.getText().toString();
             if (!TextUtils.isEmpty(address)) {
                 event.setEventAddress(address);
                 GeoPoint p = LocationUtils.getLocationFromAddress(this, address);
+
                 if (p!=null) {
                     event.setGpsLat((float) p.getLatitude());
                     event.setGpsLong((float) p.getLongitude());
                 }
+                event.setGpsLat((float) p.getLatitude());
+                event.setGpsLong((float) p.getLongitude());
+
             }
 
             eventRepo.addWithoutId(event, new RepoCallback<String>() {
@@ -430,6 +432,7 @@ public class CreateEventActivity extends AppCompatActivity {
                     getString(R.string.gsEventPicsStrgFldr), event.getId(), UploadConstants.EVENT_TYPE);
         }
     }
+
 
     @Override
     public void onBackPressed() {

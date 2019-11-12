@@ -114,7 +114,7 @@ public class Event implements Entity, Serializable {
         this.eventParticipants = eventParticipants;
     }
 
-    public void setEventAdmins(List<String> eventAdmins) {
+    public void setEventAdmins(ArrayList<String> eventAdmins) {
         this.eventAdmins = eventAdmins;
     }
 
@@ -182,6 +182,12 @@ public class Event implements Entity, Serializable {
     public void addParticipant(String uid){
         if (!eventParticipants.contains(uid)) {
             eventParticipants.add(uid);
+        }
+    }
+
+    public void addAdmin(String uid) {
+        if (!eventAdmins.contains(uid)) {
+            eventAdmins.add(uid);
         }
     }
 

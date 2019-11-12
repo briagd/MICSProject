@@ -214,20 +214,29 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="206dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/description_box"
-                    android:layout_width="match_parent"
-                    android:layout_height="174dp"
-                    android:layout_marginStart="25dp"
-                    android:layout_marginTop="15dp"
-                    android:layout_marginEnd="20dp"
-                    android:layout_weight="1"
-                    android:scrollbars="vertical"
-                    android:text="Did you ever spend a whole weekend playing video games? If so, why not taking it to the next level and spend the weekend designing one? Beval GameJam offers you the possibility to meet with other digital enthusiasts and to collaborate together to develop original multimedia contents from scratch!   Jump into a 48 hours full-immersion experience into the world of game developing, meet new people and learn new things! The co-working space of Technoport SA will be at your disposal for the whole weekend, with possibility to sleep and to shower inside.   To make sure that you get the best out of the experience a team of coaches, experts in different fields of digital creation, will support the teams of developers throughout the jam.   We will also organize a small welcome buffet and a pizza party!   If you are interested in participating, then sign up quickly! Spots are limited...first come first served! In order to register please fill out this form: https://forms.gle/Egqcsja21JurHYRE8  And pay your 10€ participation fee via billetweb: https://www.billetweb.fr/belval-game-jam-1st-edition  Further information on: https://itch.io/jam/belval-game-jam  ...Don't miss it! ;)" />
+                <ScrollView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:fillViewport="true"
+                    android:scrollbars="vertical">
+
+                    <TextView
+                        android:id="@+id/description_box"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_marginStart="25dp"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginEnd="20dp"
+                        android:layout_marginBottom="15dp"
+                        android:layout_weight="1"
+                        android:maxLength="500"
+                        android:text="This is a description" />
+                </ScrollView>
+
             </LinearLayout>
 
             <org.osmdroid.views.MapView
@@ -251,17 +260,18 @@
             android:id="@+id/participateBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="joinLeaveEvent"
             android:text="Join"
             android:translationX="315dp"
             tools:layout_marginTop="5dp" />
 
-        <ImageButton
+        <Button
             android:id="@+id/edit_event"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:background="@android:color/transparent"
-            app:srcCompat="@mipmap/edit_ic" />
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:text="Edit" />
     </com.google.android.material.navigation.NavigationView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
