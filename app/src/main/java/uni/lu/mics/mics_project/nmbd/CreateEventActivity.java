@@ -139,7 +139,6 @@ public class CreateEventActivity extends AppCompatActivity {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         String time = setTimeFormat(Integer.toString(hourOfDay)) + ":" + setTimeFormat(Integer.toString(minute));
-                        startTime = time;
                         startTimeEdit.setText(time);
                     }
                 }, h, m, true);
@@ -153,7 +152,6 @@ public class CreateEventActivity extends AppCompatActivity {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         String time = setTimeFormat(Integer.toString(hourOfDay)) + ":" + setTimeFormat(Integer.toString(minute));
-                        endTime = time;
                         endTimeEdit.setText(time);
                     }
                 }, h, m, true);
