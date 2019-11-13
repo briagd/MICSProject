@@ -332,6 +332,12 @@ public class EventActivity extends AppCompatActivity {
     }
 
 
+    public void editOnClick(View view) {
+        Intent intent = new Intent(this, CreateEventActivity.class);
+        intent.putExtra("currentUser", currentUser);
+        intent.putExtra("event", currentEvent);
+        startActivity(intent);
+    }
 }
 
 
