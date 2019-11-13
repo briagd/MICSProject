@@ -107,6 +107,14 @@ public class EventActivity extends AppCompatActivity {
         setAdress(currentEvent.getEventAddress());
         setCategory(currentEvent.getCategory());
         String creatorId = currentEvent.getCreator();
+        setProfilePics(creatorId);
+        setDescription(currentEvent.getDescription());
+        setMap();
+        setParticipants();
+    }
+
+
+    private void setProfilePics(String creatorId){
         userRepo.findById(creatorId, new RepoCallback<User>() {
             @Override
             public void onCallback(User user) {
@@ -114,15 +122,10 @@ public class EventActivity extends AppCompatActivity {
                 Log.d(TAG, "Setting Event creator's Name");
                 hostProfileImgView = findViewById(R.id.hostProfileImgView);
                 ImageViewUtils.displayUserCirclePic(EventActivity.this, user,hostProfileImgView );
-                //setHost("Hosted by " + model.getName());
-                //Toast.makeText(EventActivity.this, model.getName(), Toast.LENGTH_LONG).show();
             }
         });
-        setDescription(currentEvent.getDescription());
-        setMap();
-        setParticipants();
     }
-      
+
 
 
     private void setMap(){
@@ -217,7 +220,7 @@ public class EventActivity extends AppCompatActivity {
         }
     }
 
-    public void joinLeaveEvent(View view) {
+    public void joinLeaveEventOnClick(View view) {
         int numParticipants = currentEvent.getEventParticipants().size();
         if (joinLeaveBtn.getText() == "Join") {
             currentEvent.getEventParticipants().add(currentUser.getId());
@@ -236,6 +239,14 @@ public class EventActivity extends AppCompatActivity {
         } else {
             numberOfParticipants.setText(numParticipants + " people are going");
         }
+        eventRepo.findById(currentEvent.getId(), new RepoCallback<Event>() {
+            @Override
+            public void onCallback(Event model) {
+                currentEvent = model;
+                setParticipants();
+            }
+        });
+
     }
   
 
@@ -243,6 +254,7 @@ public class EventActivity extends AppCompatActivity {
     private void setParticipants() {
         List<String> participants = currentEvent.getEventParticipants();
         int numParticipants = participants.size();
+        Log.d(TAG, "Number of participants:"+ numParticipants);
         if (numParticipants == 1 || numParticipants == 0 ) {
             numberOfParticipants.setText(numParticipants + " person is going");
         } else {
@@ -256,15 +268,20 @@ public class EventActivity extends AppCompatActivity {
           prof2.setVisibility(View.INVISIBLE);
             prof3.setVisibility(View.INVISIBLE);
         } else if (numParticipants==1){
+            prof1.setVisibility(View.VISIBLE);
             prof2.setVisibility(View.INVISIBLE);
             prof3.setVisibility(View.INVISIBLE);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(0), prof1);
         } else if (numParticipants==2){
-
+            prof1.setVisibility(View.VISIBLE);
+            prof2.setVisibility(View.VISIBLE);
             prof3.setVisibility(View.INVISIBLE);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(0), prof1);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(1), prof2);
         } else if (numParticipants==3){
+            prof1.setVisibility(View.VISIBLE);
+            prof2.setVisibility(View.VISIBLE);
+            prof3.setVisibility(View.VISIBLE);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(0), prof1);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(1), prof2);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(2), prof3);

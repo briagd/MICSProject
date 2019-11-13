@@ -260,7 +260,7 @@
             android:id="@+id/participateBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="joinLeaveEvent"
+            android:onClick="joinLeaveEventOnClick"
             android:text="Join"
             android:translationX="315dp"
             tools:layout_marginTop="5dp" />
