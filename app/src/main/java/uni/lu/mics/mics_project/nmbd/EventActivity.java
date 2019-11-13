@@ -22,10 +22,14 @@ import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.OverlayItem;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -87,10 +91,6 @@ public class EventActivity extends AppCompatActivity {
         currentUser = (User) intent.getSerializableExtra("currentUser");
         currentUserID = currentUser.getId();
         currentEvent = (Event) intent.getSerializableExtra("currentEvent");
-//        Check if there is an image uri,this would happen if the event was just created and the picture is still being
-//        uploaded
-//        , otherwise display the picture from the eventID.
-//        imgView: is the imageView object where you want the picture to be displayed
 
         setJoinLeaveButton();
         setEditButton();
@@ -140,21 +140,28 @@ public class EventActivity extends AppCompatActivity {
             }
         });
         mapController = map.getController();
-        mapController.setZoom(10.);
+        mapController.setZoom(15.);
+        final ArrayList<OverlayItem> overlayItems = new ArrayList<OverlayItem>();
         startPoint = new GeoPoint(currentEvent.getGpsLat(), currentEvent.getGpsLong());
-        Log.d(TAG, startPoint.toString());
 
-        Marker m = new Marker(map);
-        m.setIcon(getDrawable(R.drawable.map_marker));
-        m.setPosition(startPoint);
-        m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        map.getOverlays().add(m);
+        OverlayItem overlayItem = new OverlayItem("", "", startPoint);
+        overlayItem.setMarker(getDrawable(R.drawable.map_marker));
+        overlayItems.add(overlayItem);
+        ItemizedOverlayWithFocus<OverlayItem> mOverlay;
+        mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(overlayItems,
+                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                    @Override
+                    public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
+                        return true;
+                    }
+                    @Override
+                    public boolean onItemLongPress(final int index, final OverlayItem item) {
+                        return false;
+                    }
+                }, EventActivity.this);
+        Log.d(TAG, String.valueOf(overlayItems.size()));
+        map.getOverlays().add(mOverlay);
         mapController.setCenter(new GeoPoint(startPoint));
-
-        
-
-
-        //Toast.makeText(EventActivity.this, currentEvent.getId(), Toast.LENGTH_LONG).show();
 
     }
 
