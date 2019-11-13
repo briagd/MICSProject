@@ -97,7 +97,6 @@ public class EventActivity extends AppCompatActivity {
 
         if (intent.hasExtra("image")) {
             Uri imageUri = Uri.parse(intent.getStringExtra("image"));
-
             ImageViewUtils.displayPicUri(this, imageUri, imgView);
         } else {
             ImageViewUtils.displayEventPicID(this, currentEvent.getId(), imgView);
@@ -111,6 +110,7 @@ public class EventActivity extends AppCompatActivity {
         setDescription(currentEvent.getDescription());
         setMap();
         setParticipants();
+        setupToolbar();
     }
 
 
@@ -337,6 +337,29 @@ public class EventActivity extends AppCompatActivity {
         intent.putExtra("currentUser", currentUser);
         intent.putExtra("event", currentEvent);
         startActivity(intent);
+    }
+
+    private void setupToolbar() {
+        ImageView profileImageView = findViewById(R.id.profile_pic);
+        ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(),profileImageView );
+        profileImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(EventActivity.this, ProfileActivity.class);
+                intent.putExtra("currentUser", currentUser);
+                startActivity(intent);
+                finish();
+            }
+        });
+        Button backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(EventActivity.this, HomepageActivity.class);
+                intent.putExtra("currentUser", currentUser);
+                startActivity(intent);
+            }
+        });
     }
 }
 
