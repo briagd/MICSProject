@@ -96,9 +96,11 @@ public class EventActivity extends AppCompatActivity {
         setEditButton();
 
         if (intent.hasExtra("image")) {
+            Log.d(TAG, "retrieving image extra from intent");
             Uri imageUri = Uri.parse(intent.getStringExtra("image"));
             ImageViewUtils.displayPicUri(this, imageUri, imgView);
         } else {
+            Log.d(TAG, "retrieving image from event id");
             ImageViewUtils.displayEventPicID(this, currentEvent.getId(), imgView);
         }
         setEventName(currentEvent.getName());

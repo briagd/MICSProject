@@ -93,6 +93,7 @@ public class CreateEventActivity extends AppCompatActivity {
 
     //Checks if editing
     private boolean isEditing = false;
+    private boolean isEditingPicPicked = false;
     private Event eventEditing;
 
     @Override
@@ -129,7 +130,11 @@ public class CreateEventActivity extends AppCompatActivity {
             isImagePicked = true;
         }
         if (isEditing){
-            ImageViewUtils.displayEventPicID(this, eventEditing.getId(), eventImageButton);
+            try {
+                ImageViewUtils.displayEventPicID(this, eventEditing.getId(), eventImageButton);
+            } catch(Exception e){
+                ImageViewUtils.displayEventUploadPic(this, eventImageButton);
+            }
         } else {
             ImageViewUtils.displayEventUploadPic(this, eventImageButton);
         }
@@ -257,6 +262,7 @@ public class CreateEventActivity extends AppCompatActivity {
                         break;
                 }
                 isImagePicked = true;
+                isEditingPicPicked = true;
                 ImageViewUtils.displayPicUri(this, imgUri, eventImageButton);
             } else {
                 Toast.makeText(CreateEventActivity.this, "You haven't picked Image", Toast.LENGTH_LONG).show();
@@ -437,10 +443,15 @@ public class CreateEventActivity extends AppCompatActivity {
                 }
             if (isEditing) {
                 event.setId(eventEditing.getId());
-                eventRepo.set(event.getId(), event);
-                if (isImagePicked){
+                if (isEditingPicPicked){
+                    Log.d(TAG, "Image was picked");
                     uploadFile(imgUri);
+                } else {
+                    Log.d(TAG, "Image was not picked");
+                    event.setCoverPicUrl(eventEditing.getCoverPicUrl());
                 }
+                eventRepo.set(event.getId(), event);
+
 
             } else {
 
@@ -449,6 +460,7 @@ public class CreateEventActivity extends AppCompatActivity {
                     public void onCallback(String model) {
                         eventRepo.update(model, "id", model);
                         event.setId(model);
+                        uploadFile(imgUri);
 
                     }
                 });
@@ -469,7 +481,10 @@ public class CreateEventActivity extends AppCompatActivity {
         Intent intent = new Intent(CreateEventActivity.this, EventActivity.class);
         intent.putExtra("currentUser", currentUser);
         intent.putExtra("currentEvent", event);
-        intent.putExtra("image", imgUri.toString());
+        if(isImagePicked && imgUri!=null) {
+            Log.d(TAG,"sending pic uri as intent");
+            intent.putExtra("image", imgUri.toString());
+        }
         return intent;
     }
 
