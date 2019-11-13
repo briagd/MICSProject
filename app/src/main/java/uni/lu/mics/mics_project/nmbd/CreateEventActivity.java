@@ -138,7 +138,8 @@ public class CreateEventActivity extends AppCompatActivity {
                 startTimePickerDialog = new TimePickerDialog(CreateEventActivity.this, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        String time = hourOfDay + ":" + minute;
+                        String time = setTimeFormat(Integer.toString(hourOfDay)) + ":" + setTimeFormat(Integer.toString(minute));
+                        startTime = time;
                         startTimeEdit.setText(time);
                     }
                 }, h, m, true);
@@ -151,13 +152,22 @@ public class CreateEventActivity extends AppCompatActivity {
                 endTimePickerDialog = new TimePickerDialog(CreateEventActivity.this, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        String time = hourOfDay + ":" + minute;
+                        String time = setTimeFormat(Integer.toString(hourOfDay)) + ":" + setTimeFormat(Integer.toString(minute));
+                        endTime = time;
                         endTimeEdit.setText(time);
                     }
                 }, h, m, true);
                 endTimePickerDialog.show();
             }
         });
+    }
+
+
+    public String setTimeFormat(String t){
+        if (t.length() == 1){
+            return("0" + t);
+        }
+        return t;
     }
 
     public void setDobFields() {
