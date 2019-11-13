@@ -114,7 +114,7 @@ public class Event implements Entity, Serializable {
         this.eventParticipants = eventParticipants;
     }
 
-    public void setEventAdmins(ArrayList<String> eventAdmins) {
+    public void setEventAdmins(List<String> eventAdmins) {
         this.eventAdmins = eventAdmins;
     }
 

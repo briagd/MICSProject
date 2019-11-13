@@ -449,6 +449,9 @@ public class CreateEventActivity extends AppCompatActivity {
                 } else {
                     Log.d(TAG, "Image was not picked");
                     event.setCoverPicUrl(eventEditing.getCoverPicUrl());
+                    event.setEventParticipants(eventEditing.getEventParticipants());
+                    event.setLikes(eventEditing.getLikes());
+                    event.setEventAdmins(eventEditing.getEventAdmins());
                 }
                 eventRepo.set(event.getId(), event);
 
