@@ -59,6 +59,7 @@ public class EventActivity extends AppCompatActivity {
     private TextView descriptionBox;
     private Button joinLeaveBtn;
     private Button editBtn;
+    private TextView time;
     private User currentUser;
     private String currentUserID;
     private Event currentEvent;
@@ -110,6 +111,7 @@ public class EventActivity extends AppCompatActivity {
         setMap();
         setParticipants();
         setupToolbar();
+        seTime();
     }
 
 
@@ -195,7 +197,7 @@ public class EventActivity extends AppCompatActivity {
 
     private void setHost(String hostName) {
         host = (TextView) findViewById(R.id.hosted_by);
-        host.setText("Hosted by " + hostName);
+        host.setText("Created by " + hostName);
 
     }
 
@@ -253,6 +255,11 @@ public class EventActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void seTime(){
+        time = findViewById(R.id.time_from_to);
+        time.setText(currentEvent.getStartTime() + " - " + currentEvent.getEndTime());
     }
   
 
