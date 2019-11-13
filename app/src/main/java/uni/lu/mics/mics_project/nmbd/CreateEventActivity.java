@@ -84,12 +84,16 @@ public class CreateEventActivity extends AppCompatActivity {
     private EditText endTimeEdit;
 
     private Uri imgUri;
-    private Boolean isImagePicked = false;
+    private boolean isImagePicked = false;
     private EditText addressEdit;
     private User currentUser;
     private UploadResultReceiver mUpldRessultReceiver;
     //Variables for selecting picture
     private String currentPhotoPath;
+
+    //Checks if editing
+    private boolean isEditing = false;
+    private Event eventEditing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,13 +112,38 @@ public class CreateEventActivity extends AppCompatActivity {
         eventImageButton = (ImageButton) findViewById(R.id.eventImage);
         nameEdit = findViewById(R.id.eventName);
         descriptionEdit = findViewById(R.id.descriptionText);
-        ImageViewUtils.displayEventUploadPic(this, eventImageButton);
+        startTimeEdit = findViewById(R.id.start_time_edit);
+        endTimeEdit = findViewById(R.id.end_time_edit);
+        dobEdit = (EditText) findViewById(R.id.DatePicker);
+
         setTimeFields();
         setDobFields();
         setSpinner();
 
         //Instantiate the receiver for the upload service
         mUpldRessultReceiver = new UploadResultReceiver(new Handler());
+        if (intent.getSerializableExtra("event")!=null){
+            isEditing = true;
+            eventEditing = (Event) intent.getSerializableExtra("event");
+            setupFields();
+            isImagePicked = true;
+        }
+        if (isEditing){
+            ImageViewUtils.displayEventPicID(this, eventEditing.getId(), eventImageButton);
+        } else {
+            ImageViewUtils.displayEventUploadPic(this, eventImageButton);
+        }
+
+    }
+
+    private void setupFields() {
+        nameEdit.setText(eventEditing.getName());
+        descriptionEdit.setText(eventEditing.getDescription());
+        addressEdit.setText(eventEditing.getEventAddress());
+        startTimeEdit.setText(eventEditing.getStartTime());
+        endTimeEdit.setText(eventEditing.getEndTime());
+        dobEdit.setText(eventEditing.getDate());
+
     }
 
     public void imageOnclick(View view) {
@@ -126,9 +155,9 @@ public class CreateEventActivity extends AppCompatActivity {
     }
 
     private void setTimeFields() {
-        startTimeEdit = findViewById(R.id.start_time_edit);
+
         startTimeEdit.setInputType(InputType.TYPE_NULL);
-        endTimeEdit = findViewById(R.id.end_time_edit);
+
         endTimeEdit.setInputType(InputType.TYPE_NULL);
         final int h = 0;
         final int m = 0;
@@ -170,7 +199,7 @@ public class CreateEventActivity extends AppCompatActivity {
 
     public void setDobFields() {
         //Configures the date picker
-        dobEdit = (EditText) findViewById(R.id.DatePicker);
+
         dobEdit.setInputType(InputType.TYPE_NULL);
 
         dobEdit.setOnClickListener(new View.OnClickListener() {
@@ -368,59 +397,70 @@ public class CreateEventActivity extends AppCompatActivity {
     public void onClickSave(View v) {
 
         if (isFormFilled()) {
-            Button saveButton = findViewById(R.id.SaveBtn);
-            saveButton.setVisibility(View.INVISIBLE);
-            String name = nameEdit.getText().toString();
-            String descr = descriptionEdit.getText().toString();
-            String strDate = dobEdit.getText().toString();
-            String category = eventCategory.getSelectedItem().toString();
 
-            String startTime = startTimeEdit.getText().toString();
-            String endTime = endTimeEdit.getText().toString();
+                Button saveButton = findViewById(R.id.SaveBtn);
+                saveButton.setVisibility(View.INVISIBLE);
+                String name = nameEdit.getText().toString();
+                String descr = descriptionEdit.getText().toString();
+                String strDate = dobEdit.getText().toString();
+                String category = eventCategory.getSelectedItem().toString();
 
-            event.setName(name);
-            event.setDescription(descr);
-            event.setDate(strDate);
-            event.setCreator(currentUser.getId());
-            event.setCategory(category);
-            event.setCreator(currentUser.getId());
-            event.addParticipant(currentUser.getId());
+                String startTime = startTimeEdit.getText().toString();
+                String endTime = endTimeEdit.getText().toString();
 
-            event.setStartTime(startTime);
-            event.setEndTime(endTime);
+                event.setName(name);
+                event.setDescription(descr);
+                event.setDate(strDate);
+                event.setCreator(currentUser.getId());
+                event.setCategory(category);
+                event.setCreator(currentUser.getId());
+                event.addParticipant(currentUser.getId());
 
-            event.addAdmin(currentUser.getId());
+                event.setStartTime(startTime);
+                event.setEndTime(endTime);
+
+                event.addAdmin(currentUser.getId());
 
 
+                String address = addressEdit.getText().toString();
+                if (!TextUtils.isEmpty(address)) {
+                    event.setEventAddress(address);
+                    GeoPoint p = LocationUtils.getLocationFromAddress(this, address);
 
-            String address = addressEdit.getText().toString();
-            if (!TextUtils.isEmpty(address)) {
-                event.setEventAddress(address);
-                GeoPoint p = LocationUtils.getLocationFromAddress(this, address);
-
-                if (p!=null) {
+                    if (p != null) {
+                        event.setGpsLat((float) p.getLatitude());
+                        event.setGpsLong((float) p.getLongitude());
+                    }
                     event.setGpsLat((float) p.getLatitude());
                     event.setGpsLong((float) p.getLongitude());
-                }
-                event.setGpsLat((float) p.getLatitude());
-                event.setGpsLong((float) p.getLongitude());
 
+                }
+            if (isEditing) {
+                event.setId(eventEditing.getId());
+                eventRepo.set(event.getId(), event);
+                if (isImagePicked){
+                    uploadFile(imgUri);
+                }
+
+            } else {
+
+                eventRepo.addWithoutId(event, new RepoCallback<String>() {
+                    @Override
+                    public void onCallback(String model) {
+                        eventRepo.update(model, "id", model);
+                        event.setId(model);
+
+                    }
+                });
             }
 
-            eventRepo.addWithoutId(event, new RepoCallback<String>() {
-                @Override
-                public void onCallback(String model) {
-                    eventRepo.update(model, "id", model);
-                    event.setId(model);
-                    uploadFile(imgUri);
 
-                    Toast.makeText(CreateEventActivity.this, "Event Saved", Toast.LENGTH_SHORT).show();
-                    //go to Event activity
-                    Intent intent = setIntent(event, imgUri);
-                    startActivity(intent);
-                    finish();
-                }
-            });
+            Toast.makeText(CreateEventActivity.this, "Event Saved", Toast.LENGTH_SHORT).show();
+            //go to Event activity
+
+            Intent intent = setIntent(event, imgUri);
+            startActivity(intent);
+            finish();
         }
     }
 

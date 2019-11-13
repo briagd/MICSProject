@@ -14,6 +14,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+            <include
+                layout="@layout/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <ImageButton
                 android:id="@+id/eventImageBtn"
@@ -260,10 +264,16 @@
             android:id="@+id/participateBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="joinLeaveEvent"
+            android:onClick="joinLeaveEventOnClick"
             android:text="Join"
             android:translationX="315dp"
-            tools:layout_marginTop="5dp" />
+            tools:layout_marginTop="5dp"
+            android:background="@color/blue"
+            android:shadowColor="#000000"
+            android:shadowRadius="10"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:layout_marginTop="5dp"/>
 
         <Button
             android:id="@+id/edit_event"
@@ -271,7 +281,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
-            android:text="Edit" />
+            android:background="@color/blue"
+            android:onClick="editOnClick"
+            android:shadowColor="#000000"
+            android:shadowRadius="10"
+            android:text="Edit"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
     </com.google.android.material.navigation.NavigationView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

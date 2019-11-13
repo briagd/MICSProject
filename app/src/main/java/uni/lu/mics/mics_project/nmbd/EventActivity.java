@@ -22,10 +22,13 @@ import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
+import org.osmdroid.views.overlay.OverlayItem;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -88,17 +91,12 @@ public class EventActivity extends AppCompatActivity {
         currentUser = (User) intent.getSerializableExtra("currentUser");
         currentUserID = currentUser.getId();
         currentEvent = (Event) intent.getSerializableExtra("currentEvent");
-//        Check if there is an image uri,this would happen if the event was just created and the picture is still being
-//        uploaded
-//        , otherwise display the picture from the eventID.
-//        imgView: is the imageView object where you want the picture to be displayed
 
         setJoinLeaveButton();
         setEditButton();
 
         if (intent.hasExtra("image")) {
             Uri imageUri = Uri.parse(intent.getStringExtra("image"));
-
             ImageViewUtils.displayPicUri(this, imageUri, imgView);
         } else {
             ImageViewUtils.displayEventPicID(this, currentEvent.getId(), imgView);
@@ -108,6 +106,16 @@ public class EventActivity extends AppCompatActivity {
         setAdress(currentEvent.getEventAddress());
         setCategory(currentEvent.getCategory());
         String creatorId = currentEvent.getCreator();
+        setProfilePics(creatorId);
+        setDescription(currentEvent.getDescription());
+        setMap();
+        setParticipants();
+        setupToolbar();
+        seTime();
+    }
+
+
+    private void setProfilePics(String creatorId){
         userRepo.findById(creatorId, new RepoCallback<User>() {
             @Override
             public void onCallback(User user) {
@@ -115,16 +123,10 @@ public class EventActivity extends AppCompatActivity {
                 Log.d(TAG, "Setting Event creator's Name");
                 hostProfileImgView = findViewById(R.id.hostProfileImgView);
                 ImageViewUtils.displayUserCirclePic(EventActivity.this, user,hostProfileImgView );
-                //setHost("Hosted by " + model.getName());
-                //Toast.makeText(EventActivity.this, model.getName(), Toast.LENGTH_LONG).show();
             }
         });
-        setDescription(currentEvent.getDescription());
-        setMap();
-        setParticipants();
-        seTime();
     }
-      
+
 
 
     private void setMap(){
@@ -139,21 +141,28 @@ public class EventActivity extends AppCompatActivity {
             }
         });
         mapController = map.getController();
-        mapController.setZoom(10.);
+        mapController.setZoom(15.);
+        final ArrayList<OverlayItem> overlayItems = new ArrayList<OverlayItem>();
         startPoint = new GeoPoint(currentEvent.getGpsLat(), currentEvent.getGpsLong());
-        Log.d(TAG, startPoint.toString());
 
-        Marker m = new Marker(map);
-        m.setIcon(getDrawable(R.drawable.map_marker));
-        m.setPosition(startPoint);
-        m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        map.getOverlays().add(m);
+        OverlayItem overlayItem = new OverlayItem("", "", startPoint);
+        overlayItem.setMarker(getDrawable(R.drawable.map_marker));
+        overlayItems.add(overlayItem);
+        ItemizedOverlayWithFocus<OverlayItem> mOverlay;
+        mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(overlayItems,
+                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                    @Override
+                    public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
+                        return true;
+                    }
+                    @Override
+                    public boolean onItemLongPress(final int index, final OverlayItem item) {
+                        return false;
+                    }
+                }, EventActivity.this);
+        Log.d(TAG, String.valueOf(overlayItems.size()));
+        map.getOverlays().add(mOverlay);
         mapController.setCenter(new GeoPoint(startPoint));
-
-        
-
-
-        //Toast.makeText(EventActivity.this, currentEvent.getId(), Toast.LENGTH_LONG).show();
 
     }
 
@@ -219,7 +228,7 @@ public class EventActivity extends AppCompatActivity {
         }
     }
 
-    public void joinLeaveEvent(View view) {
+    public void joinLeaveEventOnClick(View view) {
         int numParticipants = currentEvent.getEventParticipants().size();
         if (joinLeaveBtn.getText() == "Join") {
             currentEvent.getEventParticipants().add(currentUser.getId());
@@ -238,6 +247,14 @@ public class EventActivity extends AppCompatActivity {
         } else {
             numberOfParticipants.setText(numParticipants + " people are going");
         }
+        eventRepo.findById(currentEvent.getId(), new RepoCallback<Event>() {
+            @Override
+            public void onCallback(Event model) {
+                currentEvent = model;
+                setParticipants();
+            }
+        });
+
     }
 
     private void seTime(){
@@ -250,6 +267,7 @@ public class EventActivity extends AppCompatActivity {
     private void setParticipants() {
         List<String> participants = currentEvent.getEventParticipants();
         int numParticipants = participants.size();
+        Log.d(TAG, "Number of participants:"+ numParticipants);
         if (numParticipants == 1 || numParticipants == 0 ) {
             numberOfParticipants.setText(numParticipants + " person is going");
         } else {
@@ -263,15 +281,20 @@ public class EventActivity extends AppCompatActivity {
           prof2.setVisibility(View.INVISIBLE);
             prof3.setVisibility(View.INVISIBLE);
         } else if (numParticipants==1){
+            prof1.setVisibility(View.VISIBLE);
             prof2.setVisibility(View.INVISIBLE);
             prof3.setVisibility(View.INVISIBLE);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(0), prof1);
         } else if (numParticipants==2){
-
+            prof1.setVisibility(View.VISIBLE);
+            prof2.setVisibility(View.VISIBLE);
             prof3.setVisibility(View.INVISIBLE);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(0), prof1);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(1), prof2);
         } else if (numParticipants==3){
+            prof1.setVisibility(View.VISIBLE);
+            prof2.setVisibility(View.VISIBLE);
+            prof3.setVisibility(View.VISIBLE);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(0), prof1);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(1), prof2);
             ImageViewUtils.displayUserCirclePicID(this, participants.get(2), prof3);
@@ -315,6 +338,35 @@ public class EventActivity extends AppCompatActivity {
     }
 
 
+    public void editOnClick(View view) {
+        Intent intent = new Intent(this, CreateEventActivity.class);
+        intent.putExtra("currentUser", currentUser);
+        intent.putExtra("event", currentEvent);
+        startActivity(intent);
+    }
+
+    private void setupToolbar() {
+        ImageView profileImageView = findViewById(R.id.profile_pic);
+        ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(),profileImageView );
+        profileImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(EventActivity.this, ProfileActivity.class);
+                intent.putExtra("currentUser", currentUser);
+                startActivity(intent);
+                finish();
+            }
+        });
+        Button backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(EventActivity.this, HomepageActivity.class);
+                intent.putExtra("currentUser", currentUser);
+                startActivity(intent);
+            }
+        });
+    }
 }
 
 
