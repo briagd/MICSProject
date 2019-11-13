@@ -263,7 +263,13 @@
             android:onClick="joinLeaveEventOnClick"
             android:text="Join"
             android:translationX="315dp"
-            tools:layout_marginTop="5dp" />
+            tools:layout_marginTop="5dp"
+            android:background="@color/blue"
+            android:shadowColor="#000000"
+            android:shadowRadius="10"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:layout_marginTop="5dp"/>
 
         <Button
             android:id="@+id/edit_event"
@@ -271,7 +277,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
-            android:text="Edit" />
+            android:text="Edit"
+            android:background="@color/blue"
+            android:shadowColor="#000000"
+            android:shadowRadius="10"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"/>
     </com.google.android.material.navigation.NavigationView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
