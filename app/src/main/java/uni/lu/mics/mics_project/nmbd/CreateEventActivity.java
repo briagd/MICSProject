@@ -25,7 +25,9 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -96,15 +98,19 @@ public class CreateEventActivity extends AppCompatActivity {
     private boolean isEditingPicPicked = false;
     private Event eventEditing;
 
+    //Private event
+    private Switch privateSwitch;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_event);
-
+        //Initialize the repo and storage services
         globalState = (AppGlobalState) getApplicationContext();
         eventRepo = globalState.getRepoFacade().eventRepo();
         storageService = globalState.getServiceFacade().storageService();
 
+        //Get the intent and retrieve the current user object
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
 
@@ -116,6 +122,7 @@ public class CreateEventActivity extends AppCompatActivity {
         startTimeEdit = findViewById(R.id.start_time_edit);
         endTimeEdit = findViewById(R.id.end_time_edit);
         dobEdit = (EditText) findViewById(R.id.DatePicker);
+        privateSwitch = findViewById(R.id.private_switch);
 
         setTimeFields();
         setDobFields();
@@ -140,6 +147,7 @@ public class CreateEventActivity extends AppCompatActivity {
         }
 
     }
+
 
     private void setupFields() {
         nameEdit.setText(eventEditing.getName());
@@ -406,14 +414,15 @@ public class CreateEventActivity extends AppCompatActivity {
 
                 Button saveButton = findViewById(R.id.SaveBtn);
                 saveButton.setVisibility(View.INVISIBLE);
+                //Retrieve the information by the user
                 String name = nameEdit.getText().toString();
                 String descr = descriptionEdit.getText().toString();
                 String strDate = dobEdit.getText().toString();
                 String category = eventCategory.getSelectedItem().toString();
-
                 String startTime = startTimeEdit.getText().toString();
                 String endTime = endTimeEdit.getText().toString();
-
+                Boolean isPrivate = privateSwitch.isChecked();
+                //Sets all the fields for the event object to be created
                 event.setName(name);
                 event.setDescription(descr);
                 event.setDate(strDate);
@@ -421,11 +430,11 @@ public class CreateEventActivity extends AppCompatActivity {
                 event.setCategory(category);
                 event.setCreator(currentUser.getId());
                 event.addParticipant(currentUser.getId());
-
                 event.setStartTime(startTime);
                 event.setEndTime(endTime);
-
                 event.addAdmin(currentUser.getId());
+                event.setPrivate(isPrivate);
+
 
 
                 String address = addressEdit.getText().toString();
