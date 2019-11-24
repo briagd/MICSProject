@@ -165,6 +165,12 @@ public class Event implements Entity, Serializable {
         this.eventInvited = eventInvited;
     }
 
+    public void addEventInvited(String uid){
+        if (!eventInvited.contains(uid)) {
+            eventInvited.add(uid);
+        }
+    }
+
     public enum EventCategory{
         GENERAL,
         PARTY,

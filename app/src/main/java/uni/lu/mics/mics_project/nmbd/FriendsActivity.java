@@ -21,10 +21,12 @@ import uni.lu.mics.mics_project.nmbd.adapters.AdapterDoubleCallBack;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendListAdapter ;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendRequestListAdapter ;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendSearchListAdapter ;
+import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListUser;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.DbManager;
+import uni.lu.mics.mics_project.nmbd.infra.repository.EventRepository;
 import uni.lu.mics.mics_project.nmbd.infra.repository.Factory;
 import uni.lu.mics.mics_project.nmbd.infra.repository.RepoCallback;
 import uni.lu.mics.mics_project.nmbd.infra.repository.RepoFacade;
@@ -42,9 +44,10 @@ public class FriendsActivity extends AppCompatActivity {
     private final ExtendedListUser friendReqList = new ExtendedListUser();
     //Friend List
     private final ExtendedListUser friendList = new ExtendedListUser();
-    DbManager dbManager = new DbManager(new Factory());
-    RepoFacade repoFacade = dbManager.connect();
-    UserRepository userRepo = repoFacade.userRepo();
+
+
+    AppGlobalState globalState;
+    UserRepository userRepo;
     //Reference to the user logged in
     private User currentUser;
     private String currentUserID;
@@ -65,7 +68,9 @@ public class FriendsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
-
+        //Initialize the global state and database variables
+        globalState = (AppGlobalState) getApplicationContext();
+        userRepo = globalState.getRepoFacade().userRepo();
         //Retrieve current user
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");

@@ -63,7 +63,7 @@ public class EventActivity extends AppCompatActivity {
     private User currentUser;
     private String currentUserID;
     private Event currentEvent;
-
+    private Button inviteButton;
     private ImageView hostProfileImgView;
 
     //Open Map variables
@@ -80,7 +80,7 @@ public class EventActivity extends AppCompatActivity {
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
         setContentView(R.layout.activity_event);
-
+        //Initialize the global state and database variables
         globalState = (AppGlobalState) getApplicationContext();
         eventRepo = globalState.getRepoFacade().eventRepo();
         userRepo = globalState.getRepoFacade().userRepo();
@@ -93,7 +93,7 @@ public class EventActivity extends AppCompatActivity {
         currentEvent = (Event) intent.getSerializableExtra("currentEvent");
 
         setJoinLeaveButton();
-        setEditButton();
+        setEditInviteButton();
 
         if (intent.hasExtra("image")) {
             Log.d(TAG, "retrieving image extra from intent");
@@ -114,7 +114,9 @@ public class EventActivity extends AppCompatActivity {
         setParticipants();
         setupToolbar();
         seTime();
+
     }
+
 
 
     private void setProfilePics(String creatorId){
@@ -221,12 +223,19 @@ public class EventActivity extends AppCompatActivity {
         }
     }
 
-    private void setEditButton() {
+    private void setEditInviteButton() {
         editBtn = findViewById(R.id.edit_event);
+        inviteButton = findViewById(R.id.invite_button);
+        //Check if the user is an administrator of the event.
         if (currentEvent.getEventAdmins().contains(currentUser.getId())) {
+            //display the edit button
             editBtn.setVisibility(View.VISIBLE);
+            //display the invite button
+            inviteButton.setVisibility(View.VISIBLE);
+
         } else {
             editBtn.setVisibility(View.INVISIBLE);
+            inviteButton.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -368,6 +377,13 @@ public class EventActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    public void inviteOnClick(View view) {
+        Intent intent = new Intent(this, InviteActivity.class);
+        intent.putExtra("currentUser", currentUser);
+        intent.putExtra("event", currentEvent);
+        startActivity(intent);
     }
 }
 
