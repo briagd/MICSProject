@@ -259,7 +259,11 @@ public class EventActivity extends AppCompatActivity {
         int numParticipants = currentEvent.getEventParticipants().size();
         if (joinLeaveBtn.getText() == "Join") {
             currentEvent.getEventParticipants().add(currentUser.getId());
-            eventRepo.addElement(currentEvent.getId(), "eventParticipants", currentUser.getId());
+            eventRepo.addElement(currentEvent.getId(), "eventParticipants", currentUserID);
+            if(currentEvent.getEventInvited().contains(currentUserID)) {
+                eventRepo.removeElement(currentEvent.getId(), "eventInvited", currentUserID);
+                refuseInvButton.setVisibility(View.INVISIBLE);
+            }
             joinLeaveBtn.setText("Leave");
             numParticipants++;
 
