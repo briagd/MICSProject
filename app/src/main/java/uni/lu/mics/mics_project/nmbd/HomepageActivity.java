@@ -12,19 +12,35 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSnapHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SnapHelper;
+
+import java.util.ArrayList;
 
 import pub.devrel.easypermissions.EasyPermissions;
+import uni.lu.mics.mics_project.nmbd.adapters.AdapterCallBack;
+import uni.lu.mics.mics_project.nmbd.adapters.EventInvitationAdapter;
+import uni.lu.mics.mics_project.nmbd.adapters.EventListAdapter;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
+import uni.lu.mics.mics_project.nmbd.app.service.ExtendedList.ExtendedListEvent;
+import uni.lu.mics.mics_project.nmbd.app.service.ExtendedList.ExtendedListInvitation;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
+import uni.lu.mics.mics_project.nmbd.domain.model.Event;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
+import uni.lu.mics.mics_project.nmbd.infra.repository.EventRepository;
+import uni.lu.mics.mics_project.nmbd.infra.repository.RepoCallback;
+import uni.lu.mics.mics_project.nmbd.infra.repository.RepoMultiCallback;
 import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
 
 public class HomepageActivity extends AppCompatActivity {
 
     AppGlobalState globalState;
     UserRepository userRepo;
+    EventRepository eventRepo;
     Authentification authService;
     Storage storageService;
     Button btn_sign_out;
@@ -42,16 +58,25 @@ public class HomepageActivity extends AppCompatActivity {
     private static final String[] PERMISSIONS =
             {Manifest.permission.CAMERA, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
+    //Event recyclerview
+    private RecyclerView mEventInviteListRecyclerView;
+    private EventInvitationAdapter mEventInviteListAdapter;
+    //Event invites received
+    private final ExtendedListInvitation eventInviteList = new ExtendedListInvitation();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_homepage);
-
+        //initialize the global variables
         globalState = (AppGlobalState) getApplicationContext();
         userRepo = globalState.getRepoFacade().userRepo();
+        eventRepo = globalState.getRepoFacade().eventRepo();
         storageService = globalState.getServiceFacade().storageService();
         authService = globalState.getServiceFacade().authentificationService();
+
+        //Gets current user object from intent
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
 
@@ -81,8 +106,17 @@ public class HomepageActivity extends AppCompatActivity {
         EasyPermissions.requestPermissions(this, getString(R.string.rationale_camera_location),
                 RC_CAMERA_AND_LOCATION_STORAGE,
                 PERMISSIONS);
+
         setupToolbar();
+
+        //Recycler view for invites:
+        mEventInviteListRecyclerView = findViewById(R.id.eventInvitationRecyclerView);
+        initializeEventsInviteRecyclerView();
     }
+
+
+
+
 
     public void setupToolbar(){
         profileImageView = findViewById(R.id.profile_pic);
@@ -145,4 +179,74 @@ public class HomepageActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
         }
     }
+
+    //Invitation recyclerview
+    private void initializeEventsInviteRecyclerView(){
+        mEventInviteListAdapter = new EventInvitationAdapter(this, eventInviteList, new AdapterCallBack() {
+            @Override
+            public void onClickCallback(int p) {
+                startEventActivity(eventInviteList.getId(p));
+            }
+        });
+        //Make the recycler view snap on the current card view
+        SnapHelper snapHelper = new LinearSnapHelper();
+        snapHelper.attachToRecyclerView(mEventInviteListRecyclerView);
+        // Connect the adapter with the recycler view.
+        mEventInviteListRecyclerView.setAdapter(mEventInviteListAdapter);
+        // Give the recycler view a default layout manager.
+        mEventInviteListRecyclerView.setLayoutManager(new LinearLayoutManager(HomepageActivity.this, RecyclerView.HORIZONTAL, false));
+        updateEventsInviteList();
+    }
+
+    private void updateEventsInviteList() {
+        eventRepo.whereArrayContains("eventInvited", currentUser.getId(), new RepoMultiCallback<Event>() {
+            @Override
+            public void onCallback(ArrayList<Event> models) {
+                for (Event event:models){
+                    Log.d(TAG, "Events invited:"+event.getName());
+                    addEventToExtendedList(event.getId(), eventInviteList, mEventInviteListAdapter);
+                }
+                if (models.size()==0){
+                    mEventInviteListRecyclerView.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+    }
+
+    public void addEventToExtendedList(String id, final ExtendedListInvitation extList, final RecyclerView.Adapter adapter) {
+        //Access database to find event corresponding to an id
+
+        eventRepo.findById(id, new RepoCallback<Event>() {
+            @Override
+            public void onCallback(final Event model) {
+                //add the found model to the list
+                //String eventName, String eventId, String eventOrganizorId, String eventOrganizorName
+                userRepo.findById(model.getCreator(), new RepoCallback<User>() {
+                    @Override
+                    public void onCallback(User user) {
+                        extList.addElement(model.getName(), model.getId(), model.getCreator(), user.getName());
+                        //Notifies adapter that the list has been updated so recyclerview can be updated
+                        adapter.notifyItemInserted(extList.getIdIndexOfLast());
+                    }
+                });
+
+            }
+        });
+    }
+
+    public void startEventActivity (String eventId){
+        final Intent intent = new Intent(this, EventActivity.class);
+        intent.putExtra("currentUser", currentUser);
+        eventRepo.findById(eventId, new RepoCallback<Event>() {
+            @Override
+            public void onCallback(Event model) {
+                intent.putExtra("currentEvent", model);
+                startActivity(intent);
+                finish();
+            }
+
+        });
+    }
+
+
 }

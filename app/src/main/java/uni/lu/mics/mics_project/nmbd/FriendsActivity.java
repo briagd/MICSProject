@@ -22,14 +22,10 @@ import uni.lu.mics.mics_project.nmbd.adapters.FriendListAdapter ;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendRequestListAdapter ;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendSearchListAdapter ;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
-import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListUser;
+import uni.lu.mics.mics_project.nmbd.app.service.ExtendedList.ExtendedListUser;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
-import uni.lu.mics.mics_project.nmbd.infra.DbManager;
-import uni.lu.mics.mics_project.nmbd.infra.repository.EventRepository;
-import uni.lu.mics.mics_project.nmbd.infra.repository.Factory;
 import uni.lu.mics.mics_project.nmbd.infra.repository.RepoCallback;
-import uni.lu.mics.mics_project.nmbd.infra.repository.RepoFacade;
 import uni.lu.mics.mics_project.nmbd.infra.repository.RepoMultiCallback;
 import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
 

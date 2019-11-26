@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import uni.lu.mics.mics_project.nmbd.R;
-import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListUser;
+import uni.lu.mics.mics_project.nmbd.app.service.ExtendedList.ExtendedListUser;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 
 public class FriendInviteAdapter extends RecyclerView.Adapter<FriendInviteAdapter.FriendInviteViewHolder>{

@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import uni.lu.mics.mics_project.nmbd.adapters.EventMapCallBack;
 import uni.lu.mics.mics_project.nmbd.adapters.EventMapListAdapter;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
-import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListEvent;
+import uni.lu.mics.mics_project.nmbd.app.service.ExtendedList.ExtendedListEvent;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.app.service.location.LocationCallBack;

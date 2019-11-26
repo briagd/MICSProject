@@ -32,7 +32,7 @@
                 android:background="@android:color/transparent" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/eventInvitation"
+                android:id="@+id/eventInvitationRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

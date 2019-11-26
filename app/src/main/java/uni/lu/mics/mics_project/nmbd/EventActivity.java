@@ -65,6 +65,7 @@ public class EventActivity extends AppCompatActivity {
     private Event currentEvent;
     private Button inviteButton;
     private ImageView hostProfileImgView;
+    private Button refuseInvButton;
 
     //Open Map variables
     MapView map = null;
@@ -114,9 +115,24 @@ public class EventActivity extends AppCompatActivity {
         setParticipants();
         setupToolbar();
         seTime();
+        setRefuseInviteButton();
 
     }
 
+    private void setRefuseInviteButton() {
+
+        refuseInvButton = findViewById(R.id.refuse_inv_button);
+        if (currentEvent.getEventInvited().contains(currentUserID) && !currentEvent.getEventAdmins().contains(currentUserID)){
+            refuseInvButton.setVisibility(View.VISIBLE);
+        } else {
+            refuseInvButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    public void refuseOnClick(View view) {
+        eventRepo.removeElement(currentEvent.getId(), "eventInvited", currentUserID);
+        returnToHomepage();
+    }
 
 
     private void setProfilePics(String creatorId){
@@ -362,21 +378,23 @@ public class EventActivity extends AppCompatActivity {
         profileImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(EventActivity.this, ProfileActivity.class);
-                intent.putExtra("currentUser", currentUser);
-                startActivity(intent);
-                finish();
+                returnToHomepage();
             }
         });
         Button backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(EventActivity.this, HomepageActivity.class);
-                intent.putExtra("currentUser", currentUser);
-                startActivity(intent);
+                returnToHomepage();
             }
         });
+    }
+
+    private void returnToHomepage(){
+        Intent intent = new Intent(EventActivity.this, HomepageActivity.class);
+        intent.putExtra("currentUser", currentUser);
+        startActivity(intent);
+        finish();
     }
 
     public void inviteOnClick(View view) {

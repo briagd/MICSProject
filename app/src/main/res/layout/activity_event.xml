@@ -277,6 +277,20 @@
             android:layout_marginTop="5dp"/>
 
         <Button
+            android:id="@+id/refuse_inv_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:background="@color/red"
+            android:onClick="refuseOnClick"
+            android:shadowColor="#000000"
+            android:shadowRadius="10"
+            android:text="Refuse Invitation"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+
+        <Button
             android:id="@+id/edit_event"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

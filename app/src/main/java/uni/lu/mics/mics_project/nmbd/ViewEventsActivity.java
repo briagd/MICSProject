@@ -23,7 +23,7 @@ import uni.lu.mics.mics_project.nmbd.adapters.AdapterCallBack;
 import uni.lu.mics.mics_project.nmbd.adapters.EventListAdapter;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
-import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListEvent;
+import uni.lu.mics.mics_project.nmbd.app.service.ExtendedList.ExtendedListEvent;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.domain.model.Event;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;

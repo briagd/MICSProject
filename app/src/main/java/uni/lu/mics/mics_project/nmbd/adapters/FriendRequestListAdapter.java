@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import uni.lu.mics.mics_project.nmbd.R;
-import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListUser;
+import uni.lu.mics.mics_project.nmbd.app.service.ExtendedList.ExtendedListUser;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 
 public class FriendRequestListAdapter extends RecyclerView.Adapter<FriendRequestListAdapter.FriendRequestViewHolder>{

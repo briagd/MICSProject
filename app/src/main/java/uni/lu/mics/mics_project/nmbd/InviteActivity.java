@@ -15,9 +15,8 @@ import android.widget.Toast;
 
 import uni.lu.mics.mics_project.nmbd.adapters.AdapterCallBack;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendInviteAdapter;
-import uni.lu.mics.mics_project.nmbd.adapters.FriendListAdapter;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
-import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListUser;
+import uni.lu.mics.mics_project.nmbd.app.service.ExtendedList.ExtendedListUser;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.domain.model.Event;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
