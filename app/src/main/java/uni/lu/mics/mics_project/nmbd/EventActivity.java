@@ -407,6 +407,14 @@ public class EventActivity extends AppCompatActivity {
         intent.putExtra("event", currentEvent);
         startActivity(intent);
     }
+
+    public void getDirextionsOnClick(View view) {
+        Uri gmmIntentUri = Uri.parse("geo:0,0?q="+currentEvent.getGpsLat()+","+currentEvent.getGpsLong());
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        if (mapIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(mapIntent);
+        }
+    }
 }
 
 
