@@ -110,9 +110,11 @@ public class ViewEventsActivity extends AppCompatActivity {
                         @Override
                         public void onCallback(ArrayList<Event> models) {
                             for (Event event : models) {
-                                //add the the name and user id to the lists send to the recyclerview
-                                addEventToExtendedLis(event.getId(), searchResultList, mEventSearchListAdapter);
+                                if (!event.isPrivate()) {
+                                    //add the the name and user id to the lists send to the recyclerview
+                                    addEventToExtendedLis(event.getId(), searchResultList, mEventSearchListAdapter);
                                     Log.d(TAG, event.getName() + "was found in search");
+                                }
                             }
                         }
                     });
