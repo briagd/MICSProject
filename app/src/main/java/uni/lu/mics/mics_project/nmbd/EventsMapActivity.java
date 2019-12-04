@@ -150,12 +150,14 @@ public class EventsMapActivity extends AppCompatActivity {
                 Log.d(TAG, String.valueOf(models.size()));
                 for (Event e:models) {
                     //add markers
-                    OverlayItem overlayItem = new OverlayItem(e.getName(), e.getDescription(), new GeoPoint(e.getGpsLat(), e.getGpsLong()));
-                    overlayItem.setMarker(getDrawable(R.drawable.map_marker));
-                    overlayItems.add(overlayItem);
-                    eventIds.add(e.getId());
-                    //add event to the extended list to display cards in recycler view
-                    eventExtList.addElement(e.getName(),e.getId(), e.getDate(), e.getCategory(), e.getEventAddress());
+                    if(!e.isPrivate()) {
+                        OverlayItem overlayItem = new OverlayItem(e.getName(), e.getDescription(), new GeoPoint(e.getGpsLat(), e.getGpsLong()));
+                        overlayItem.setMarker(getDrawable(R.drawable.map_marker));
+                        overlayItems.add(overlayItem);
+                        eventIds.add(e.getId());
+                        //add event to the extended list to display cards in recycler view
+                        eventExtList.addElement(e.getName(), e.getId(), e.getDate(), e.getCategory(), e.getEventAddress());
+                    }
                 }
                 //Initialize recycler view
                 initializeEventsRecyclerView();
