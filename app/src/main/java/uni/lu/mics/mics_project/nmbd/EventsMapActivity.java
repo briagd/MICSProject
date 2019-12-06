@@ -233,6 +233,7 @@ public class EventsMapActivity extends AppCompatActivity {
         backToHomepage();
     }
 
+    //Set up the tool bar
     private void setupToolbar() {
         ImageView profileImageView = findViewById(R.id.profile_pic);
         ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(),profileImageView );
