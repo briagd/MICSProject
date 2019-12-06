@@ -24,30 +24,32 @@ public class LocationUtils{
     //GPS variables
     private FusedLocationProviderClient fusedLocationClient;
 
-        public static GeoPoint getLocationFromAddress(Context context, String strAddress){
+    public static GeoPoint getLocationFromAddress(Context context, String strAddress){
 
-            Geocoder coder = new Geocoder(context);
-            List<Address> address;
-            GeoPoint p1 = null;
+        Geocoder coder = new Geocoder(context);
+        List<Address> address;
+        GeoPoint p1 = null;
 
-            try {
-                address = coder.getFromLocationName(strAddress,5);
-                if (address==null || address.size()==0) {
-                    return null;
-                }
-                Address location=address.get(0);
-                location.getLatitude();
-                location.getLongitude();
-
-                p1 = new GeoPoint(location.getLatitude(),
-                        location.getLongitude());
-
-                return p1;
-            } catch (IOException e) {
-                e.printStackTrace();
+        try {
+            address = coder.getFromLocationName(strAddress,5);
+            if (address==null || address.size()==0) {
+                return null;
             }
+            Address location=address.get(0);
+            location.getLatitude();
+            location.getLongitude();
+
+            p1 = new GeoPoint(location.getLatitude(),
+                    location.getLongitude());
+
             return p1;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return p1;
+    }
+
+
     public static void getLastLocation(Context context, final LocationCallBack locationCallBack){
         //Will be executed if permission has already been granted
         //gets the current location

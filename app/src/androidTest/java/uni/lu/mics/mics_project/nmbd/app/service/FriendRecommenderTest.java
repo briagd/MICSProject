@@ -3,6 +3,9 @@ package uni.lu.mics.mics_project.nmbd.app.service;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import uni.lu.mics.mics_project.nmbd.domain.model.User;
 
 import static org.junit.Assert.*;
 
@@ -12,9 +15,10 @@ public class FriendRecommenderTest {
 
     @Test
     public void getRecommendation() {
-        String currentUser = "c";
+        User currentUser = new User( "c",  "a@a.com",  "jdede");
+        //String currentUser = "c";
 
-        ArrayList<String> names = new ArrayList<>();
+        ArrayList<String> names = new ArrayList<String>();
         names.add("a");
         names.add("b");
         names.add("a");
@@ -73,7 +77,7 @@ public class FriendRecommenderTest {
 
     @Test
     public void getNumCommon() {
-        String currentUser = "c";
+        User currentUser = new User( "c",  "a@a.com",  "wefwe");
 
         ArrayList<String> names = new ArrayList<>();
         names.add("a");
