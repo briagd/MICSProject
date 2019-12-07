@@ -88,13 +88,13 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-
+        //Retrieve the global repos
         globalState = (AppGlobalState) getApplicationContext();
         userRepo = globalState.getRepoFacade().userRepo();
         authService = globalState.getServiceFacade().authentificationService();
         storageService = globalState.getServiceFacade().storageService();
 
-
+        //Retrieve intents
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
         currentUserID = currentUser.getId();
@@ -102,23 +102,23 @@ public class ProfileActivity extends AppCompatActivity {
         //Instantiate the receiver for the upload service
         mUpldRessultReceiver = new UploadResultReceiver(new Handler());
 
-
+        //Sets the different fields
         setNameFields();
         setDobFields();
         setPasswordFields();
         setPicFields();
-
         displayProfilePic();
     }
 
+    //Sets the profile picture
     private void setPicFields() {
         thmbProfileImageView = findViewById(R.id.profile_activity_thmb_imageView);
         uploadPicButton = findViewById(R.id.profile_activity_upload_picture_button);
-        //Set Upload button and upload progress bar to invisible as no picture has been chosen
+        //Set Upload button to invisible as no picture has been chosen
         uploadPicButton.setVisibility(View.INVISIBLE);
     }
 
-
+    //Sets the name fields and display a save button only if name is changed
     public void setNameFields(){
         nameEdit = findViewById(R.id.profile_activity_name_edit_view);
         saveNameButton = findViewById(R.id.profile_activity_name_button);
@@ -148,6 +148,7 @@ public class ProfileActivity extends AppCompatActivity {
         Toast.makeText(this, "Name updated", Toast.LENGTH_SHORT).show();
     }
 
+    //Set the date of birth fields
     public void setDobFields(){
         //Configures the date picker
         saveDobButton = findViewById(R.id.profile_activity_dob_button);
@@ -184,6 +185,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    //sets the save date of birth button on click action
     public void saveDobOnClick(View view) {
         String dob = dobEdit.getText().toString();
         currentUser.setDateOfBirth(dob);
@@ -207,6 +209,8 @@ public class ProfileActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+
+    //Sets the edit password fields
     public void setPasswordFields(){
         passwordEdit = findViewById(R.id.profile_activity_password_edit);
         confirmPasswordEdit = findViewById(R.id.profile_activity_confirmpassword_edit);
@@ -221,10 +225,12 @@ public class ProfileActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //if a password is entered the show the confirm password field is shown
                 confirmPasswordTextView.setVisibility(View.VISIBLE);
                 confirmPasswordEdit.setVisibility(View.VISIBLE);
                 String newPassword = s.toString();
                 String newConfirmPassword = confirmPasswordEdit.getText().toString();
+                //Check tha the two entered passwords match, if not ask user to correct
                 if (!newPassword.equals(newConfirmPassword)) {
                     Log.d(TAG, "Passwords do not match!");
                     //Changes the confirm password label to notify user that passwords do not match
@@ -236,6 +242,7 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) { }
         });
+        //When the confirm text is changed then the save button can be shown
         confirmPasswordEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -263,13 +270,15 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    //Action to take when the save password button is clciked
     public void savePasswordOnClick(View view) {
         String newPassword = passwordEdit.getText().toString();
         String newConfirmPassword = confirmPasswordEdit.getText().toString();
         //check that passwords match
         if(!newPassword.matches("") && newPassword.equals(newConfirmPassword)) {
-            //updates passwords on the database
+            //updates password in the database
             authService.updatePassword(newPassword);
+            //remove the entered texts
             passwordEdit.getText().clear();
             confirmPasswordEdit.getText().clear();
             confirmPasswordTextView.setVisibility(View.INVISIBLE);
@@ -280,10 +289,11 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    //If the picture is clicked then a new picture can be selected
     public void pictureOnClick(View view) {
         selectImage();
     }
-
+    //Intent retrieved from the picture choosing service
     @Override
     protected void onActivityResult(int reqCode, int resultCode, Intent data) {
         super.onActivityResult(reqCode, resultCode, data);
@@ -387,7 +397,7 @@ public class ProfileActivity extends AppCompatActivity {
         uploadFile();
     }
 
-
+    //Display the profile picture after a new one has been selected
     private void displayProfilePicAfterUpload(){
         if (imageUri!=null) {
             ImageViewUtils.displayCirclePicUri(ProfileActivity.this, imageUri, thmbProfileImageView);
@@ -400,11 +410,11 @@ public class ProfileActivity extends AppCompatActivity {
         ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(),thmbProfileImageView );
     }
 
+    //Start service to select picture
     private void uploadFile(){
         if(imageUri!=null) {
             UploadStartIntentService.startIntentService(this, mUpldRessultReceiver, imageUri,
                     getString(R.string.gsProfilePicsStrgFldr), currentUserID, UploadConstants.PROFILE_TYPE);
-
         }
     }
 
