@@ -27,10 +27,15 @@ public class Storage {
         this.mStorageRef = this.storage.getReference();
     }
 
+    //Service to upload a picture given the uri, the folder in which it should be stored and the uid
     public void uploadPic(final Context context, Uri imgUri, String gsUrl ,String picUid, final StorageUploadCallback strgCallBack){
+        //Create a filename from the picUid the extension of file from uri
         final String filename = picUid + "." + getFileExtension(context, imgUri);
+        //Location in which the picture has to be stored (folder+filename)
         final String fileLoc = gsUrl + picUid + "." + getFileExtension(context, imgUri);
+        //Full file url
         final String fileUrl = context.getString(R.string.gsUrl) + picUid + "." + getFileExtension(context, imgUri);
+        //Get the storage reference in which the file will be stored
         final StorageReference fileReference = mStorageRef.child(fileLoc);
         fileReference.putFile(imgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -51,6 +56,7 @@ public class Storage {
         });
     }
 
+    //Get the reference of a file given the folder and the pic filename
     public void getStorageReference(final String gsUrl , final String picUid, final StorageCallback strgCallBack){
         if (picUid==null){
             Log.d(TAG, "picUid is null");
@@ -62,6 +68,7 @@ public class Storage {
         }
     }
 
+    //Delete a file from the storage given the folder in which it is stored and the pic uid
     public void deleteFile(final String gsFolderUrl , final String picUid){
             StorageReference storageReference = mStorageRef.child(gsFolderUrl+picUid);
             storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -77,6 +84,7 @@ public class Storage {
             });
     }
 
+    //Get the file extension given the uri
     private String getFileExtension(Context context, Uri uri){
         ContentResolver cR = context.getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
