@@ -28,12 +28,16 @@ public class FriendRecommender {
         }
     }
 
+    //Check if the id is the same as the user id and that the id is not in received request list and that the user has not
+    //already sent a request to that id and that the user and id are not already friends
     private boolean isSuitableRecom(String recomID){
         return !recomID.equals(this.currentUserID) && !currentUser.getFriendReqReceivedList().contains(recomID)
                 && !currentUser.getFriendReqSentList().contains(recomID) && !currentUser.getFriendList().contains(recomID);
     }
 
+    //
     private void makeRecom(){
+        //Loop through all the ids and count the number of occurences to a map
         HashMap<String, Integer> map = new HashMap<String, Integer>();
         for (String friend : this.friendIdsList) {
             if (isSuitableRecom(friend)) {
@@ -41,6 +45,7 @@ public class FriendRecommender {
                 map.put(friend, (j == null) ? 1 : j + 1);
             }
         }
+        //Return null if the map is empty. Otherwise return the user ID with the highest count
         if (map.isEmpty()){
             friendReco = null;
             numCommon = 0;
