@@ -43,7 +43,6 @@ import uni.lu.mics.mics_project.nmbd.infra.repository.RepoMultiCallback;
 
 public class EventsMapActivity extends AppCompatActivity {
 
-
     private final String TAG = "EventsMapActivity";
 
     AppGlobalState globalState;
@@ -56,8 +55,6 @@ public class EventsMapActivity extends AppCompatActivity {
     //Open Map variables
     IMapController mapController;
     GeoPoint startPoint;
-
-
 
     //Location variable
     Location userlocation;
@@ -73,7 +70,6 @@ public class EventsMapActivity extends AppCompatActivity {
     final private ExtendedListEvent eventExtList = new ExtendedListEvent();
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,10 +80,12 @@ public class EventsMapActivity extends AppCompatActivity {
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
         setContentView(R.layout.activity_events_map);
 
+        //Retrieve the repos from global state
         globalState = (AppGlobalState) getApplicationContext();
         eventRepo = globalState.getRepoFacade().eventRepo();
         storageService = globalState.getServiceFacade().storageService();
 
+        //Get the user from intent
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
 
@@ -121,9 +119,7 @@ public class EventsMapActivity extends AppCompatActivity {
     }
 
 
-
-
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         //this will refresh the osmdroid configuration on resuming.
         //if you make changes to the configuration, use
@@ -132,7 +128,7 @@ public class EventsMapActivity extends AppCompatActivity {
         map.onResume(); //needed for compass, my location overlays, v6.0.0 and up
     }
 
-    public void onPause(){
+    public void onPause() {
         super.onPause();
         //this will refresh the osmdroid configuration on resuming.
         //if you make changes to the configuration, use
@@ -141,16 +137,15 @@ public class EventsMapActivity extends AppCompatActivity {
         map.onPause();  //needed for compass, my location overlays, v6.0.0 and up
     }
 
-    private void displayEventMarkers(){
-
-
+    private void displayEventMarkers() {
+        //Get all the events from database
         eventRepo.getAll(new RepoMultiCallback<Event>() {
             @Override
             public void onCallback(ArrayList<Event> models) {
                 Log.d(TAG, String.valueOf(models.size()));
-                for (Event e:models) {
-                    //add markers
-                    if(!e.isPrivate()) {
+                for (Event e : models) {
+                    //add markers on the map for each event
+                    if (!e.isPrivate()) {
                         OverlayItem overlayItem = new OverlayItem(e.getName(), e.getDescription(), new GeoPoint(e.getGpsLat(), e.getGpsLong()));
                         overlayItem.setMarker(getDrawable(R.drawable.map_marker));
                         overlayItems.add(overlayItem);
@@ -170,12 +165,14 @@ public class EventsMapActivity extends AppCompatActivity {
                                 mEventListRecyclerView.smoothScrollToPosition(index);
                                 return true;
                             }
+
                             @Override
                             public boolean onItemLongPress(final int index, final OverlayItem item) {
                                 return false;
                             }
                         }, EventsMapActivity.this);
-                Log.d(TAG, String.valueOf(overlayItems.size()));
+                Log.d(TAG, "Number of overlay items is: " + String.valueOf(overlayItems.size()));
+                //Add the overlay items to the map
                 map.getOverlays().add(mOverlay);
             }
         });
@@ -208,9 +205,10 @@ public class EventsMapActivity extends AppCompatActivity {
     }
 
 
-    public void startEventActivity (String eventId){
+    public void startEventActivity(String eventId) {
         final Intent intent = new Intent(this, EventActivity.class);
         intent.putExtra("currentUser", currentUser);
+        //Retrieve the event object to be passed in intent from database
         eventRepo.findById(eventId, new RepoCallback<Event>() {
             @Override
             public void onCallback(Event model) {
@@ -221,7 +219,7 @@ public class EventsMapActivity extends AppCompatActivity {
         });
     }
 
-    public void backToHomepage(){
+    public void backToHomepage() {
         Intent intent = new Intent(EventsMapActivity.this, HomepageActivity.class);
         intent.putExtra("currentUser", currentUser);
         startActivity(intent);
@@ -236,7 +234,7 @@ public class EventsMapActivity extends AppCompatActivity {
     //Set up the tool bar
     private void setupToolbar() {
         ImageView profileImageView = findViewById(R.id.profile_pic);
-        ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(),profileImageView );
+        ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(), profileImageView);
         profileImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
