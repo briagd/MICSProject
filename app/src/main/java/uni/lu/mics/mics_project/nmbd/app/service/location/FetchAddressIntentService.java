@@ -120,12 +120,7 @@ import java.util.Locale;
                 // Fetch the address lines using {@code getAddressLine},
                 // join them, and send them to the thread. The {@link android.location.address}
                 // class provides other options for fetching address details that you may prefer
-                // to use. Here are some examples:
-                // getLocality() ("Mountain View", for example)
-                // getAdminArea() ("CA", for example)
-                // getPostalCode() ("94043", for example)
-                // getCountryCode() ("US", for example)
-                // getCountryName() ("United States", for example)
+                // to use.
                 for(int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
                     addressFragments.add(address.getAddressLine(i));
                 }
