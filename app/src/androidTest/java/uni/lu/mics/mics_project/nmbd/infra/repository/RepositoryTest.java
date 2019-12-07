@@ -39,6 +39,46 @@ public class RepositoryTest {
        });
     }
 
+    //Check that user is correctly created and deleted in database
+    @Test
+    public void createUserInmDB(){
+        AppGlobalState globalState;
+        final UserRepository userRepo;
+        globalState = (AppGlobalState) getApplicationContext();
+        userRepo = globalState.getRepoFacade().userRepo();
+        final String userID = "nfewnwef";
+        final String userEmail = "defq@fae.com";
+        final String userName = "barbara";
+        User userAdd = new User(userID, userEmail, userName);
+        //Add user to database
+        userRepo.add(userAdd, new RepoCallback<Void>() {
+            @Override
+            public void onCallback(Void model) {
+                //Retrieve added user
+                userRepo.findById(userID, new RepoCallback<User>() {
+                    @Override
+                    public void onCallback(User user) {
+                        //Checks that the user info is correct in database
+                        assertEquals(user.getId(),userID);
+                        assertEquals(user.getEmail(),userEmail);
+                        assertEquals(user.getName(),userName);
+                        //Delete added user
+                        userRepo.delete(userID);
+                        //Check that user was correctly deleted
+                        userRepo.findById(userID, new RepoCallback<User>() {
+                            @Override
+                            public void onCallback(User model) {
+                                assertNull(model);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+
+    }
+
     //Checks that event is correctly retrieved from the database
     @Test
     public void retrieveEventFromDB(){
@@ -71,8 +111,16 @@ public class RepositoryTest {
                 assertEquals(event.getEventAddress(),address);
                 assertTrue(event.getEventParticipants().contains(participant1));
                 assertTrue(event.getEventParticipants().contains(participant2));
+                assertEquals(event.getGpsLat(),gpsLat,0.0001);
+                assertEquals(event.getGpsLong(),gpsLong,0.0001);
+                assertEquals(event.getName(),name);
+                assertEquals(event.isPrivate(),isPrivate);
+                assertEquals(event.getEndTime(),endTime);
+                assertEquals(event.getStartTime(),startTime);
             }
         });
     }
+
+
 
 }
