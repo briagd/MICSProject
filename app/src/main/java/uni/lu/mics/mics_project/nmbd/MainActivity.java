@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //Retrieve the global variables for the database
         globalState = (AppGlobalState) getApplicationContext();
         userRepo = globalState.getRepoFacade().userRepo();
         authService = globalState.getServiceFacade().authentificationService();
@@ -54,26 +54,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    //Service result if user correctly signed-in
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == MY_REQUEST_CODE) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
+                //Get the id of user from authorization database
                 final String authId = authService.getAuthUid();
                 userRepo.findById(authId, new RepoCallback<User>() {
                     @Override
-                    public void onCallback(User model) {
-                        if (model == null) {
-                            model = new User(authId, authService.getAuthEmail(), authService.getAuthDisplayName());
-                            userRepo.set(authId, model);
+                    public void onCallback(User user) {
+                        if (user == null) {
+                            //if the user did not exist in the database (new user) the a new user is added to the database with corresponding email and name
+                            user = new User(authId, authService.getAuthEmail(), authService.getAuthDisplayName());
+                            userRepo.set(authId, user);
                             Log.d(TAG, "User added to database");
                         }
-                        Intent intent = getIntent(model);
+                        Intent intent = getIntent(user);
                         //go to homepage activity
                         startActivity(intent);
-                        Toast.makeText(MainActivity.this, "Welcome " + model.getName(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "Welcome " + user.getName(), Toast.LENGTH_LONG).show();
                         finish();
                     }
                 });

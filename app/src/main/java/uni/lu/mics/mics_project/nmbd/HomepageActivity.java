@@ -198,6 +198,7 @@ public class HomepageActivity extends AppCompatActivity {
         updateEventsInviteList();
     }
 
+    //Updates the list of invited users
     private void updateEventsInviteList() {
         eventRepo.whereArrayContains("eventInvited", currentUser.getId(), new RepoMultiCallback<Event>() {
             @Override

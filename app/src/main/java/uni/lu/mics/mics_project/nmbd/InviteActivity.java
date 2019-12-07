@@ -60,7 +60,7 @@ public class InviteActivity extends AppCompatActivity {
         //Setup the toolbar at the top of screen
         setupToolbar();
 
-        //
+        //Recycler view
         mFriendInvirteRecyclerView = findViewById(R.id.friends_invite_recyclerview);
         friendsLabel = findViewById(R.id.friends_activity_friends_list_label2);
         initializeFriendRecyclerView();
