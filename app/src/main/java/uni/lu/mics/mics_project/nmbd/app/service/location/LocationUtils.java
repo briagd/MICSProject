@@ -25,11 +25,12 @@ public class LocationUtils{
     private FusedLocationProviderClient fusedLocationClient;
 
     public static GeoPoint getLocationFromAddress(Context context, String strAddress){
-
+        //Declare the variables needed to retrieve address and object to be returned
         Geocoder coder = new Geocoder(context);
         List<Address> address;
         GeoPoint p1 = null;
 
+        //If address is unsuitable then a null object will be returned otherwise return a geopoint containing the corresponding lattitude and longitude
         try {
             address = coder.getFromLocationName(strAddress,5);
             if (address==null || address.size()==0) {
