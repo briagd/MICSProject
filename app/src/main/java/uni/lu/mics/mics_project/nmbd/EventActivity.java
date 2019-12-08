@@ -39,6 +39,7 @@ import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
 
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,9 +57,11 @@ import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
 import uni.lu.mics.mics_project.nmbd.domain.model.Comment;
 import uni.lu.mics.mics_project.nmbd.domain.model.Event;
+import uni.lu.mics.mics_project.nmbd.domain.model.Rating;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.repository.CommentRepository;
 import uni.lu.mics.mics_project.nmbd.infra.repository.EventRepository;
+import uni.lu.mics.mics_project.nmbd.infra.repository.RatingRepository;
 import uni.lu.mics.mics_project.nmbd.infra.repository.RepoCallback;
 import uni.lu.mics.mics_project.nmbd.infra.repository.RepoMultiCallback;
 import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
@@ -71,6 +74,7 @@ public class EventActivity extends AppCompatActivity {
     EventRepository eventRepo;
     UserRepository userRepo;
     CommentRepository commentRepo;
+    RatingRepository ratingRepo;
     Storage storageService;
 
     private ImageButton imgView;
@@ -92,6 +96,9 @@ public class EventActivity extends AppCompatActivity {
     private ImageView commenterPic;
     private ImageView hostProfileImgView;
     private NavigationView navigationView;
+    private RatingBar ratingBar;
+    private TextView eventRating;
+    private TextView scoreText;
 
     //Open Map variables
     MapView map = null;
@@ -112,6 +119,7 @@ public class EventActivity extends AppCompatActivity {
         eventRepo = globalState.getRepoFacade().eventRepo();
         userRepo = globalState.getRepoFacade().userRepo();
         commentRepo = globalState.getRepoFacade().commentRepo();
+        ratingRepo = globalState.getRepoFacade().ratingRepo();
         storageService = globalState.getServiceFacade().storageService();
 
         imgView = findViewById(R.id.eventImageBtn);
@@ -144,6 +152,7 @@ public class EventActivity extends AppCompatActivity {
         setParticipants();
         setupToolbar();
         seTime();
+        setupRating();
         setCommenterName(currentUser.getName());
         setCommenterPic();
         getComments();
@@ -152,6 +161,7 @@ public class EventActivity extends AppCompatActivity {
         navigationView = findViewById(R.id.navigationView);
         commentBody = findViewById(R.id.commentBody);
         handleCommentField(commentBody);
+        handleRatings();
 
     }
 
@@ -418,6 +428,9 @@ public class EventActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void commentOnClick(View view){
         String commText = commentBody.getText().toString();
@@ -487,6 +500,39 @@ public class EventActivity extends AppCompatActivity {
         return ts.toString();
     }
 
+    private void setupRating(){
+        eventRating = findViewById(R.id.score);
+        scoreText = findViewById(R.id.starscore);
+
+        ratingRepo.findByEventId(currentEvent.getId(), new RepoMultiCallback<Rating>() {
+            @Override
+            public void onCallback(ArrayList<Rating> models) {
+                Log.d(TAG, "onCallback: setupRating " + models.size());
+
+                if (models.size() == 0){
+                    eventRating.setText("0.0");
+                    scoreText.setText("0 Stars out of 5");
+                }
+                else {
+                    String retrievedRating = new DecimalFormat("##.##").format(currentEvent.getRating()/models.size());
+                    Log.d(TAG, "onCallback: setupRating " + currentEvent.getRating() + retrievedRating);
+                    eventRating.setText(retrievedRating);
+                    scoreText.setText(retrievedRating + " Stars out of 5");
+                }
+            }
+        });
+
+        ratingRepo.findByEventAndOwnerIds(currentEvent.getId(), currentUserID, new RepoMultiCallback<Rating>() {
+            @Override
+            public void onCallback(ArrayList<Rating> models) {
+                if (!models.isEmpty()){
+                    ratingBar.setRating(models.get(0).getValue());
+                }
+            }
+        });
+
+    }
+
     private void handleCommentField(View view){
         view.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -510,6 +556,58 @@ public class EventActivity extends AppCompatActivity {
         });
     }
 
+    private void handleRatings(){
+        ratingBar = findViewById(R.id.ratingbar);
+        eventRating = findViewById(R.id.score);
+        scoreText = findViewById(R.id.starscore);
+
+
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+
+                float ratingvalue = (float) ratingBar.getRating();
+
+                if (ratingRepo.existsDoc("ownerId", currentUserID)){
+                    ratingRepo.findByEventAndOwnerIds(currentEvent.getId(), currentUserID, new RepoMultiCallback<Rating>() {
+                        @Override
+                        public void onCallback(ArrayList<Rating> models) {
+                            float totalRatings = currentEvent.getRating();
+                            Log.d(TAG, "onCallback: Ratind exists in Db: The query is successful");
+                            //Log.d(TAG, "onCallback: Current event Id "+ currentEvent.getId());
+                            //Log.d(TAG, "onCallback: Current user Id "+ currentUserID);
+                            if (!models.isEmpty()){
+                                ratingRepo.update(models.get(0).getId(), "value", ratingvalue);
+                                totalRatings = totalRatings - models.get(0).getValue() + ratingBar.getRating();
+                                currentEvent.setRating(totalRatings);
+                                eventRepo.update(currentEvent.getId(), "rating", totalRatings);
+                                setupRating();
+                                //Toast.makeText(getApplicationContext(), " RetrievedID : " + models.get(0).getId()+ "", Toast.LENGTH_SHORT).show();
+                            }
+                            else{
+                                final Rating userRating = new Rating(currentUserID, currentEvent.getId(), ratingvalue);
+                                ratingRepo.addWithoutId(userRating, new RepoCallback<String>() {
+                                    @Override
+                                    public void onCallback(String model) {
+                                        float totalRatings = currentEvent.getRating();
+                                        Log.d(TAG, "onCallback: Adding rating to DB");
+                                        ratingRepo.update(model, "id", model);
+                                        Log.d(TAG, "onCallback: Updating rating's id field");
+                                        userRating.setId(model);
+                                        totalRatings += ratingBar.getRating();
+                                        currentEvent.setRating(totalRatings);
+                                        eventRepo.update(currentEvent.getId(), "rating", totalRatings);
+                                        setupRating();
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+
+            }
+        });
+    }
 }
 
 
