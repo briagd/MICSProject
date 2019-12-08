@@ -263,6 +263,50 @@
                 android:focusedByDefault="true">-->
             </LinearLayout>
 
+            <RelativeLayout
+                android:id="@+id/ratingLayout"
+                android:layout_width="match_parent"
+                android:layout_height="101dp"
+                android:orientation="vertical">
+
+                <RatingBar
+                    android:id="@+id/ratingbar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="135dp"
+                    android:layout_marginTop="20dp">
+
+                </RatingBar>
+
+                <TextView
+                    android:id="@+id/score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="45dp"
+                    android:layout_marginTop="15dp"
+                    android:background="@layout/rounded_edittext_layout"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="5.0"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="#efeff0" />
+
+                <TextView
+                    android:id="@+id/starscore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="5.0 Stars out of 5"
+                    android:textSize="12sp"
+                    android:layout_below="@+id/score"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginTop="5dp"
+/>
+            </RelativeLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
