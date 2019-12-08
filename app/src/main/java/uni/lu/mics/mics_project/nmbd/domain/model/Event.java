@@ -27,14 +27,14 @@ public class Event implements Entity, Serializable {
     // List of admins by UIDs
     private List<String> eventAdmins;
     private String creator;
-    private int likes;
+    private float rating;
 
     public Event(){
         this.eventParticipants = new ArrayList<>();
         this.eventInvited = new ArrayList<>();
         this.eventAdmins = new ArrayList<>();
         this.coverPicUrl = "event_avatar.jpg";
-        this.likes = 0;
+        this.rating = 0f;
         this.startTime = "00:00";
         this.endTime = "00:01";
     }
@@ -43,7 +43,6 @@ public class Event implements Entity, Serializable {
         if (name == null || name.isEmpty()){
             throw new DomainException("name can't be empty");
         }
-        this.id = id;
         this.name = name;
         this.description = description;
         this.date = date;
@@ -55,7 +54,7 @@ public class Event implements Entity, Serializable {
         this.eventAdmins.add(creator);
         this.category = category;
         this.coverPicUrl = "event_avatar.jpg";
-        this.likes = 0;
+        this.rating = 0f;
     }
 
     public String getId() {
@@ -171,12 +170,12 @@ public class Event implements Entity, Serializable {
 
     }
 
-    public int getLikes() {
-        return likes;
+    public float getRating() {
+        return this.rating;
     }
 
-    public void setLikes(int likes) {
-        this.likes = likes;
+    public void setRating(float rating) {
+        this.rating = rating;
     }
 
     public void addParticipant(String uid){

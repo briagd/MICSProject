@@ -450,7 +450,7 @@ public class CreateEventActivity extends AppCompatActivity {
                     Log.d(TAG, "Image was not picked");
                     event.setCoverPicUrl(eventEditing.getCoverPicUrl());
                     event.setEventParticipants(eventEditing.getEventParticipants());
-                    event.setLikes(eventEditing.getLikes());
+                    event.setRating(eventEditing.getRating());
                     event.setEventAdmins(eventEditing.getEventAdmins());
                 }
                 eventRepo.set(event.getId(), event);
@@ -498,7 +498,6 @@ public class CreateEventActivity extends AppCompatActivity {
                     getString(R.string.gsEventPicsStrgFldr), event.getId(), UploadConstants.EVENT_TYPE);
         }
     }
-
 
     @Override
     public void onBackPressed() {
