@@ -16,11 +16,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import uni.lu.mics.mics_project.nmbd.domain.model.Entity;
@@ -31,7 +31,7 @@ public class Repository<T extends Entity> {
 
     protected CollectionReference collectionRef;
     // class object whose is model (event or user)
-    private Class<T> modelClass;
+    protected Class<T> modelClass;
 
     public Repository(CollectionReference collectionRef, Class<T> modelClass) {
         this.collectionRef = collectionRef;
@@ -73,7 +73,17 @@ public class Repository<T extends Entity> {
                         Log.e("Repository", String.format("Entity (%s) not found ", docId));
                         repoCallback.onCallback(null);
                     }
-                });;
+                });
+    }
+
+    public Boolean existsDoc(String field, String value){
+        Query query = collectionRef.whereEqualTo(field, value);
+        if (query != null){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
 
@@ -249,5 +259,6 @@ public class Repository<T extends Entity> {
             }
         });
     }
+
 
 }
