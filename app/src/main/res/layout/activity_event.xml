@@ -13,7 +13,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="50dp">
             <include
                 layout="@layout/toolbar"
                 android:layout_width="match_parent"
@@ -80,7 +81,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="25dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:orientation="horizontal">
 
@@ -249,31 +250,102 @@
                 android:layout_height="350dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:overScrollMode="never"/>
+                android:overScrollMode="never">
+
+            </org.osmdroid.views.MapView>
+
+            <LinearLayout
+                android:id="@+id/separatorLayout"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:orientation="vertical">
+                <!--android:focusable="true"
+                android:focusedByDefault="true">-->
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvcomments"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="15dp">
+
+                <ImageView
+                    android:paddingTop="5dp"
+                    android:id="@+id/userPic"
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
+                    android:src="@mipmap/ic_launcher" />
+
+                <TextView
+                    android:id="@+id/userCommenterName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="85dp"
+                    android:layout_marginTop="0dp"
+                    android:text="Eventzy User"
+                    android:textSize="17sp" />
+
+                <EditText
+                    android:id="@+id/commentBody"
+                    android:layout_width="285dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="85dp"
+                    android:layout_marginTop="30dp"
+                    android:focusableInTouchMode="true"/>
+
+                <Button
+                    android:id="@+id/commentBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/commentBody"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="11dp"
+                    android:background="@color/blue"
+                    android:onClick="commentOnClick"
+                    android:shadowColor="#000000"
+                    android:shadowRadius="10"
+                    android:text="Comment"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp" />
+
+            </RelativeLayout>
+
 
         </LinearLayout>
     </ScrollView>
 
     <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigationView"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" >
+        app:layout_constraintEnd_toEndOf="parent">
 
         <Button
             android:id="@+id/participateBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="joinLeaveEventOnClick"
-            android:text="Join"
-            android:translationX="315dp"
-            tools:layout_marginTop="5dp"
+            android:layout_marginTop="5dp"
             android:background="@color/blue"
+            android:onClick="joinLeaveEventOnClick"
             android:shadowColor="#000000"
             android:shadowRadius="10"
+            android:text="Join"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
-            android:layout_marginTop="5dp"/>
+            android:translationX="315dp"
+            tools:layout_marginTop="5dp" />
 
         <Button
             android:id="@+id/edit_event"
