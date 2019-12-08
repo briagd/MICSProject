@@ -21,4 +21,7 @@ public class Factory {
         return new CommentRepository(dbRef);
     }
 
+    public RatingRepository makeRatingRepository(FirebaseFirestore dbRef){
+        return new RatingRepository(dbRef);
+    }
 }

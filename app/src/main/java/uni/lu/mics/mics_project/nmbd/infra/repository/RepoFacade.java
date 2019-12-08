@@ -9,6 +9,7 @@ public class RepoFacade {
     private UserRepository userRepo;
     private EventRepository eventRepo;
     private CommentRepository commentRepo;
+    private RatingRepository ratingRepo;
 
 
 
@@ -17,6 +18,7 @@ public class RepoFacade {
         this.userRepo = repoFactory.makeUserRepository(db);
         this.eventRepo = repoFactory.makeEventRepository(db);
         this.commentRepo = repoFactory.makeCommentRepository(db);
+        this.ratingRepo = repoFactory.makeRatingRepository(db);
     }
 
     public UserRepository userRepo(){
@@ -31,4 +33,7 @@ public class RepoFacade {
         return this.commentRepo;
     }
 
+    public RatingRepository ratingRepo(){
+        return this.ratingRepo;
+    }
 }
