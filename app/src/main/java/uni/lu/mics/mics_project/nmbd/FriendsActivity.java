@@ -3,6 +3,7 @@ package uni.lu.mics.mics_project.nmbd;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -18,9 +19,9 @@ import android.widget.Toast;
 
 import uni.lu.mics.mics_project.nmbd.adapters.AdapterCallBack;
 import uni.lu.mics.mics_project.nmbd.adapters.AdapterDoubleCallBack;
-import uni.lu.mics.mics_project.nmbd.adapters.FriendListAdapter ;
-import uni.lu.mics.mics_project.nmbd.adapters.FriendRequestListAdapter ;
-import uni.lu.mics.mics_project.nmbd.adapters.FriendSearchListAdapter ;
+import uni.lu.mics.mics_project.nmbd.adapters.FriendListAdapter;
+import uni.lu.mics.mics_project.nmbd.adapters.FriendRequestListAdapter;
+import uni.lu.mics.mics_project.nmbd.adapters.FriendSearchListAdapter;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.ExtendedList.ExtendedListUser;
 import uni.lu.mics.mics_project.nmbd.app.service.FriendRecommender;
@@ -64,6 +65,7 @@ public class FriendsActivity extends AppCompatActivity {
 
     private LinearLayout friendsReqLayout;
     private View friendsReqDivider;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,7 +86,7 @@ public class FriendsActivity extends AppCompatActivity {
         mFriendReqListRecyclerView = findViewById(R.id.friends_activity_req_pending_recyclerview);
         mFriendListRecyclerView = findViewById(R.id.friends_activity_friends_recyclerview);
         mSearchResultRecyclerView = findViewById(R.id.friends_activity_search_result_recyclerview);
-        friendsReqLayout =  findViewById(R.id.friend_req_layout);
+        friendsReqLayout = findViewById(R.id.friend_req_layout);
         friendsReqDivider = findViewById(R.id.friends_divider);
         friendRecom = findViewById(R.id.recom);
         //initialize the friend search recyclerView, friend request recycler view
@@ -254,7 +256,7 @@ public class FriendsActivity extends AppCompatActivity {
         updateFriendReqLists();
     }
 
-    public void sendFriendRequest(String sendUserID){
+    public void sendFriendRequest(String sendUserID) {
         currentUser.addFriendToReqSentList(sendUserID);
         userRepo.addElement(currentUserID, "friendReqSentList", sendUserID);
         userRepo.addElement(sendUserID, "friendReqReceivedList", currentUserID);
@@ -299,7 +301,7 @@ public class FriendsActivity extends AppCompatActivity {
         });
     }
 
-    public void setFriendRecommendation(){
+    public void setFriendRecommendation() {
         //Initially hide the friend recommendation layout
         friendRecom.setVisibility(View.GONE);
         //Run a thread as it could be a time consuming operation
@@ -311,15 +313,18 @@ public class FriendsActivity extends AppCompatActivity {
                 userRepo.getAll(new RepoMultiCallback<User>() {
                     @Override
                     public void onCallback(ArrayList<User> users) {
-                        for (User user : users){
-                            for (String friend:user.getFriendList()){
-                                //adding all the friends of friends to the list
-                                friendsOfFriends.add(friend);
+                        for (User user : users) {
+                            if (currentUser.getFriendList().contains(user)) {
+                                for (String friend : user.getFriendList()) {
+                                    //adding all the friends of friends to the list
+                                    friendsOfFriends.add(friend);
+                                }
                             }
                         }
+                        Log.d(TAG, "onCallback: " + friendsOfFriends.size());
                         //Using the FriendRecommender object to find which is the most common friend in the list
                         FriendRecommender fRecom = new FriendRecommender(currentUser, friendsOfFriends);
-                        if (fRecom.getRecommendation()!=null) {
+                        if (fRecom.getRecommendation() != null) {
                             final String recomID = fRecom.getRecommendation();
                             final int numFriendsCommon = fRecom.getNumCommon();
                             //Getting the most likely common friend User Object from the database
@@ -333,7 +338,7 @@ public class FriendsActivity extends AppCompatActivity {
                                     recomName.setText(user.getName());
                                     //Display the number of friends in common
                                     TextView recom_number = findViewById(R.id.recom_number_TextView);
-                                    recom_number.setText("You have "+ numFriendsCommon +" friends in common.");
+                                    recom_number.setText("You have " + numFriendsCommon + " friends in common.");
                                     //Display the user picture
                                     ImageView recom_pic = findViewById(R.id.recom_pic_imageView);
                                     ImageViewUtils.displayUserCirclePicID(FriendsActivity.this, recomID, recom_pic);
@@ -343,7 +348,7 @@ public class FriendsActivity extends AppCompatActivity {
                                         @Override
                                         public void onClick(View v) {
                                             sendFriendRequest(recomID);
-                                            Toast.makeText(FriendsActivity.this, "Friend request sent to: "+ user.getName(), Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(FriendsActivity.this, "Friend request sent to: " + user.getName(), Toast.LENGTH_SHORT).show();
                                             setFriendRecommendation();
                                         }
                                     });
@@ -357,7 +362,7 @@ public class FriendsActivity extends AppCompatActivity {
         }).start();
     }
 
-    public void backToHomepage(){
+    public void backToHomepage() {
         Intent intent = new Intent(FriendsActivity.this, HomepageActivity.class);
         intent.putExtra("currentUser", currentUser);
         startActivity(intent);
@@ -371,7 +376,7 @@ public class FriendsActivity extends AppCompatActivity {
 
     private void setupToolbar() {
         ImageView profileImageView = findViewById(R.id.profile_pic);
-        ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(),profileImageView );
+        ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(), profileImageView);
         profileImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -389,7 +394,6 @@ public class FriendsActivity extends AppCompatActivity {
             }
         });
     }
-
 
 
 }
