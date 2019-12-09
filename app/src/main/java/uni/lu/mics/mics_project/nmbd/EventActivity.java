@@ -102,7 +102,7 @@ public class EventActivity extends AppCompatActivity {
     private TextView scoreText;
 
     private Button inviteButton;
-    private ImageView hostProfileImgView;
+
     private Button refuseInvButton;
 
 
