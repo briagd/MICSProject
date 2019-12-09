@@ -8,6 +8,8 @@ public class RepoFacade {
     // used for adding one level of abstraction (kind of storing the repos)
     private UserRepository userRepo;
     private EventRepository eventRepo;
+    private CommentRepository commentRepo;
+    private RatingRepository ratingRepo;
 
 
 
@@ -15,6 +17,8 @@ public class RepoFacade {
 
         this.userRepo = repoFactory.makeUserRepository(db);
         this.eventRepo = repoFactory.makeEventRepository(db);
+        this.commentRepo = repoFactory.makeCommentRepository(db);
+        this.ratingRepo = repoFactory.makeRatingRepository(db);
     }
 
     public UserRepository userRepo(){
@@ -23,5 +27,13 @@ public class RepoFacade {
 
     public EventRepository eventRepo(){
         return this.eventRepo;
+    }
+
+    public CommentRepository commentRepo(){
+        return this.commentRepo;
+    }
+
+    public RatingRepository ratingRepo(){
+        return this.ratingRepo;
     }
 }

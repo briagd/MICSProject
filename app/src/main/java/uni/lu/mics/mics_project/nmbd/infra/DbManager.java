@@ -1,5 +1,7 @@
 package uni.lu.mics.mics_project.nmbd.infra;
 
+import android.util.Log;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import uni.lu.mics.mics_project.nmbd.infra.repository.Factory;
@@ -24,8 +26,7 @@ public class DbManager {
         try {
             this.dbRef = FirebaseFirestore.getInstance();
         } catch (Exception e){
-            // TO DO: setup a logger
-            System.out.print("Could not get a database reference");
+            Log.d("DbManager", "connect: could not get a database reference ");
             return null;
         }
         return new RepoFacade(this.repoFactory, this.dbRef);
