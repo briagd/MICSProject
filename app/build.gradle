@@ -41,6 +41,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:19.2.0'
     // add SDKs for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
+    testImplementation 'junit:junit:4.12'
 
     implementation 'com.google.firebase:firebase-auth:19.1.0'
     implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
