@@ -21,13 +21,12 @@ import uni.lu.mics.mics_project.nmbd.adapters.AdapterDoubleCallBack;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendListAdapter ;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendRequestListAdapter ;
 import uni.lu.mics.mics_project.nmbd.adapters.FriendSearchListAdapter ;
-import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListUser;
+import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
+import uni.lu.mics.mics_project.nmbd.app.service.ExtendedList.ExtendedListUser;
+import uni.lu.mics.mics_project.nmbd.app.service.FriendRecommender;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
-import uni.lu.mics.mics_project.nmbd.infra.DbManager;
-import uni.lu.mics.mics_project.nmbd.infra.repository.Factory;
 import uni.lu.mics.mics_project.nmbd.infra.repository.RepoCallback;
-import uni.lu.mics.mics_project.nmbd.infra.repository.RepoFacade;
 import uni.lu.mics.mics_project.nmbd.infra.repository.RepoMultiCallback;
 import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
 
@@ -42,9 +41,10 @@ public class FriendsActivity extends AppCompatActivity {
     private final ExtendedListUser friendReqList = new ExtendedListUser();
     //Friend List
     private final ExtendedListUser friendList = new ExtendedListUser();
-    DbManager dbManager = new DbManager(new Factory());
-    RepoFacade repoFacade = dbManager.connect();
-    UserRepository userRepo = repoFacade.userRepo();
+
+
+    AppGlobalState globalState;
+    UserRepository userRepo;
     //Reference to the user logged in
     private User currentUser;
     private String currentUserID;
@@ -58,6 +58,9 @@ public class FriendsActivity extends AppCompatActivity {
     private RecyclerView mFriendListRecyclerView;
     private FriendListAdapter mFriendListAdapter;
     private TextView friendsLabel;
+    //Friend recommendation variable
+    private LinearLayout friendRecom;
+
 
     private LinearLayout friendsReqLayout;
     private View friendsReqDivider;
@@ -65,7 +68,9 @@ public class FriendsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
-
+        //Initialize the global state and database variables
+        globalState = (AppGlobalState) getApplicationContext();
+        userRepo = globalState.getRepoFacade().userRepo();
         //Retrieve current user
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
@@ -81,10 +86,12 @@ public class FriendsActivity extends AppCompatActivity {
         mSearchResultRecyclerView = findViewById(R.id.friends_activity_search_result_recyclerview);
         friendsReqLayout =  findViewById(R.id.friend_req_layout);
         friendsReqDivider = findViewById(R.id.friends_divider);
+        friendRecom = findViewById(R.id.recom);
         //initialize the friend search recyclerView, friend request recycler view
         initializeSearchRecyclerView();
         initializeFriendRecyclerView();
         initializeFriendReqRecyclerView();
+        setFriendRecommendation();
 
         //Add listener to search edit view so Recycler view can be updated when there is a change
         searchEdit.addTextChangedListener(new TextWatcher() {
@@ -247,6 +254,13 @@ public class FriendsActivity extends AppCompatActivity {
         updateFriendReqLists();
     }
 
+    public void sendFriendRequest(String sendUserID){
+        currentUser.addFriendToReqSentList(sendUserID);
+        userRepo.addElement(currentUserID, "friendReqSentList", sendUserID);
+        userRepo.addElement(sendUserID, "friendReqReceivedList", currentUserID);
+        //Display a toast for success on sending friend request
+        Log.d(TAG, "Friend request sent to " + sendUserID);
+    }
 
 
     public void initializeSearchRecyclerView() {
@@ -259,12 +273,8 @@ public class FriendsActivity extends AppCompatActivity {
                     public void onClickCallback(int p) {
                         //Add friend request to the currentUser object and update database
                         String sendUserID = searchResultList.getId(p);
-                        currentUser.addFriendToReqSentList(sendUserID);
-                        userRepo.addElement(currentUserID, "friendReqSentList", sendUserID);
-                        userRepo.addElement(sendUserID, "friendReqReceivedList", currentUserID);
-                        //Display a toast for success on sending friend request
+                        sendFriendRequest(sendUserID);
                         Toast.makeText(FriendsActivity.this, "Friend request sent to " + searchResultList.getName(p), Toast.LENGTH_LONG).show();
-                        Log.d(TAG, "Friend request sent to " + searchResultList.getName(p));
                         //Clear the search results and removes the search results from screen
                         searchResultList.removeElement(p);
                         mFriendSearchListAdapter.notifyItemRemoved(p);
@@ -287,6 +297,64 @@ public class FriendsActivity extends AppCompatActivity {
                 adapter.notifyItemInserted(extList.getIdIndexOfLast());
             }
         });
+    }
+
+    public void setFriendRecommendation(){
+        //Initially hide the friend recommendation layout
+        friendRecom.setVisibility(View.GONE);
+        //Run a thread as it could be a time consuming operation
+        new Thread(new Runnable() {
+            public void run() {
+                //Arraylist to store all the friends of the current user's friends
+                final ArrayList<String> friendsOfFriends = new ArrayList<>();
+                //Retrieving data from firestore
+                userRepo.getAll(new RepoMultiCallback<User>() {
+                    @Override
+                    public void onCallback(ArrayList<User> users) {
+                        for (User user : users){
+                            for (String friend:user.getFriendList()){
+                                //adding all the friends of friends to the list
+                                friendsOfFriends.add(friend);
+                            }
+                        }
+                        //Using the FriendRecommender object to find which is the most common friend in the list
+                        FriendRecommender fRecom = new FriendRecommender(currentUser, friendsOfFriends);
+                        if (fRecom.getRecommendation()!=null) {
+                            final String recomID = fRecom.getRecommendation();
+                            final int numFriendsCommon = fRecom.getNumCommon();
+                            //Getting the most likely common friend User Object from the database
+                            userRepo.findById(recomID, new RepoCallback<User>() {
+                                @Override
+                                public void onCallback(final User user) {
+                                    //Sets the friend recommendation layout to visible
+                                    friendRecom.setVisibility(View.VISIBLE);
+                                    //Display the name of the friend
+                                    TextView recomName = findViewById(R.id.recom_result_name);
+                                    recomName.setText(user.getName());
+                                    //Display the number of friends in common
+                                    TextView recom_number = findViewById(R.id.recom_number_TextView);
+                                    recom_number.setText("You have "+ numFriendsCommon +" friends in common.");
+                                    //Display the user picture
+                                    ImageView recom_pic = findViewById(R.id.recom_pic_imageView);
+                                    ImageViewUtils.displayUserCirclePicID(FriendsActivity.this, recomID, recom_pic);
+                                    //sets the button
+                                    Button sendReq = findViewById(R.id.recom_button);
+                                    sendReq.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            sendFriendRequest(recomID);
+                                            Toast.makeText(FriendsActivity.this, "Friend request sent to: "+ user.getName(), Toast.LENGTH_SHORT).show();
+                                            setFriendRecommendation();
+                                        }
+                                    });
+
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        }).start();
     }
 
     public void backToHomepage(){

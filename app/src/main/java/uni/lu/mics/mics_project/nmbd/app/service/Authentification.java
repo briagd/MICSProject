@@ -26,6 +26,7 @@ public class Authentification {
     final private String TAG = "Authentification";
 
     public Authentification(){
+        //Define the different possible authentification methods, Email or Google Account
         providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build(),
                 new AuthUI.IdpConfig.GoogleBuilder().build()
@@ -35,6 +36,7 @@ public class Authentification {
         );
     }
 
+    //Create the sign in page using the defined providers and with the app theme
     public Intent createSignInIntent() {
         Intent intent = AuthUI.getInstance().createSignInIntentBuilder()
                 .setAvailableProviders(providers)
@@ -44,28 +46,32 @@ public class Authentification {
         return intent;
     }
 
-
+    //Returns the authentificated user
     public FirebaseUser getCurrentUser(){
         return FirebaseAuth.getInstance().getCurrentUser();
     }
 
-
+    //Returns the ID of the authentificated user
     public String getAuthUid(){
         return getCurrentUser().getUid();
     }
 
+    //Returns the name of the authentificated user
     public String getAuthDisplayName(){
         return getCurrentUser().getDisplayName();
     }
 
+    //returns the email of the authentificated user
     public String getAuthEmail(){
         return getCurrentUser().getEmail();
     }
 
+    //Checks if a user is already signed in
     public Boolean isUserSignedIn(){
         return (getCurrentUser()!=null);
     }
 
+    //Change password to a new password
     public void updatePassword(String newPassword){
         getCurrentUser().updatePassword(newPassword)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -78,6 +84,7 @@ public class Authentification {
                 });
     }
 
+    //Sign out the user
     public void signOut(final Context context, Class targetActivity){
         AuthUI.getInstance()
                 .signOut(context)

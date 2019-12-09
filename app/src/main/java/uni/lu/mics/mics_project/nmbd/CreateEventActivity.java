@@ -25,7 +25,9 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -96,18 +98,23 @@ public class CreateEventActivity extends AppCompatActivity {
     private boolean isEditingPicPicked = false;
     private Event eventEditing;
 
+    //Private event
+    private Switch privateSwitch;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_event);
-
+        //Initialize the repo and storage services
         globalState = (AppGlobalState) getApplicationContext();
         eventRepo = globalState.getRepoFacade().eventRepo();
         storageService = globalState.getServiceFacade().storageService();
 
+        //Get the intent and retrieve the current user object
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
 
+        //Initialize the different view elements
         addressEdit = findViewById(R.id.LocationPicker);
         eventCategory = (Spinner) findViewById(R.id.SpinnerEvent);
         eventImageButton = (ImageButton) findViewById(R.id.eventImage);
@@ -116,6 +123,7 @@ public class CreateEventActivity extends AppCompatActivity {
         startTimeEdit = findViewById(R.id.start_time_edit);
         endTimeEdit = findViewById(R.id.end_time_edit);
         dobEdit = (EditText) findViewById(R.id.DatePicker);
+        privateSwitch = findViewById(R.id.private_switch);
 
         setTimeFields();
         setDobFields();
@@ -123,16 +131,23 @@ public class CreateEventActivity extends AppCompatActivity {
 
         //Instantiate the receiver for the upload service
         mUpldRessultReceiver = new UploadResultReceiver(new Handler());
-        if (intent.getSerializableExtra("event")!=null){
+
+        //Check the intent to know if the event is being edited or created
+        if (intent.getSerializableExtra("event") != null) {
             isEditing = true;
+            //Get the event object
             eventEditing = (Event) intent.getSerializableExtra("event");
+            //updates the different text fields according to the event information
             setupFields();
             isImagePicked = true;
         }
-        if (isEditing){
+
+        //Attempts to retrieve the event picture if the event is being edited otherwise display the default pic
+        if (isEditing) {
             try {
                 ImageViewUtils.displayEventPicID(this, eventEditing.getId(), eventImageButton);
-            } catch(Exception e){
+            } catch (Exception e) {
+                //Picture might not have finished uploading at time the event is being uploaded
                 ImageViewUtils.displayEventUploadPic(this, eventImageButton);
             }
         } else {
@@ -141,6 +156,7 @@ public class CreateEventActivity extends AppCompatActivity {
 
     }
 
+    //Updates the different fields if the event is to be edited
     private void setupFields() {
         nameEdit.setText(eventEditing.getName());
         descriptionEdit.setText(eventEditing.getDescription());
@@ -148,17 +164,18 @@ public class CreateEventActivity extends AppCompatActivity {
         startTimeEdit.setText(eventEditing.getStartTime());
         endTimeEdit.setText(eventEditing.getEndTime());
         dobEdit.setText(eventEditing.getDate());
-
     }
 
     public void imageOnclick(View view) {
         selectImage();
     }
 
+    //Set the category spinner
     public void setSpinner() {
         eventCategory.setAdapter(new ArrayAdapter<Event.EventCategory>(this, android.R.layout.simple_spinner_dropdown_item, Event.EventCategory.values()));
     }
 
+    //Start time and end time field
     private void setTimeFields() {
 
         startTimeEdit.setInputType(InputType.TYPE_NULL);
@@ -195,16 +212,16 @@ public class CreateEventActivity extends AppCompatActivity {
     }
 
 
-    public String setTimeFormat(String t){
-        if (t.length() == 1){
-            return("0" + t);
+    //Format the time to a string
+    public String setTimeFormat(String t) {
+        if (t.length() == 1) {
+            return ("0" + t);
         }
         return t;
     }
 
+    //Configures the date picker
     public void setDobFields() {
-        //Configures the date picker
-
         dobEdit.setInputType(InputType.TYPE_NULL);
 
         dobEdit.setOnClickListener(new View.OnClickListener() {
@@ -225,7 +242,7 @@ public class CreateEventActivity extends AppCompatActivity {
                                 try {
                                     Date enteredDate = sdf.parse(eventDate);
                                     Date currentDate = cldr.getTime();
-                                    if (enteredDate.compareTo(currentDate)>=0){
+                                    if (enteredDate.compareTo(currentDate) >= 0) {
                                         dobEdit.setText(eventDate);
                                     } else {
                                         Toast.makeText(CreateEventActivity.this, "Please set a date in the future for your event", Toast.LENGTH_LONG).show();
@@ -247,6 +264,8 @@ public class CreateEventActivity extends AppCompatActivity {
 //        }
     }
 
+
+    //Get the picture selected from service
     @Override
     protected void onActivityResult(int reqCode, int resultCode, Intent data) {
         super.onActivityResult(reqCode, resultCode, data);
@@ -270,6 +289,7 @@ public class CreateEventActivity extends AppCompatActivity {
         }
     }
 
+    //Creates a service for a picture to be selected from app or camera
     private void selectImage() {
         //Check if camera permission has been granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -346,7 +366,7 @@ public class CreateEventActivity extends AppCompatActivity {
         return image;
     }
 
-
+    //Check that all the fields have correctly been filled and display appropriate message to user
     public Boolean isFormFilled() {
         Boolean isAllFilled = true;
 
@@ -400,50 +420,49 @@ public class CreateEventActivity extends AppCompatActivity {
         return isAllFilled;
     }
 
+    //Whent the save button is pressed, the event object is sent to the database
     public void onClickSave(View v) {
-
+        //Check that the form is correctly filled
         if (isFormFilled()) {
-
-                Button saveButton = findViewById(R.id.SaveBtn);
-                saveButton.setVisibility(View.INVISIBLE);
-                String name = nameEdit.getText().toString();
-                String descr = descriptionEdit.getText().toString();
-                String strDate = dobEdit.getText().toString();
-                String category = eventCategory.getSelectedItem().toString();
-
-                String startTime = startTimeEdit.getText().toString();
-                String endTime = endTimeEdit.getText().toString();
-
-                event.setName(name);
-                event.setDescription(descr);
-                event.setDate(strDate);
-                event.setCreator(currentUser.getId());
-                event.setCategory(category);
-                event.setCreator(currentUser.getId());
-                event.addParticipant(currentUser.getId());
-
-                event.setStartTime(startTime);
-                event.setEndTime(endTime);
-
-                event.addAdmin(currentUser.getId());
-
-
-                String address = addressEdit.getText().toString();
-                if (!TextUtils.isEmpty(address)) {
-                    event.setEventAddress(address);
-                    GeoPoint p = LocationUtils.getLocationFromAddress(this, address);
-
-                    if (p != null) {
-                        event.setGpsLat((float) p.getLatitude());
-                        event.setGpsLong((float) p.getLongitude());
-                    }
+            //Remove the save button so that the event cannot be saved twice
+            Button saveButton = findViewById(R.id.SaveBtn);
+            saveButton.setVisibility(View.INVISIBLE);
+            //Retrieve the information by the user
+            String name = nameEdit.getText().toString();
+            String descr = descriptionEdit.getText().toString();
+            String strDate = dobEdit.getText().toString();
+            String category = eventCategory.getSelectedItem().toString();
+            String startTime = startTimeEdit.getText().toString();
+            String endTime = endTimeEdit.getText().toString();
+            Boolean isPrivate = privateSwitch.isChecked();
+            //Sets all the fields for the event object to be created
+            event.setName(name);
+            event.setDescription(descr);
+            event.setDate(strDate);
+            event.setCreator(currentUser.getId());
+            event.setCategory(category);
+            event.setCreator(currentUser.getId());
+            event.addParticipant(currentUser.getId());
+            event.setStartTime(startTime);
+            event.setEndTime(endTime);
+            event.addAdmin(currentUser.getId());
+            event.setPrivate(isPrivate);
+            //Get the gps coordinates from the address
+            String address = addressEdit.getText().toString();
+            if (!TextUtils.isEmpty(address)) {
+                event.setEventAddress(address);
+                GeoPoint p = LocationUtils.getLocationFromAddress(this, address);
+                if (p != null) {
                     event.setGpsLat((float) p.getLatitude());
                     event.setGpsLong((float) p.getLongitude());
-
                 }
+                event.setGpsLat((float) p.getLatitude());
+                event.setGpsLong((float) p.getLongitude());
+            }
+            //Check if the event is being edited to know if a picture is already chosen and to set the correct ID
             if (isEditing) {
                 event.setId(eventEditing.getId());
-                if (isEditingPicPicked){
+                if (isEditingPicPicked) {
                     Log.d(TAG, "Image was picked");
                     uploadFile(imgUri);
                 } else {
@@ -454,25 +473,18 @@ public class CreateEventActivity extends AppCompatActivity {
                     event.setEventAdmins(eventEditing.getEventAdmins());
                 }
                 eventRepo.set(event.getId(), event);
-
-
             } else {
-
                 eventRepo.addWithoutId(event, new RepoCallback<String>() {
                     @Override
                     public void onCallback(String model) {
                         eventRepo.update(model, "id", model);
                         event.setId(model);
                         uploadFile(imgUri);
-
                     }
                 });
             }
-
-
             Toast.makeText(CreateEventActivity.this, "Event Saved", Toast.LENGTH_SHORT).show();
             //go to Event activity
-
             Intent intent = setIntent(event, imgUri);
             startActivity(intent);
             finish();
@@ -484,13 +496,14 @@ public class CreateEventActivity extends AppCompatActivity {
         Intent intent = new Intent(CreateEventActivity.this, EventActivity.class);
         intent.putExtra("currentUser", currentUser);
         intent.putExtra("currentEvent", event);
-        if(isImagePicked && imgUri!=null) {
-            Log.d(TAG,"sending pic uri as intent");
+        if (isImagePicked && imgUri != null) {
+            Log.d(TAG, "sending pic uri as intent");
             intent.putExtra("image", imgUri.toString());
         }
         return intent;
     }
 
+    //Service to upload a picture
     private void uploadFile(Uri imgUri) {
         if (imgUri != null) {
             Log.d(TAG, "Starting upload service");
@@ -518,7 +531,6 @@ public class CreateEventActivity extends AppCompatActivity {
         UploadResultReceiver(Handler handler) {
             super(handler);
         }
-
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
         }

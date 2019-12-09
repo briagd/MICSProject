@@ -31,18 +31,10 @@
                 android:layout_height="10dp"
                 android:background="@android:color/transparent" />
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/eventInvitationRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <View
-                    android:id="@+id/divider15"
-                    android:layout_width="300dp"
-                    android:layout_height="match_parent"
-                    android:background="@android:color/transparent" />
-
-            </LinearLayout>
+                android:layout_height="wrap_content" />
 
             <View
                 android:id="@+id/divider3"

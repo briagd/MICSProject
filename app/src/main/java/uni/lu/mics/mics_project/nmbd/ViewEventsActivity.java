@@ -25,7 +25,7 @@ import uni.lu.mics.mics_project.nmbd.adapters.AdapterCallBack;
 import uni.lu.mics.mics_project.nmbd.adapters.EventListAdapter;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
-import uni.lu.mics.mics_project.nmbd.app.service.ExtendedListEvent;
+import uni.lu.mics.mics_project.nmbd.app.service.ExtendedList.ExtendedListEvent;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.domain.model.Event;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
@@ -112,9 +112,11 @@ public class ViewEventsActivity extends AppCompatActivity {
                         @Override
                         public void onCallback(ArrayList<Event> models) {
                             for (Event event : models) {
-                                //add the the name and user id to the lists send to the recyclerview
-                                addEventToExtendedLis(event.getId(), searchResultList, mEventSearchListAdapter);
+                                if (!event.isPrivate()) {
+                                    //add the the name and user id to the lists send to the recyclerview
+                                    addEventToExtendedLis(event.getId(), searchResultList, mEventSearchListAdapter);
                                     Log.d(TAG, event.getName() + "was found in search");
+                                }
                             }
                         }
                     });

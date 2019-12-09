@@ -27,7 +27,12 @@ public class Event implements Entity, Serializable {
     // List of admins by UIDs
     private List<String> eventAdmins;
     private String creator;
+
     private float rating;
+
+    private int likes;
+    private boolean isPrivate;
+
 
     public Event(){
         this.eventParticipants = new ArrayList<>();
@@ -37,12 +42,16 @@ public class Event implements Entity, Serializable {
         this.rating = 0f;
         this.startTime = "00:00";
         this.endTime = "00:01";
+        this.isPrivate = true;
     }
 
     public Event(String name, String description, String date, String creator, String category) throws DomainException {
         if (name == null || name.isEmpty()){
             throw new DomainException("name can't be empty");
         }
+
+        //this.id = id;
+
         this.name = name;
         this.description = description;
         this.date = date;
@@ -54,7 +63,12 @@ public class Event implements Entity, Serializable {
         this.eventAdmins.add(creator);
         this.category = category;
         this.coverPicUrl = "event_avatar.jpg";
+
         this.rating = 0f;
+
+        this.likes = 0;
+        this.isPrivate = true;
+
     }
 
     public String getId() {
@@ -161,6 +175,12 @@ public class Event implements Entity, Serializable {
         this.eventInvited = eventInvited;
     }
 
+    public void addEventInvited(String uid){
+        if (!eventInvited.contains(uid)) {
+            eventInvited.add(uid);
+        }
+    }
+
     public enum EventCategory{
         GENERAL,
         PARTY,
@@ -208,5 +228,13 @@ public class Event implements Entity, Serializable {
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean aPrivate) {
+        isPrivate = aPrivate;
     }
 }

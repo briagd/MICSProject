@@ -9,13 +9,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import uni.lu.mics.mics_project.nmbd.R;
 import uni.lu.mics.mics_project.nmbd.app.service.ExtendedList.ExtendedListUser;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 
-public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.FriendListViewHolder>{
+public class FriendInviteAdapter extends RecyclerView.Adapter<FriendInviteAdapter.FriendInviteViewHolder>{
 
     private final ExtendedListUser mFriendList;
     private LayoutInflater mInflater;
@@ -23,7 +24,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
     private final Context context;
 
 
-    public FriendListAdapter(Context context, ExtendedListUser extListUser,
+    public FriendInviteAdapter(Context context, ExtendedListUser extListUser,
                              AdapterCallBack listener) {
         mInflater = LayoutInflater.from(context);
         this.mFriendList = extListUser;
@@ -33,15 +34,15 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
 
     @NonNull
     @Override
-    public FriendListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public FriendInviteAdapter.FriendInviteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View mItemView = mInflater.inflate(R.layout.friend_item,
                 parent, false);
-        FriendListViewHolder holder = new FriendListViewHolder(mItemView,this);
+        FriendInviteAdapter.FriendInviteViewHolder holder = new FriendInviteAdapter.FriendInviteViewHolder(mItemView,this);
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull FriendListViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull FriendInviteAdapter.FriendInviteViewHolder holder, int position) {
 
         String mCurrent = mFriendList.getName(position);
         ImageViewUtils.displayUserCirclePicID(context, mFriendList.getId(position), holder.friendPicImageView);
@@ -56,19 +57,21 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
     }
 
 
-    public class FriendListViewHolder extends RecyclerView.ViewHolder{
+    public class FriendInviteViewHolder extends RecyclerView.ViewHolder{
         private final TextView friendItemView;
-        private final Button unfriendButton;
+        private final Button inviteButton;
         private final ImageView friendPicImageView;
-        private final FriendListAdapter mAdapter;
+        private final FriendInviteAdapter mAdapter;
         private AdapterCallBack myClickListener;
 
-        private FriendListViewHolder(View itemView, FriendListAdapter adapter){
+        private FriendInviteViewHolder(View itemView, FriendInviteAdapter adapter){
             super(itemView);
             friendItemView = itemView.findViewById(R.id.friend_name_label);
             friendPicImageView = itemView.findViewById(R.id.friend_item_pic_imageView);
-            unfriendButton = itemView.findViewById(R.id.unfriend_button);
-            unfriendButton.setOnClickListener(new View.OnClickListener() {
+            inviteButton = itemView.findViewById(R.id.unfriend_button);
+            inviteButton.setText("Invite");
+            inviteButton.setBackgroundColor(ContextCompat.getColor(inviteButton.getContext(), R.color.blue));
+            inviteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     myClickListener.onClickCallback(getAdapterPosition());
