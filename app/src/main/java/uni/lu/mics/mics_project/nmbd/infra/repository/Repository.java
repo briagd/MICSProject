@@ -5,7 +5,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -220,11 +219,11 @@ public class Repository<T extends Entity> {
 
     //Used for querying database, and return all the objects for which a field (could be number or string) is greater or equal to a given value
     public void whereGreaterThanOrEqualTo(String field, String toCompare, final RepoMultiCallback<T> repoCallback){
-        this.collectionRef.whereGreaterThanOrEqualTo(field, toCompare).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        this.collectionRef.orderBy(field).startAt(toCompare).endAt(toCompare+"\uf8ff").limit(5).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 ArrayList<T> models = new ArrayList<>();
-                for (QueryDocumentSnapshot document : task.getResult()) {
+                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                     models.add(document.toObject(modelClass));
                 }
                 repoCallback.onCallback(models);
