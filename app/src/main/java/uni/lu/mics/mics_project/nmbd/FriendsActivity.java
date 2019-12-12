@@ -314,10 +314,13 @@ public class FriendsActivity extends AppCompatActivity {
                     @Override
                     public void onCallback(ArrayList<User> users) {
                         for (User user : users) {
-                            if (currentUser.getFriendList().contains(user)) {
+                            Log.d(TAG, "onCallback: Users size:"+users.size());
+                            if (currentUser.getFriendList().contains(user.getId())) {
+                               Log.d(TAG, "user retrieved from friend list"+user.getName());
                                 for (String friend : user.getFriendList()) {
                                     //adding all the friends of friends to the list
                                     friendsOfFriends.add(friend);
+                                    Log.d(TAG, "setFriendRecommendation: "+ friendsOfFriends.size());
                                 }
                             }
                         }
