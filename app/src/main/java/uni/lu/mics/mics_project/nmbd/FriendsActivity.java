@@ -26,6 +26,7 @@ import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.ExtendedList.ExtendedListUser;
 import uni.lu.mics.mics_project.nmbd.app.service.FriendRecommender;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
+import uni.lu.mics.mics_project.nmbd.domain.model.Event;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.repository.RepoCallback;
 import uni.lu.mics.mics_project.nmbd.infra.repository.RepoMultiCallback;
@@ -66,6 +67,9 @@ public class FriendsActivity extends AppCompatActivity {
     private LinearLayout friendsReqLayout;
     private View friendsReqDivider;
 
+    private boolean isEventParticipants = false;
+    private Event currentEvent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +81,12 @@ public class FriendsActivity extends AppCompatActivity {
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
         currentUserID = currentUser.getId();
+        //If the intent has an Event as extra then the activity should show the participants of the event
+        if (intent.hasExtra("event")) {
+            currentEvent = (Event) intent.getSerializableExtra("event");
+            Log.d(TAG, "onCreate: Number of event participants: "+currentEvent.getEventParticipants().size());
+            isEventParticipants = true;
+        }
 
         //Initialize the different views in layout
         searchEdit = findViewById(R.id.friends_activity_search_edit);
@@ -90,12 +100,36 @@ public class FriendsActivity extends AppCompatActivity {
         friendsReqDivider = findViewById(R.id.friends_divider);
         friendRecom = findViewById(R.id.recom);
         //initialize the friend search recyclerView, friend request recycler view
-        initializeSearchRecyclerView();
+
         initializeFriendRecyclerView();
         initializeFriendReqRecyclerView();
-        setFriendRecommendation();
+        initializeSearchRecyclerView();
 
-        //Add listener to search edit view so Recycler view can be updated when there is a change
+        //Checks if the activity is to view participants of an event, if so the search tool and friend recommendation are not used
+        if(isEventParticipants){
+            searchEdit.setVisibility(View.GONE);
+            friendRecom.setVisibility(View.GONE);
+            initializeParticipantsNotFriends();
+        } else{
+            setFriendRecommendation();
+            initializeSearchEdit();
+        }
+
+        setupToolbar();
+    }
+
+    private void initializeParticipantsNotFriends(){
+        searchResultList.clearLists();
+        for (String id : currentEvent.getEventParticipants()){
+            if (!currentUser.getFriendList().contains(id) && !currentUser.getFriendReqReceivedList().contains(id) && !currentUserID.equals(id)){
+                addFriendToExtendedList(id, searchResultList, mFriendSearchListAdapter);
+            }
+        }
+        mFriendSearchListAdapter.notifyDataSetChanged();
+    }
+
+    //Add listener to search edit view so Recycler view can be updated when there is a change
+    private void initializeSearchEdit() {
         searchEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -136,14 +170,16 @@ public class FriendsActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
             }
         });
-
-        setupToolbar();
     }
 
     public void updateFriendList() {
         //If there are no current friends then change the display message
         if (currentUser.getFriendList().size() == 0) {
-            friendsLabel.setText("You do not have any friend.");
+            if (isEventParticipants){
+                friendsLabel.setText("You do not have any friend participating in the event.");
+            }else {
+                friendsLabel.setText("You do not have any friend.");
+            }
             mFriendListRecyclerView.setVisibility(View.INVISIBLE);
         } else {
             friendsLabel.setText("Friends: ");
@@ -151,21 +187,44 @@ public class FriendsActivity extends AppCompatActivity {
             friendList.clearLists();
             mFriendListAdapter.notifyDataSetChanged();
             for (String id : currentUser.getFriendList()) {
-                addFriendToExtendedList(id, friendList, mFriendListAdapter);
+                if (isEventParticipants) {
+                    if(currentEvent.getEventParticipants().contains(id)) {
+                        addFriendToExtendedList(id, friendList, mFriendListAdapter);
+                    }
+                } else {
+                    addFriendToExtendedList(id, friendList, mFriendListAdapter);
+                }
             }
         }
     }
 
     public void updateFriendReqLists() {
         //If there are no friend request then the friend request label and recycler view can be set invisible
+        friendReqList.clearLists();
+        int pendingReq = 0;
         if (currentUser.getFriendReqReceivedList().size() == 0) {
-            friendsReqLayout.setVisibility(View.INVISIBLE);
-            mFriendReqListRecyclerView.setVisibility(View.INVISIBLE);
+            friendsReqLayout.setVisibility(View.GONE);
+            mFriendReqListRecyclerView.setVisibility(View.GONE);
         } else {
             for (String id : currentUser.getFriendReqReceivedList()) {
-                addFriendToExtendedList(id, friendReqList, mFriendRequestListAdapter);
+                //Checks if the activity is to show event participants
+                if(isEventParticipants){
+                    if(currentEvent.getEventParticipants().contains(id)){
+                        pendingReq++;
+                        addFriendToExtendedList(id, friendReqList, mFriendRequestListAdapter);
+                    }
+                }else{
+                    addFriendToExtendedList(id, friendReqList, mFriendRequestListAdapter);
+                }
             }
         }
+        Log.d(TAG, "updateFriendReqLists: Number of friend requests: "+friendReqList.getSize());
+        //Check if the activity is to view participants of an event and checks if there is any participant that has sent a friend request to the user
+        if(isEventParticipants && pendingReq==0){
+                friendsReqLayout.setVisibility(View.GONE);
+                mFriendReqListRecyclerView.setVisibility(View.GONE);
+        }
+
     }
 
     public void initializeFriendRecyclerView() {
@@ -185,6 +244,9 @@ public class FriendsActivity extends AppCompatActivity {
                 //Refresh the the list for the recycler view
                 friendList.removeElement(p);
                 mFriendListAdapter.notifyItemRemoved(p);
+                if (isEventParticipants){
+                    initializeParticipantsNotFriends();
+                }
                 if (currentUser.getFriendList().size() == 0) {
                     friendsLabel.setText("You do not have any friend.");
                     mFriendListRecyclerView.setVisibility(View.INVISIBLE);
@@ -223,11 +285,9 @@ public class FriendsActivity extends AppCompatActivity {
 
                         //Updates the friend list
                         updateFriendList();
-
+                        updateFriendReqLists();
                         if (currentUser.getFriendReqReceivedList().size() == 0) {
                             friendsReqLayout.setVisibility(View.INVISIBLE);
-
-
                         }
                     }
 
@@ -275,11 +335,23 @@ public class FriendsActivity extends AppCompatActivity {
                     public void onClickCallback(int p) {
                         //Add friend request to the currentUser object and update database
                         String sendUserID = searchResultList.getId(p);
+                        if(!isEventParticipants){
                         sendFriendRequest(sendUserID);
                         Toast.makeText(FriendsActivity.this, "Friend request sent to " + searchResultList.getName(p), Toast.LENGTH_LONG).show();
                         //Clear the search results and removes the search results from screen
                         searchResultList.removeElement(p);
                         mFriendSearchListAdapter.notifyItemRemoved(p);
+                        searchResultList.clearLists();
+                        mFriendSearchListAdapter.notifyDataSetChanged();
+                        }else{
+                            if (!currentUser.getFriendReqSentList().contains(sendUserID)){
+                                sendFriendRequest(sendUserID);
+                                Toast.makeText(FriendsActivity.this, "Friend request sent to " + searchResultList.getName(p), Toast.LENGTH_LONG).show();
+                            } else{
+                                Toast.makeText(FriendsActivity.this, "Friend request already sent to " + searchResultList.getName(p), Toast.LENGTH_LONG).show();
+                            }
+                        }
+
                     }
                 });
         // Connect the adapter with the recycler view.
@@ -377,6 +449,14 @@ public class FriendsActivity extends AppCompatActivity {
         backToHomepage();
     }
 
+    private void backToEventActivity(){
+        Intent intent = new Intent(FriendsActivity.this, EventActivity.class);
+        intent.putExtra("currentUser", currentUser);
+        intent.putExtra("currentEvent", currentEvent);
+        Log.d(TAG, "backToEventActivity: Number of event participants: "+currentEvent.getEventParticipants().size());
+        startActivity(intent);
+    }
+
     private void setupToolbar() {
         ImageView profileImageView = findViewById(R.id.profile_pic);
         ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(), profileImageView);
@@ -393,7 +473,11 @@ public class FriendsActivity extends AppCompatActivity {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                backToHomepage();
+                if (isEventParticipants){
+                    backToEventActivity();
+                } else {
+                    backToHomepage();
+                }
             }
         });
     }

@@ -381,7 +381,8 @@ public class EventActivity extends AppCompatActivity {
     //Displays pictures of some participants
     private void setParticipants() {
         //Retrieve the list of participants
-        List<String> participants = currentEvent.getEventParticipants();
+        List<String> participants = new ArrayList<>();
+        participants.addAll(currentEvent.getEventParticipants());
         int numParticipants = participants.size();
         Log.d(TAG, "Number of participants:" + numParticipants);
         if (numParticipants == 1 || numParticipants == 0) {
@@ -693,6 +694,13 @@ public class EventActivity extends AppCompatActivity {
         }
     }
 
+    public void viewParticipantsOnClick(View view) {
+        Intent intent = new Intent(this, FriendsActivity.class);
+        intent.putExtra("currentUser", currentUser);
+        intent.putExtra("event", currentEvent);
+        startActivity(intent);
+
+    }
 }
 
 
