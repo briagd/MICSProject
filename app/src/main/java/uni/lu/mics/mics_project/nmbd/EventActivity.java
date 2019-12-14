@@ -11,22 +11,27 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.api.LogDescriptor;
 
 import org.apache.commons.lang3.text.WordUtils;
 import org.osmdroid.api.IMapController;
@@ -52,6 +57,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import uni.lu.mics.mics_project.nmbd.adapters.CommentRvAdapter;
+import uni.lu.mics.mics_project.nmbd.adapters.RecyclerItemClickListener;
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
@@ -66,7 +72,8 @@ import uni.lu.mics.mics_project.nmbd.infra.repository.RepoCallback;
 import uni.lu.mics.mics_project.nmbd.infra.repository.RepoMultiCallback;
 import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
 
-public class EventActivity extends AppCompatActivity {
+public class EventActivity extends FragmentActivity
+        implements EditDeleteCommentsDialogFragment.EditDeleteListener{
 
     final String TAG = "EventActivity";
 
@@ -100,6 +107,9 @@ public class EventActivity extends AppCompatActivity {
     private RatingBar ratingBar;
     private TextView eventRating;
     private TextView scoreText;
+    private RelativeLayout commentLayout;
+    private EditDeleteCommentsDialogFragment editDeleteDialog;
+    private List<Comment> comments;
 
     private Button inviteButton;
 
@@ -167,7 +177,7 @@ public class EventActivity extends AppCompatActivity {
         setCommenterName(currentUser.getName());
         setCommenterPic();
         getComments();
-        //getRating();
+        setCommentsListener();
 
         navigationView = findViewById(R.id.navigationView);
         commentBody = findViewById(R.id.commentBody);
@@ -177,6 +187,27 @@ public class EventActivity extends AppCompatActivity {
         setRefuseInviteButton();
 
 
+    }
+
+
+    private void setCommentsListener(){
+        RecyclerView recyclerView = findViewById(R.id.rvcomments);
+        recyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(this, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override public void onItemClick(View view, int position) {
+                        Log.d(TAG, "onItemClick: RecyclerView Short Click");
+                    }
+
+                    @Override public void onLongItemClick(View view, int position) {
+                        Log.d(TAG, "onItemClick: RecyclerView Long Click");
+                        Log.d(TAG, "onLongItemClick: clicked position" );
+                        editDeleteDialog = new EditDeleteCommentsDialogFragment();
+                        editDeleteDialog.show(getSupportFragmentManager(), "Test");
+                        Log.d(TAG, "onLongItemClick: " + comments.get(position).getText());
+
+                    }
+                })
+        );
     }
 
 
@@ -530,6 +561,7 @@ public class EventActivity extends AppCompatActivity {
                     List<Comment> retrievedComments = dbComments;
                 if (retrievedComments != null) {
                     retrievedComments.sort(Comparator.comparing(u -> u.getDate()));
+                    comments = retrievedComments;
                     List<String> ownerIds = retrievedComments.stream().map(comment -> comment.getOwnerId()).collect(Collectors.toList());
                     List<String> testNames = retrievedComments.stream().map(comment -> comment.getOwnerName()).collect(Collectors.toList());
                     List<String> testPics = retrievedComments.stream().map(comment -> comment.getOwnerPic()).collect(Collectors.toList());
@@ -693,6 +725,24 @@ public class EventActivity extends AppCompatActivity {
         }
     }
 
+
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        Log.d(TAG, "onDialogPositiveClick: ");
+
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        Log.d(TAG, "onDialogNegativeClick: ");
+    }
+
+    @Override
+    public void onDialogNeutralClick(DialogFragment dialog) {
+        Log.d(TAG, "onDialogNeutralClick: ");
+        dialog.dismiss();
+    }
 }
 
 

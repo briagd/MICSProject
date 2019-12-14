@@ -333,10 +333,11 @@
             </LinearLayout>
 
             <RelativeLayout
+                android:id="@+id/commentlayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="15dp">
+                android:padding="15dp" >
 
                 <ImageView
                     android:paddingTop="5dp"

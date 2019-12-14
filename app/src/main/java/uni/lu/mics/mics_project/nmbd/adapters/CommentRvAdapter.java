@@ -25,8 +25,9 @@ public class CommentRvAdapter extends RecyclerView.Adapter<CommentRvAdapter.View
     private List<String> commenterNames;
     private List<String> UrlPics;
     private List<String> commentTexts;
-    private List<String> commentdates;
+    public List<String> commentdates;
     private List<String> commenterIds;
+    private View.OnClickListener mOnClickListener;
     private Context mContext;
 
     public CommentRvAdapter(Context mContext, List<String> commenterNames, List<String> urlPics, List<String> commentTexts, List<String> commentDates, List<String> commenterIds ) {
@@ -42,6 +43,7 @@ public class CommentRvAdapter extends RecyclerView.Adapter<CommentRvAdapter.View
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_commentlist_item, parent, false);
+        view.setOnClickListener(mOnClickListener);
         ViewHolder holder = new ViewHolder(view);
         return holder;
     }
