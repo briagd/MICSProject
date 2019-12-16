@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ProfileActivity">
+
+    <ScrollView
+        android:id="@+id/profile_activity_scroll_view"
+        android:layout_width="400dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/profile_activity_back_button"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/back_b"
+                    android:onClick="backOnclick" />
+
+                <ImageView
+                    android:id="@+id/profile_activity_thmb_imageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="80sp"
+                    android:adjustViewBounds="true"
+                    android:clickable="true"
+                    android:focusableInTouchMode="false"
+                    android:onClick="pictureOnClick"
+                    android:translationX="200sp"
+                    tools:srcCompat="@drawable/ic_profile_icons" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Tap to select a profile picture"
+                android:translationX="210dp" />
+
+            <View
+                android:id="@+id/divider7"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="@color/fui_transparent" />
+
+            <Button
+                android:id="@+id/profile_activity_upload_picture_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:background="@color/blue"
+                android:padding="4sp"
+                android:shadowColor="#000000"
+                android:shadowRadius="10"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:onClick="uploadPictureOnClick"
+                android:text="Upload Picture"
+                android:translationX="230dp" />
+
+            <View
+                android:id="@+id/divider6"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="@android:color/transparent" />
+
+            <View
+                android:id="@+id/divider4"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:background="@color/red"
+                android:padding="20dp"
+                android:paddingTop="20dp" />
+
+            <TextView
+                android:id="@+id/profile_activity_name_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:text="Name:" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/profile_activity_name_edit_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:ems="10"
+                    android:maxLength="40"
+                    android:inputType="textPersonName" />
+
+                <Button
+                    android:id="@+id/profile_activity_name_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/blue"
+                    android:padding="4sp"
+                    android:shadowColor="#000000"
+                    android:shadowRadius="10"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:onClick="saveNameOnclick"
+                    android:text="Save name" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/profile_activity_dob_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Birthday:" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/profile_activity_dob_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:layout_marginStart="8dp"
+                    android:inputType="textPersonName" />
+
+                <Button
+                    android:id="@+id/profile_activity_dob_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/blue"
+                    android:onClick="saveDobOnClick"
+                    android:padding="4sp"
+                    android:shadowColor="#000000"
+                    android:shadowRadius="10"
+                    android:text="Save"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/divider8"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:background="@color/red" />
+
+            <TextView
+                android:id="@+id/profile_activity_password_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Password:" />
+
+            <EditText
+                android:id="@+id/profile_activity_password_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Enter new password"
+                android:layout_marginStart="8dp"
+                android:inputType="textPassword" />
+
+            <TextView
+                android:id="@+id/profile_activity_confirmpassword_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Confirm Password:" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/profile_activity_confirmpassword_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="Confirm password"
+                    android:layout_marginStart="8dp"
+                    android:inputType="textPassword" />
+
+                <Button
+                    android:id="@+id/profile_activity_save_password_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/blue"
+                    android:padding="4sp"
+                    android:shadowColor="#000000"
+                    android:shadowRadius="10"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:onClick="savePasswordOnClick"
+                    android:text="Save Password" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

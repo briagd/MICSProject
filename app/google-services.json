@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "50275635772",
+    "firebase_url": "https://mics-android-project.firebaseio.com",
+    "project_id": "mics-android-project",
+    "storage_bucket": "mics-android-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:50275635772:android:0d20a3cd9af13f4f342939",
+        "android_client_info": {
+          "package_name": "uni.lu.mics.mics_project.nmbd"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "50275635772-5mmc303k5bffdums2h27jr08kpm5en73.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBu6996GYY-4kmWpS2IBeDQaMTIL0DLkw0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "50275635772-5mmc303k5bffdums2h27jr08kpm5en73.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

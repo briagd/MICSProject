@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="15dp"
+    android:id="@+id/parentRelativeLayout">
+
+    <ImageView
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:id="@+id/commenterPic"
+        android:src="@mipmap/ic_launcher" />
+
+    <TextView
+        android:id="@+id/commenterName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Eventzy User"
+        android:layout_marginStart="85dp"
+        android:layout_marginTop="0dp"
+        android:textSize="17sp"/>
+
+    <TextView
+        android:id="@+id/commentText"
+        android:layout_width="285dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="85dp"
+        android:layout_marginTop="30dp"/>
+
+    <TextView
+        android:id="@+id/commentTimestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="01/12/2019 18:46"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/commentText"
+
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="0dp"
+        android:textSize="12sp"/>
+
+
+
+</RelativeLayout>
