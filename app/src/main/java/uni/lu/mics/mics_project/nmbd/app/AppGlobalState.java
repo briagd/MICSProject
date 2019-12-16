@@ -27,4 +27,5 @@ public class AppGlobalState extends Application {
     public ServiceFacade getServiceFacade(){
         return this.serviceFacade;
     }
+
 }

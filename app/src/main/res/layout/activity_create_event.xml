@@ -21,6 +21,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <View
+                android:id="@+id/divider40"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="@android:color/transparent" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -30,11 +36,26 @@
                     android:id="@+id/eventImage"
                     android:layout_width="match_parent"
                     android:layout_height="185dp"
+                    android:background="@android:color/transparent"
                     android:onClick="imageOnclick"
                     app:srcCompat="@drawable/fui_idp_button_background_phone" />
 
 
             </LinearLayout>
+
+            <View
+                android:id="@+id/divider42"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="@android:color/transparent" />
+
+            <View
+                android:id="@+id/divider13"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:background="@color/orange" />
 
             <TextView
                 android:id="@+id/EventNameTag"
@@ -42,6 +63,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginRight="250dp"
                 android:text="Name" />
 
@@ -59,15 +81,25 @@
                     android:layout_marginTop="0dp"
                     android:ems="10"
                     android:hint="Name"
+                    android:maxLength="64"
                     android:inputType="textPersonName" />
 
             </LinearLayout>
+
+            <View
+                android:id="@+id/divider9"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:background="@color/orange" />
 
             <TextView
                 android:id="@+id/DescriptionNameTag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:text="Description" />
 
             <LinearLayout
@@ -88,6 +120,14 @@
 
             </LinearLayout>
 
+            <View
+                android:id="@+id/divider10"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:background="@color/orange" />
+
             <TextView
                 android:id="@+id/EventTypeTxt"
                 android:layout_width="wrap_content"
@@ -104,13 +144,53 @@
                 android:ems="10"
                 android:inputType="textPassword" />
 
+            <View
+                android:id="@+id/divider11"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:background="@color/orange" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/private_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="Invite Only" />
+
+                <Switch
+                    android:id="@+id/private_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_weight="1"
+                    android:paddingEnd="150dp"
+                    android:paddingBottom="8dp" />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/divider47"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:background="@color/orange" />
+
             <TextView
                 android:id="@+id/DateTag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Date"
-                tools:layout_marginTop="20dp" />
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Date" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -119,44 +199,115 @@
 
                 <EditText
                     android:id="@+id/DatePicker"
-                    android:layout_width="wrap_content"
+                    android:layout_width="299dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
+                    android:editable="false"
                     android:ems="10"
                     android:hint="Date"
-                    android:inputType="date"/>
+                    android:inputType="date" />
 
+            </LinearLayout>
+
+            <View
+                android:id="@+id/divider12"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:background="@color/orange" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/start_time_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Start Time:" />
+
+                <View
+                    android:id="@+id/divider46"
+                    android:layout_width="153dp"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+
+                <TextView
+                    android:id="@+id/end_time_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_weight="1"
+                    android:text="End Time:" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="45dp"
+                android:layout_height="match_parent"
                 android:orientation="horizontal">
 
                 <EditText
-                    android:id="@+id/LocationPicker"
+                    android:id="@+id/start_time_edit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:ems="10"
-                    android:hint="Location"
-                     />
-
-                <Button
-                    android:id="@+id/SaveLocationBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
+                    android:layout_marginLeft="8dp"
                     android:layout_weight="1"
-                    android:text="Save location" />
+                    android:ems="10"
+                    android:inputType="time" />
+
+                <View
+                    android:id="@+id/divider45"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+
+                <EditText
+                    android:id="@+id/end_time_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="time" />
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/profile_activity_profile_picture_view"
-                android:layout_width="wrap_content"
+            <View
+                android:id="@+id/divider44"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:background="@color/orange" />
+
+            <TextView
+                android:id="@+id/AddressTag"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:adjustViewBounds="true" />
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="10dp"
+                android:text="Address" />
+
+            <EditText
+                android:id="@+id/LocationPicker"
+                android:layout_width="299dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:hint="Enter the address of the event"
+                android:inputType="textMultiLine" />
+
+            <View
+                android:id="@+id/divider14"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:background="@color/orange" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -166,23 +317,35 @@
 
                 <Button
                     android:id="@+id/cancelBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:layout_marginLeft="210dp"
                     android:layout_marginTop="0dp"
-                    android:onClick="cancelOnClick"
-                    android:text="@android:string/cancel" />
+                    android:background="@drawable/cross"
+                    android:onClick="cancelOnClick" />
+
+                <View
+                    android:id="@+id/divider5"
+                    android:layout_width="45dp"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
 
                 <Button
                     android:id="@+id/SaveBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="0dp"
-                    android:onClick="onClickSave"
-                    android:text="save" />
+                    android:background="@drawable/check"
+                    android:onClick="onClickSave" />
 
             </LinearLayout>
+
+            <View
+                android:id="@+id/divider41"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:background="@android:color/transparent" />
 
         </LinearLayout>
     </ScrollView>

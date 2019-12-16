@@ -4,7 +4,7 @@ package uni.lu.mics.mics_project.nmbd.infra.repository;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-
+import androidx.annotation.Nullable;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -12,27 +12,52 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Map;
 
+import uni.lu.mics.mics_project.nmbd.domain.model.Entity;
 
-public class Repository<T> {
+
+public class Repository<T extends Entity> {
+
 
     protected CollectionReference collectionRef;
     // class object whose is model (event or user)
-    private Class<T> modelClass;
+    protected Class<T> modelClass;
 
     public Repository(CollectionReference collectionRef, Class<T> modelClass) {
         this.collectionRef = collectionRef;
         this.modelClass = modelClass;
     }
 
-    public void findById(String docID, final RepoCallback<T> repoCallback) {
-        DocumentReference docRef = this.collectionRef.document(docID);
+    public String generateId() {
+        return this.collectionRef.document().getId();
+    }
+
+    public void list(final RepoMultiCallback<T> repoCallback){
+        collectionRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()){
+                    ArrayList<T> models = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : task.getResult())
+                        models.add(document.toObject(modelClass));
+                    repoCallback.onCallback(models);
+                }
+            }
+        });
+    }
+
+    //Returns an object identified from its id
+    public void findById(final String docId, final RepoCallback<T> repoCallback) {
+        DocumentReference docRef = this.collectionRef.document(docId);
         docRef.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
@@ -45,31 +70,57 @@ public class Repository<T> {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        //repoCallback.onCallback();
-                    }
-                });;
-    }
-
-    public void add(T model, final RepoCallback repoCallback) {
-        this.collectionRef.add(model)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d("DocAdding", "DocumentSnapshot written with ID: " + documentReference.getId());
-                        repoCallback.onGetField(documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("DocAdding", "Error adding document", e);
+                        Log.e("Repository", String.format("Entity (%s) not found ", docId));
+                        repoCallback.onCallback(null);
                     }
                 });
     }
 
-    /*
+    public Boolean existsDoc(String field, String value){
+        Query query = collectionRef.whereEqualTo(field, value);
+        if (query != null){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 
-     */
+    //Add an object model to the database if ID is known
+    public void add(final T model, final RepoCallback<Void> repoCallback) {
+        DocumentReference doc = this.collectionRef.document(model.getId());
+        doc.set(model)
+            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void v) {
+                    repoCallback.onCallback(v);
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w("DocAdding", "Error adding document", e);
+                }
+            });
+    }
+
+    //adds an object to the database and the id will be generated by the database
+    public void addWithoutId(final T model, final RepoCallback<String> repoCallback) {
+        this.collectionRef.add(model)
+        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            @Override
+            public void onSuccess(DocumentReference documentReference) {
+                 repoCallback.onCallback(documentReference.getId());
+            }
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    //Sets an object of ID uid to model, to be used if an object is to be replaced by a new one
     public void set(String uid, T model){
         this.collectionRef.document(uid).set(model).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
@@ -84,6 +135,7 @@ public class Repository<T> {
         });
     }
 
+    //Updates an object using a Map for the different fields to be updated
     public void update(String modelUid, Map<String, Object> updates) {
         DocumentReference docRef = this.collectionRef.document(modelUid);
         docRef.update(updates)
@@ -101,6 +153,7 @@ public class Repository<T> {
                 });
     }
 
+    //Updates input field of an object of known ID
     public void update(String modelUid, @NonNull String field, Object value, Object... moreFieldsAndValues){
         DocumentReference docRef = this.collectionRef.document(modelUid);
         docRef.update(field, value, moreFieldsAndValues)
@@ -118,17 +171,19 @@ public class Repository<T> {
                 });
     }
 
+    //Add one element to a field list of an object of known ID
     public void addElement(String modelUid, String listName, Object value){
         this.collectionRef.document(modelUid).update(listName, FieldValue.arrayUnion(value));
 
     }
 
+    //Remove one element to a field list of an object of known ID
     public void removeElement(String modelUid, String listName, Object value){
         this.collectionRef.document(modelUid).update(listName, FieldValue.arrayRemove(value));
 
     }
 
-
+    //Delete an object in the database given its ID
     public void delete(String modelUid) {
         this.collectionRef.document(modelUid).delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -145,8 +200,40 @@ public class Repository<T> {
                 });
     }
 
+    //Retrieve all the objects from a repository
+    public void getAll(final RepoMultiCallback<T> repoCallback){
+        this.collectionRef.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            ArrayList<T> models = new ArrayList<>();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                models.add(document.toObject(modelClass));
+                            }
+                            repoCallback.onCallback(models);
+                        }
+                    }
+                });
+    }
+
+    //Used for querying database, and return all the objects for which a field (could be number or string) is greater or equal to a given value
     public void whereGreaterThanOrEqualTo(String field, String toCompare, final RepoMultiCallback<T> repoCallback){
-        this.collectionRef.whereGreaterThanOrEqualTo(field, toCompare).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        this.collectionRef.orderBy(field).startAt(toCompare).endAt(toCompare+"\uf8ff").limit(5).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                ArrayList<T> models = new ArrayList<>();
+                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                    models.add(document.toObject(modelClass));
+                }
+                repoCallback.onCallback(models);
+            }
+        });
+    }
+
+    //Returns all objects that contain the string toCompare in a given field
+    public void whereArrayContains(String field, String toCompare, final RepoMultiCallback<T> repoCallback){
+        this.collectionRef.whereArrayContains(field, toCompare).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 ArrayList<T> models = new ArrayList<>();
@@ -157,5 +244,27 @@ public class Repository<T> {
             }
         });
     }
+
+    public void addUpdateListener(String uid, final RepoCallback<T> repoCallback){
+        this.collectionRef.document(uid).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w("addUpdateListener", "Listen failed.", e);
+                    return;
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    Log.d("addUpdateListener", "Current data: " + snapshot.getData());
+                    T model = snapshot.toObject(modelClass);
+                    repoCallback.onCallback(model);
+                } else {
+                    Log.d("addUpdateListener", "Current data: null");
+                }
+            }
+        });
+    }
+
 
 }

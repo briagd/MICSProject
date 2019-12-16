@@ -2,39 +2,51 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="uni.lu.mics.mics_project.nmbd">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
-        android:allowBackup="true"
         android:name=".app.AppGlobalState"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".FriendsActivity"></activity>
+        <activity android:name=".InviteActivity"></activity>
+        <activity android:name=".FriendsActivity" />
+        <activity android:name=".ViewEventsActivity" />
+        <activity android:name=".EventsMapActivity" />
         <activity android:name=".SandboxActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".EventActivity" />
         <activity android:name=".CreateEventActivity" />
         <activity android:name=".HomepageActivity" />
         <activity android:name=".MainActivity">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service
             android:name=".app.service.location.FetchAddressIntentService"
-            android:exported="false"/>
+            android:exported="false" />
         <service android:name=".app.service.uploadService.UploadIntentService" />
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.android.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
-
-
-
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 </manifest>

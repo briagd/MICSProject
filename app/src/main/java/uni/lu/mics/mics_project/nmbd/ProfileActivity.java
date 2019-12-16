@@ -1,12 +1,16 @@
 package uni.lu.mics.mics_project.nmbd;
 
-import android.annotation.SuppressLint;
+import android.Manifest;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.provider.MediaStore;
@@ -19,26 +23,25 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
-import com.google.firebase.storage.StorageReference;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 import uni.lu.mics.mics_project.nmbd.app.AppGlobalState;
 import uni.lu.mics.mics_project.nmbd.app.service.Authentification;
-import uni.lu.mics.mics_project.nmbd.app.service.ImageViewUtils;
+import uni.lu.mics.mics_project.nmbd.app.service.Images.ImageViewUtils;
 import uni.lu.mics.mics_project.nmbd.app.service.Storage;
-import uni.lu.mics.mics_project.nmbd.app.service.StorageCallback;
-import uni.lu.mics.mics_project.nmbd.app.service.StorageUploadCallback;
 import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadConstants;
-import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadIntentService;
 import uni.lu.mics.mics_project.nmbd.app.service.uploadService.UploadStartIntentService;
 import uni.lu.mics.mics_project.nmbd.domain.model.User;
 import uni.lu.mics.mics_project.nmbd.infra.repository.UserRepository;
@@ -76,17 +79,22 @@ public class ProfileActivity extends AppCompatActivity {
     //Receiver from UploadServiceIntent
     private UploadResultReceiver mUpldRessultReceiver;
 
+    //Variables for selecting picture
+    private String currentPhotoPath;
+    private final int PICFROMGALLERY = 1;
+    private final int PICFROMCAMERA = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-
+        //Retrieve the global repos
         globalState = (AppGlobalState) getApplicationContext();
         userRepo = globalState.getRepoFacade().userRepo();
         authService = globalState.getServiceFacade().authentificationService();
         storageService = globalState.getServiceFacade().storageService();
 
-
+        //Retrieve intents
         Intent intent = getIntent();
         currentUser = (User) intent.getSerializableExtra("currentUser");
         currentUserID = currentUser.getId();
@@ -94,23 +102,23 @@ public class ProfileActivity extends AppCompatActivity {
         //Instantiate the receiver for the upload service
         mUpldRessultReceiver = new UploadResultReceiver(new Handler());
 
-
+        //Sets the different fields
         setNameFields();
         setDobFields();
         setPasswordFields();
         setPicFields();
-
         displayProfilePic();
     }
 
+    //Sets the profile picture
     private void setPicFields() {
         thmbProfileImageView = findViewById(R.id.profile_activity_thmb_imageView);
         uploadPicButton = findViewById(R.id.profile_activity_upload_picture_button);
-        //Set Upload button and upload progress bar to invisible as no picture has been chosen
+        //Set Upload button to invisible as no picture has been chosen
         uploadPicButton.setVisibility(View.INVISIBLE);
     }
 
-
+    //Sets the name fields and display a save button only if name is changed
     public void setNameFields(){
         nameEdit = findViewById(R.id.profile_activity_name_edit_view);
         saveNameButton = findViewById(R.id.profile_activity_name_button);
@@ -140,6 +148,7 @@ public class ProfileActivity extends AppCompatActivity {
         Toast.makeText(this, "Name updated", Toast.LENGTH_SHORT).show();
     }
 
+    //Set the date of birth fields
     public void setDobFields(){
         //Configures the date picker
         saveDobButton = findViewById(R.id.profile_activity_dob_button);
@@ -176,6 +185,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    //sets the save date of birth button on click action
     public void saveDobOnClick(View view) {
         String dob = dobEdit.getText().toString();
         currentUser.setDateOfBirth(dob);
@@ -199,6 +209,8 @@ public class ProfileActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+
+    //Sets the edit password fields
     public void setPasswordFields(){
         passwordEdit = findViewById(R.id.profile_activity_password_edit);
         confirmPasswordEdit = findViewById(R.id.profile_activity_confirmpassword_edit);
@@ -213,10 +225,12 @@ public class ProfileActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //if a password is entered the show the confirm password field is shown
                 confirmPasswordTextView.setVisibility(View.VISIBLE);
                 confirmPasswordEdit.setVisibility(View.VISIBLE);
                 String newPassword = s.toString();
                 String newConfirmPassword = confirmPasswordEdit.getText().toString();
+                //Check tha the two entered passwords match, if not ask user to correct
                 if (!newPassword.equals(newConfirmPassword)) {
                     Log.d(TAG, "Passwords do not match!");
                     //Changes the confirm password label to notify user that passwords do not match
@@ -228,6 +242,7 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) { }
         });
+        //When the confirm text is changed then the save button can be shown
         confirmPasswordEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -255,13 +270,15 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    //Action to take when the save password button is clciked
     public void savePasswordOnClick(View view) {
         String newPassword = passwordEdit.getText().toString();
         String newConfirmPassword = confirmPasswordEdit.getText().toString();
         //check that passwords match
         if(!newPassword.matches("") && newPassword.equals(newConfirmPassword)) {
-            //updates passwords on the database
+            //updates password in the database
             authService.updatePassword(newPassword);
+            //remove the entered texts
             passwordEdit.getText().clear();
             confirmPasswordEdit.getText().clear();
             confirmPasswordTextView.setVisibility(View.INVISIBLE);
@@ -272,28 +289,107 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    public void chooseImageOnClick(View view) {
-        openImageChooser();
+    //If the picture is clicked then a new picture can be selected
+    public void pictureOnClick(View view) {
+        selectImage();
     }
-
-    @SuppressLint("IntentReset")
-    private void openImageChooser(){
-        //Opens the images from Gallery saved on the phone to choose a profile picture
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
-    }
-
+    //Intent retrieved from the picture choosing service
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        //Sets the image view to the image chosen when intent is received
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode ==RESULT_OK && data!=null && data.getData()!= null){
-            imageUri = data.getData();
-            //Make the upload button visible
-            uploadPicButton.setVisibility(View.VISIBLE);
+    protected void onActivityResult(int reqCode, int resultCode, Intent data) {
+        super.onActivityResult(reqCode, resultCode, data);
+        if(resultCode != RESULT_CANCELED) {
+            if (resultCode == RESULT_OK ) {
+                switch (reqCode) {
+                    case PICFROMCAMERA:
+                        File file = new File(currentPhotoPath);
+                        imageUri  = Uri.fromFile(file);
+                        break;
+                    case PICFROMGALLERY:
+                        imageUri = data.getData();
+                        break;
+                }
+                uploadPicButton.setVisibility(View.VISIBLE);
+                ImageViewUtils.displayCirclePicUri(this, imageUri, thmbProfileImageView);
+            }else {
+                Toast.makeText(this, "You haven't picked Image", Toast.LENGTH_LONG).show();
+            }
         }
     }
+
+    private void selectImage() {
+        //Check if camera permission has been granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            final CharSequence[] options = {"Choose from Gallery", "Cancel"};
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Choose your profile picture");
+            builder.setItems(options, new DialogInterface.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.N)
+                @Override
+                public void onClick(DialogInterface dialog, int item) {
+                    if (options[item].equals("Choose from Gallery")) {
+                        Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(pickPhoto, PICFROMGALLERY);
+
+                    } else if (options[item].equals("Cancel")) {
+                        dialog.dismiss();
+                    }
+                }
+            });
+            builder.show();
+        }else {
+            final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Choose your profile picture");
+            builder.setItems(options, new DialogInterface.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.N)
+                @Override
+                public void onClick(DialogInterface dialog, int item) {
+                    if (options[item].equals("Take Photo")) {
+                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                            File image = null;
+                            try {
+                                image = createImageFile();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            if (image != null) {
+                                Uri photoURI = FileProvider.getUriForFile(ProfileActivity.this,
+                                        "com.example.android.fileprovider",
+                                        image);
+                                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                                startActivityForResult(takePictureIntent, PICFROMCAMERA);
+                            }
+                        }
+                    } else if (options[item].equals("Choose from Gallery")) {
+                        Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(pickPhoto, PICFROMGALLERY);
+
+                    } else if (options[item].equals("Cancel")) {
+                        dialog.dismiss();
+                    }
+                }
+            });
+            builder.show();
+        }
+    }
+    //Create a file when a picture with a unique name to be stored locally
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new android.icu.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
 
     public void uploadPictureOnClick(View view) {
         //Hides button so no attempt to upload multiple times possible
@@ -301,34 +397,28 @@ public class ProfileActivity extends AppCompatActivity {
         uploadFile();
     }
 
-
+    //Display the profile picture after a new one has been selected
     private void displayProfilePicAfterUpload(){
-        ImageViewUtils.displayCirclePicUri(ProfileActivity.this, imageUri,thmbProfileImageView );
+        if (imageUri!=null) {
+            ImageViewUtils.displayCirclePicUri(ProfileActivity.this, imageUri, thmbProfileImageView);
+        } else{
+            displayProfilePic();
+        }
     }
 
     private void displayProfilePic() {
-        String currentUserProfilePicUrl = currentUser.getProfilePicUrl();
-        final String gsUrl = this.getString(R.string.gsTb64ProfPicUrl);
-        storageService.getStorageReference(gsUrl, currentUserProfilePicUrl, new StorageCallback() {
-            @Override
-            public void onSuccess(StorageReference storageReference) {
-                ImageViewUtils.displayCirclePic(ProfileActivity.this, storageReference, thmbProfileImageView);
-                Log.d(TAG, "User profile picture correctly retrieved");
-            }
-            @Override
-            public void onFailure() {
-                ImageViewUtils.displayCircleAvatarPic(ProfileActivity.this, storageService, thmbProfileImageView);
-            }
-        });
+        ImageViewUtils.displayUserCirclePicID(this, currentUser.getId(),thmbProfileImageView );
     }
 
+    //Start service to select picture
     private void uploadFile(){
         if(imageUri!=null) {
             UploadStartIntentService.startIntentService(this, mUpldRessultReceiver, imageUri,
                     getString(R.string.gsProfilePicsStrgFldr), currentUserID, UploadConstants.PROFILE_TYPE);
-
         }
     }
+
+
 
     //Intent service to upload file
     /**

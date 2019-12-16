@@ -1,20 +1,15 @@
 package uni.lu.mics.mics_project.nmbd.domain.model;
 
-import android.content.res.Resources;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import uni.lu.mics.mics_project.nmbd.R;
+public class User implements Entity, Serializable {
 
-public class User implements Serializable {
-
-
-    private String username;
 
     private String id;
     private String name;
+    private String username;
     private String dateOfBirth;
     private int age;
     private String email;

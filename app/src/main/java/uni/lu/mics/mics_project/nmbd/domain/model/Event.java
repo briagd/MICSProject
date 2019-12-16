@@ -4,12 +4,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Event implements Serializable {
+public class Event implements Entity, Serializable {
 
-    private String eventId;
+
+    private String id;
     private String name;
     private String description;
     private String date;
+    private String startTime;
+    private String endTime;
     private String category;
     private String coverPicUrl;
 
@@ -25,21 +28,55 @@ public class Event implements Serializable {
     private List<String> eventAdmins;
     private String creator;
 
-    public Event(){}
+    private float rating;
+
+    private int likes;
+    private boolean isPrivate;
+
+
+    public Event(){
+        this.eventParticipants = new ArrayList<>();
+        this.eventInvited = new ArrayList<>();
+        this.eventAdmins = new ArrayList<>();
+        this.coverPicUrl = "event_avatar.jpg";
+        this.rating = 0f;
+        this.startTime = "00:00";
+        this.endTime = "00:01";
+        this.isPrivate = true;
+    }
 
     public Event(String name, String description, String date, String creator, String category) throws DomainException {
         if (name == null || name.isEmpty()){
             throw new DomainException("name can't be empty");
         }
+
+        //this.id = id;
+
         this.name = name;
         this.description = description;
         this.date = date;
         this.creator = creator;
         this.eventParticipants = new ArrayList<>();
         this.eventParticipants.add(creator);
+        this.eventInvited = new ArrayList<>();
         this.eventAdmins = new ArrayList<>();
         this.eventAdmins.add(creator);
         this.category = category;
+        this.coverPicUrl = "event_avatar.jpg";
+
+        this.rating = 0f;
+
+        this.likes = 0;
+        this.isPrivate = true;
+
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -98,14 +135,6 @@ public class Event implements Serializable {
         this.creator = creator;
     }
 
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
-    }
-
-    public String getEventId() {
-        return eventId;
-    }
-
     public String getCategory() {
         return category;
     }
@@ -122,6 +151,36 @@ public class Event implements Serializable {
         this.coverPicUrl = coverPicUrl;
     }
 
+    public float getGpsLat() {
+        return gpsLat;
+    }
+
+    public void setGpsLat(float gpsLat) {
+        this.gpsLat = gpsLat;
+    }
+
+    public float getGpsLong() {
+        return gpsLong;
+    }
+
+    public void setGpsLong(float gpsLong) {
+        this.gpsLong = gpsLong;
+    }
+
+    public List<String> getEventInvited() {
+        return eventInvited;
+    }
+
+    public void setEventInvited(List<String> eventInvited) {
+        this.eventInvited = eventInvited;
+    }
+
+    public void addEventInvited(String uid){
+        if (!eventInvited.contains(uid)) {
+            eventInvited.add(uid);
+        }
+    }
+
     public enum EventCategory{
         GENERAL,
         PARTY,
@@ -129,5 +188,53 @@ public class Event implements Serializable {
         CONCERT,
         TRIP
 
+    }
+
+    public float getRating() {
+        return this.rating;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
+    }
+
+    public void addParticipant(String uid){
+        if (!eventParticipants.contains(uid)) {
+            eventParticipants.add(uid);
+        }
+    }
+
+    public void addAdmin(String uid) {
+        if (!eventAdmins.contains(uid)) {
+            eventAdmins.add(uid);
+        }
+    }
+
+    public void removeParticipant(String uid){
+        eventParticipants.remove(uid);
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean aPrivate) {
+        isPrivate = aPrivate;
     }
 }

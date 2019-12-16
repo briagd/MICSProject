@@ -16,4 +16,12 @@ public class Factory {
     public EventRepository makeEventRepository(FirebaseFirestore dbRef){
         return new EventRepository(dbRef);
     }
+
+    public CommentRepository makeCommentRepository(FirebaseFirestore dbRef){
+        return new CommentRepository(dbRef);
+    }
+
+    public RatingRepository makeRatingRepository(FirebaseFirestore dbRef){
+        return new RatingRepository(dbRef);
+    }
 }
